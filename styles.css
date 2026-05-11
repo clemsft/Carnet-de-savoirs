@@ -1938,6 +1938,7 @@ input[type="range"].w-range::-moz-range-thumb {
   padding: 0;
   border: none;
   overflow: hidden;
+  position: relative;
 }
 .globe-fd-svg {
   width: 100%;
@@ -1947,6 +1948,51 @@ input[type="range"].w-range::-moz-range-thumb {
      jusqu'aux bords pour qu'il n'y ait aucun liseré. */
   background: transparent;
 }
+/* ---- Mode plein écran ----
+   Le wrapper occupe tout le viewport en position fixe ; le SVG s'étire
+   en hauteur pour exploiter toute la place disponible. La règle sur
+   body.globe-fullscreen-active masque la sidebar et la topbar pour que
+   la carte ait toute la fenêtre pour respirer. */
+.globe-fd-wrap.is-fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  border-radius: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.globe-fd-wrap.is-fullscreen .globe-fd-svg {
+  width: 100%;
+  height: 100%;
+  max-height: 100vh;
+}
+body.globe-fullscreen-active .sidebar,
+body.globe-fullscreen-active .topbar { display: none !important; }
+body.globe-fullscreen-active { overflow: hidden; }
+
+/* Bouton "Quitter" flottant en haut à droite du wrap, visible uniquement
+   en mode plein écran (la toolbar étant masquée par le wrap fixe). */
+.globe-fs-exit {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: none;
+  background: rgba(20, 20, 30, 0.85);
+  color: var(--text);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+  padding: 0.55rem 0.95rem;
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  z-index: 10;
+  backdrop-filter: blur(4px);
+}
+.globe-fs-exit:hover { border-color: var(--text); }
+.globe-fd-wrap.is-fullscreen .globe-fs-exit { display: block; }
 /* Champ d'étoiles d'arrière-plan : décoratif, jamais cliquable */
 .globe-fd-stars {
   pointer-events: none;
@@ -2125,8 +2171,95 @@ input[type="range"].w-range::-moz-range-thumb {
 }
 .globe-fd-svg.labels-minimal .globe-fd-node:hover .globe-fd-label,
 .globe-fd-svg.labels-minimal .globe-fd-node.is-focus .globe-fd-label,
-.globe-fd-svg.labels-minimal .globe-fd-node.is-neighbor .globe-fd-label {
+.globe-fd-svg.labels-minimal .globe-fd-node.is-neighbor .globe-fd-label,
+.globe-fd-svg.labels-minimal .globe-fd-node.is-pinned .globe-fd-label {
   opacity: 1;
+}
+
+/* Quand un sujet a le focus (survol OU épinglé), son label est agrandi
+   pour bien le distinguer de ses voisins, et clairement visible. */
+.globe-fd-svg.has-focus .globe-fd-node.is-focus .globe-fd-label {
+  font-size: 15px;
+  font-weight: 600;
+}
+.globe-fd-svg .globe-fd-node.is-pinned .globe-fd-label {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* ---- Étiquettes des clusters de domaine ----
+   Un texte discret au-dessus de chaque bulle floue : permet d'identifier
+   d'un coup d'œil "ici la Physique, là l'Histoire". On utilise la couleur
+   du domaine, en majuscules espacées, opacité atténuée. */
+.globe-fd-cluster-label {
+  font-family: var(--f-display);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.55;
+  pointer-events: none;
+  paint-order: stroke fill;
+  stroke: var(--bg-card);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+/* En mode focus, les labels de cluster s'estompent pour ne pas concurrencer
+   les labels de nœuds. */
+.globe-fd-svg.has-focus .globe-fd-cluster-label { opacity: 0.18; }
+
+/* ---- Mode épinglé : visuel du sujet sélectionné ----
+   On souligne le sujet épinglé avec un anneau et un curseur, pour bien
+   distinguer "j'ai cliqué ici, ça reste là" du simple survol. */
+.globe-fd-node { cursor: pointer; }
+.globe-fd-node:focus { outline: none; }
+.globe-fd-node.is-pinned .globe-fd-dot {
+  stroke-width: 2.5px;
+  filter: drop-shadow(0 0 12px currentColor);
+}
+.globe-fd-node.is-pinned .globe-fd-halo {
+  opacity: 0.4;
+}
+
+/* ---- Bouton "Ouvrir cette fiche" dans le panneau d'info ---- */
+.globe-info-header-row {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.4rem;
+}
+.globe-info-header-row .globe-info-title {
+  margin: 0;
+  flex: 1 1 auto;
+}
+.globe-info-open {
+  color: var(--accent, var(--text));
+  font-size: 0.92rem;
+  text-decoration: none;
+  font-weight: 500;
+  white-space: nowrap;
+  border-bottom: 1px dashed currentColor;
+  padding-bottom: 1px;
+  transition: opacity 0.15s;
+}
+.globe-info-open:hover { opacity: 0.7; }
+
+/* ---- Bouton d'action dans la toolbar (plein écran, etc.) ---- */
+.globe-btn-action {
+  background: var(--bg-card);
+  color: var(--text);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+  padding: 0.55rem 0.9rem;
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.globe-btn-action:hover {
+  border-color: var(--text);
+  color: var(--text);
 }
 
 /* Visibilité (filtre) */

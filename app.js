@@ -3281,7 +3281,11 @@
     const timeById = {};
     top.forEach(t => { timeById[t.id] = t.timeMs; });
 
-    const W = 960, H = 720, cx = W / 2, cy = H / 2;
+    // Canvas plus généreux maintenant qu'on a 44+ sujets : on a besoin de
+    // place pour que les nœuds respirent et que les labels ne se chevauchent
+    // pas en permanence. preserveAspectRatio garantit que ça reste lisible
+    // sur n'importe quelle largeur de conteneur.
+    const W = 1280, H = 920, cx = W / 2, cy = H / 2;
     const nodes = sujets.map((s, i) => {
       const angle = (i / sujets.length) * Math.PI * 2;
       const labelClean = String(s.meta.titre).replace(/<[^>]+>/g, '');
@@ -3460,12 +3464,12 @@
     // domaine s'attirent vers leur centre de gravité, ce qui crée
     // visuellement des clusters distincts.
     const ITER = 380;
-    const REPULSION = 18000;
+    const REPULSION = 22000;
     const ATTRACTION = 0.022;
     const CENTER_FORCE = 0.0014;
     const DOMAIN_COHESION = 0.020;
     const DAMPING = 0.86;
-    const MIN_DIST = 100;
+    const MIN_DIST = 130;
 
     // Pré-calculer la liste des domaines et l'appartenance des nœuds
     const nodesByDomain = {};
@@ -3617,7 +3621,20 @@
       cbWeakEdges,
       el('span', null, 'Afficher les liens faibles')
     );
-    main.appendChild(el('div', { class: 'globe-toolbar' }, search, domSel, isolatedToggle, weakEdgesToggle));
+    // Par défaut : labels masqués sauf au survol/focus (mode "carte
+    // stellaire ultra-aérée"). Coché = on affiche tous les labels en
+    // permanence pour une vue d'ensemble nominative.
+    const cbAllLabels = el('input', { type: 'checkbox' });
+    const allLabelsToggle = el('label', { class: 'globe-toggle' },
+      cbAllLabels,
+      el('span', null, 'Tous les labels')
+    );
+    const fullscreenBtn = el('button', {
+      class: 'globe-btn-action',
+      title: 'Passer la carte en plein écran (Echap pour sortir)'
+    }, '⛶ Plein écran');
+    main.appendChild(el('div', { class: 'globe-toolbar' },
+      search, domSel, isolatedToggle, weakEdgesToggle, allLabelsToggle, fullscreenBtn));
 
     // ---- Rendu SVG ----
     function attrEscape(s) {
@@ -3644,6 +3661,7 @@
     // qui regroupe au moins 2 sujets. Donne une lecture immédiate des
     // "constellations" thématiques sans saturer l'image. ----
     let bubbles = '';
+    let bubbleLabels = '';
     clusterDomains.forEach(domain => {
       const members = nodesByDomain[domain];
       if (members.length < 2) return;
@@ -3656,11 +3674,17 @@
         const dd = Math.sqrt(dxm * dxm + dym * dym);
         if (dd > maxR) maxR = dd;
       });
-      const radius = maxR + 55;
+      const radius = maxR + 60;
       const fill = domainColor(domain);
       bubbles += `<circle class="globe-fd-cluster" cx="${mx.toFixed(1)}" cy="${my.toFixed(1)}" r="${radius.toFixed(1)}" fill="${fill}"/>`;
+      // Étiquette du cluster : placée légèrement au-dessus du bord supérieur
+      // de la bulle. On la pousse un peu vers l'intérieur si elle dépasse.
+      let lblY = my - radius - 10;
+      if (lblY < 30) lblY = my + radius + 24;
+      bubbleLabels += `<text class="globe-fd-cluster-label" x="${mx.toFixed(1)}" y="${lblY.toFixed(1)}" text-anchor="middle" fill="${fill}">${attrEscape(domain)}</text>`;
     });
     svgInner += `<g class="globe-fd-clusters" aria-hidden="true">${bubbles}</g>`;
+    svgInner += `<g class="globe-fd-cluster-labels" aria-hidden="true">${bubbleLabels}</g>`;
 
     // ---- Arêtes : courbes de Bézier quadratiques pour un rendu organique ----
     // Les longues arêtes (cross-cluster) sont davantage incurvées vers
@@ -3689,6 +3713,11 @@
     });
 
     // ---- Nœuds : halo + cercle + label ----
+    // Note : on n'enveloppe plus le cercle dans un <a> car le clic est
+    // désormais utilisé pour épingler le focus (et non pour ouvrir la
+    // fiche). L'ouverture du sujet se fait depuis le panneau d'info via
+    // le bouton "Ouvrir cette fiche", ou via Entrée quand le nœud est
+    // focalisé au clavier.
     nodes.forEach(n => {
       const color = domainColor(n.domain);
       const r = 8 + Math.min(14, Math.sqrt(Math.max(0, n.timeMs) / 60000));
@@ -3698,28 +3727,40 @@
                : n.lblAnchor === 'end'   ? n.lblBX + halfW
                : n.lblBX;
       const ty = n.lblBY + 4.5;
-      svgInner += `<g class="globe-fd-node${isIsolated ? ' is-isolated' : ''}" data-id="${attrEscape(n.id)}" data-domain="${attrEscape(n.domain)}" style="color: ${color}">
+      svgInner += `<g class="globe-fd-node${isIsolated ? ' is-isolated' : ''}" data-id="${attrEscape(n.id)}" data-domain="${attrEscape(n.domain)}" style="color: ${color}" tabindex="0" role="button" aria-label="${attrEscape(n.label)}">
         <circle class="globe-fd-halo" cx="${n.x.toFixed(1)}" cy="${n.y.toFixed(1)}" r="${(r * 1.9).toFixed(1)}" fill="${color}"/>
-        <a href="#/sujet/${encodeURIComponent(n.id)}">
-          <circle class="globe-fd-dot" cx="${n.x.toFixed(1)}" cy="${n.y.toFixed(1)}" r="${r.toFixed(1)}" fill="${color}" stroke="${color}"/>
-          <text x="${tx.toFixed(1)}" y="${ty.toFixed(1)}" text-anchor="${n.lblAnchor}" class="globe-fd-label">${attrEscape(n.shortLabel)}</text>
-        </a>
+        <circle class="globe-fd-dot" cx="${n.x.toFixed(1)}" cy="${n.y.toFixed(1)}" r="${r.toFixed(1)}" fill="${color}" stroke="${color}"/>
+        <text x="${tx.toFixed(1)}" y="${ty.toFixed(1)}" text-anchor="${n.lblAnchor}" class="globe-fd-label">${attrEscape(n.shortLabel)}</text>
       </g>`;
     });
 
     const wrap = el('div', { class: 'globe-fd-wrap' });
-    // Mode "weak-hidden" actif par défaut : les arêtes de poids 1 sont
-    // masquées pour réduire le bruit visuel.
-    wrap.innerHTML = `<svg class="globe-fd-svg weak-hidden" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">${svgInner}</svg>`;
+    // Modes par défaut :
+    //   - "weak-hidden" : les arêtes faibles (poids 1) sont masquées
+    //   - "labels-minimal" : les labels apparaissent uniquement au survol
+    //     ou sur le sujet épinglé, pour réduire la saturation visuelle
+    //     quand la carte contient plusieurs dizaines de sujets.
+    wrap.innerHTML = `<svg class="globe-fd-svg weak-hidden labels-minimal" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">${svgInner}</svg>`;
+    // Bouton d'exit flottant visible uniquement en mode plein écran : la
+    // toolbar n'est plus accessible quand wrap couvre tout le viewport,
+    // donc on a besoin d'une porte de sortie cliquable (Echap fonctionne
+    // aussi, mais ce n'est pas évident sur mobile).
+    const exitFsBtn = el('button', {
+      class: 'globe-fs-exit',
+      title: 'Quitter le plein écran (Echap)'
+    }, '✕  Quitter');
+    wrap.appendChild(exitFsBtn);
     main.appendChild(wrap);
 
     // ---- Panneau d'info "ce qui relie ces sujets" ----
     const infoDefault = el('div', { class: 'globe-info-default' },
-      'Survole un sujet sur la carte — ce panneau affichera ses voisins et ce qui les relie : tags partagés, citation [[slug]] dans le cours, ou lien explicite déclaré dans le sujet.');
+      'Survole un sujet sur la carte — clique pour épingler son focus. Ce panneau affiche ses voisins et ce qui les relie : tags partagés, citation [[slug]] dans le cours, ou lien explicite déclaré.');
     const infoTitle = el('h3', { class: 'globe-info-title' });
+    const infoOpenBtn = el('a', { class: 'globe-info-open', href: '#' }, 'Ouvrir cette fiche →');
+    const infoHeader = el('div', { class: 'globe-info-header-row' }, infoTitle, infoOpenBtn);
     const infoSubtitle = el('p', { class: 'globe-info-subtitle' });
     const infoList = el('ul', { class: 'globe-info-list' });
-    const infoFocused = el('div', { class: 'globe-info-focused' }, infoTitle, infoSubtitle, infoList);
+    const infoFocused = el('div', { class: 'globe-info-focused' }, infoHeader, infoSubtitle, infoList);
     infoFocused.hidden = true;
     const infoPanel = el('div', { class: 'globe-info-panel' }, infoDefault, infoFocused);
     main.appendChild(infoPanel);
@@ -3838,6 +3879,7 @@
       infoDefault.hidden = true;
       infoFocused.hidden = false;
       infoTitle.textContent = node.label;
+      infoOpenBtn.setAttribute('href', '#/sujet/' + encodeURIComponent(id));
 
       if (neighborIds.length === 0) {
         infoSubtitle.textContent = 'Aucune connexion — ajoute un tag commun ou un lien [[' + node.id + ']] dans un autre cours pour le rattacher.';
@@ -3943,12 +3985,96 @@
       });
     }
 
+    // ---- Mode épinglé : clic = focus persistant ----
+    // Tant qu'un sujet est épinglé, le survol des autres ne change pas
+    // l'affichage — l'utilisateur peut lire tranquillement le panneau.
+    // Cliquer sur le même sujet ou ailleurs (fond) le déépingle, et la
+    // touche Echap fonctionne aussi.
+    let pinnedId = null;
+
+    function applyPin(id) {
+      pinnedId = id || null;
+      nodeEls.forEach(g => g.classList.toggle('is-pinned', g.getAttribute('data-id') === pinnedId));
+      if (pinnedId) {
+        highlight(pinnedId);
+        updateInfoPanel(pinnedId);
+      } else {
+        highlight(null);
+        // Le panneau garde sa dernière vue par design — pas de reset.
+      }
+    }
+
     nodeEls.forEach(g => {
       const id = g.getAttribute('data-id');
-      g.addEventListener('mouseenter', () => { highlight(id); updateInfoPanel(id); });
-      g.addEventListener('mouseleave', () => highlight(null));
-      g.addEventListener('focusin', () => { highlight(id); updateInfoPanel(id); });
-      g.addEventListener('focusout', () => highlight(null));
+      g.addEventListener('mouseenter', () => {
+        if (pinnedId) return; // figé tant qu'un sujet est épinglé
+        highlight(id); updateInfoPanel(id);
+      });
+      g.addEventListener('mouseleave', () => {
+        if (pinnedId) return;
+        highlight(null);
+      });
+      g.addEventListener('focusin', () => {
+        if (pinnedId) return;
+        highlight(id); updateInfoPanel(id);
+      });
+      g.addEventListener('focusout', () => {
+        if (pinnedId) return;
+        highlight(null);
+      });
+      // Clic : épingle / déépingle ce sujet
+      g.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        applyPin(pinnedId === id ? null : id);
+      });
+      // Entrée au clavier : ouvre la fiche (raccourci direct)
+      g.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          navigate('/sujet/' + encodeURIComponent(id));
+        } else if (e.key === ' ') {
+          e.preventDefault();
+          applyPin(pinnedId === id ? null : id);
+        }
+      });
+    });
+
+    // Clic dans le SVG hors d'un nœud → déépingle
+    svgEl.addEventListener('click', (e) => {
+      if (!e.target.closest('.globe-fd-node') && pinnedId) {
+        applyPin(null);
+      }
+    });
+
+    // ---- Mode plein écran ----
+    function toggleFullscreen(on) {
+      const enable = on != null ? on : !wrap.classList.contains('is-fullscreen');
+      wrap.classList.toggle('is-fullscreen', enable);
+      document.body.classList.toggle('globe-fullscreen-active', enable);
+      fullscreenBtn.textContent = enable ? '⛶ Quitter le plein écran' : '⛶ Plein écran';
+    }
+    fullscreenBtn.addEventListener('click', () => toggleFullscreen());
+    exitFsBtn.addEventListener('click', () => toggleFullscreen(false));
+
+    // Echap : sortir du plein écran et/ou déépingler
+    function onEscape(e) {
+      if (e.key !== 'Escape') return;
+      if (wrap.classList.contains('is-fullscreen')) {
+        toggleFullscreen(false);
+      } else if (pinnedId) {
+        applyPin(null);
+      }
+    }
+    document.addEventListener('keydown', onEscape);
+    // Nettoyage minimal : si la vue est re-rendue, on s'assure que la classe
+    // body est retirée pour ne pas laisser sidebar/topbar masquées.
+    window.addEventListener('hashchange', function cleanupFs() {
+      if (document.body.classList.contains('globe-fullscreen-active')) {
+        document.body.classList.remove('globe-fullscreen-active');
+      }
+      window.removeEventListener('hashchange', cleanupFs);
+      document.removeEventListener('keydown', onEscape);
     });
 
     search.addEventListener('input', applyFilters);
@@ -3958,6 +4084,11 @@
     // arêtes de poids 1 (un seul tag partagé, généralement du bruit).
     cbWeakEdges.addEventListener('change', () => {
       svgEl.classList.toggle('weak-hidden', !cbWeakEdges.checked);
+    });
+    // Tous les labels : coché = on retire "labels-minimal" pour afficher
+    // tous les labels en permanence.
+    cbAllLabels.addEventListener('change', () => {
+      svgEl.classList.toggle('labels-minimal', !cbAllLabels.checked);
     });
   }
 
