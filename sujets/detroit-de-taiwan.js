@@ -15,7 +15,7 @@ window.CarnetDeSavoirs.register({
     difficulte: 3,
     duree_estimee_min: 35,
     prerequis: [],
-    lie_a: ['ia-generative'],
+    lie_a: ['ia-generative', 'arctique'],
     date_creation: '2026-05-10',
     date_maj: '2026-05-10'
   },

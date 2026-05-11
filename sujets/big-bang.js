@@ -15,7 +15,7 @@ window.CarnetDeSavoirs.register({
     difficulte: 2,
     duree_estimee_min: 30,
     prerequis: [],
-    lie_a: ['theorie-relativite', 'trous-noirs', 'mecanique-quantique'],
+    lie_a: ['theorie-relativite', 'trous-noirs', 'mecanique-quantique', 'theorie-des-cordes'],
     date_creation: '2026-05-11',
     date_maj: '2026-05-11'
   },

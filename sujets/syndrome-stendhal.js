@@ -15,7 +15,7 @@ window.CarnetDeSavoirs.register({
     difficulte: 2,
     duree_estimee_min: 25,
     prerequis: [],
-    lie_a: ['cerveau-humain', 'effet-placebo', 'paris-geographie', 'renaissance-italienne'],
+    lie_a: ['cerveau-humain', 'effet-placebo', 'paris-geographie', 'renaissance-italienne', 'gastronomie'],
     date_creation: '2026-05-11',
     date_maj: '2026-05-11'
   },

@@ -15,7 +15,7 @@ window.CarnetDeSavoirs.register({
     difficulte: 3,
     duree_estimee_min: 35,
     prerequis: [],
-    lie_a: ['monnaies-numeriques', 'detroit-de-taiwan', 'infini-mathematiques', 'conquete-spatiale-moderne'],
+    lie_a: ['monnaies-numeriques', 'detroit-de-taiwan', 'infini-mathematiques', 'conquete-spatiale-moderne', 'nombres-premiers', 'histoire-internet'],
     date_creation: '2026-05-10',
     date_maj: '2026-05-10'
   },

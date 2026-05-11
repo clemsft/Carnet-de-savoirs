@@ -15,7 +15,7 @@ window.CarnetDeSavoirs.register({
     difficulte: 2,
     duree_estimee_min: 30,
     prerequis: [],
-    lie_a: ['empire-byzantin', 'empire-ottoman', 'rome-antique'],
+    lie_a: ['empire-byzantin', 'empire-ottoman', 'rome-antique', 'cathedrales-gothiques', 'gastronomie'],
     date_creation: '2026-05-11',
     date_maj: '2026-05-11'
   },

@@ -15,7 +15,7 @@ window.CarnetDeSavoirs.register({
     difficulte: 3,
     duree_estimee_min: 35,
     prerequis: [],
-    lie_a: ['trous-noirs', 'ia-generative'],
+    lie_a: ['trous-noirs', 'ia-generative', 'theorie-des-cordes'],
     date_creation: '2026-05-10',
     date_maj: '2026-05-10'
   },

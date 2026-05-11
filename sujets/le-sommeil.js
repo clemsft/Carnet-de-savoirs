@@ -15,7 +15,7 @@ window.CarnetDeSavoirs.register({
     difficulte: 1,
     duree_estimee_min: 25,
     prerequis: [],
-    lie_a: ['systeme-immunitaire'],
+    lie_a: ['systeme-immunitaire', 'sport-physiologie'],
     date_creation: '2026-05-10',
     date_maj: '2026-05-10'
   },

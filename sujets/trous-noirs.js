@@ -16,7 +16,7 @@ window.CarnetDeSavoirs.register({
     difficulte: 2,
     duree_estimee_min: 25,
     prerequis: [],
-    lie_a: ['mecanique-quantique', 'conquete-spatiale-moderne'],
+    lie_a: ['mecanique-quantique', 'conquete-spatiale-moderne', 'theorie-des-cordes'],
     date_creation: '2026-05-09',
     date_maj: '2026-05-09'
   },

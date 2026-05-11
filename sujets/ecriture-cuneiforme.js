@@ -15,7 +15,7 @@ window.CarnetDeSavoirs.register({
     difficulte: 2,
     duree_estimee_min: 25,
     prerequis: [],
-    lie_a: ['empire-byzantin', 'paris-geographie'],
+    lie_a: ['empire-byzantin', 'paris-geographie', 'pyramides-egypte'],
     date_creation: '2026-05-10',
     date_maj: '2026-05-10'
   },

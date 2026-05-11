@@ -15,7 +15,7 @@ window.CarnetDeSavoirs.register({
     difficulte: 2,
     duree_estimee_min: 30,
     prerequis: [],
-    lie_a: ['le-sommeil'],
+    lie_a: ['le-sommeil', 'sport-physiologie'],
     date_creation: '2026-05-10',
     date_maj: '2026-05-10'
   },

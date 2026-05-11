@@ -15,7 +15,7 @@ window.CarnetDeSavoirs.register({
     difficulte: 3,
     duree_estimee_min: 35,
     prerequis: [],
-    lie_a: ['mecanique-quantique', 'trous-noirs', 'big-bang'],
+    lie_a: ['mecanique-quantique', 'trous-noirs', 'big-bang', 'theorie-des-cordes'],
     date_creation: '2026-05-11',
     date_maj: '2026-05-11'
   },
