@@ -1,0 +1,19 @@
+{
+  "name": "Carnet de Savoirs",
+  "short_name": "Carnet",
+  "description": "Atelier d'apprentissage personnel — sujets multi-vues, quiz, cartes mentales et suivi.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0a0a14",
+  "theme_color": "#ff6b35",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "carnet.ico",
+      "sizes": "256x256",
+      "type": "image/x-icon"
+    }
+  ]
+}

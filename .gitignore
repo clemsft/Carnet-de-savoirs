@@ -1,0 +1,18 @@
+# Snapshots zip out-of-band — git remplace ce système, plus besoin de tracker.
+# Le v1.0_initial.zip reste sur disque comme artefact historique mais n'est pas versionné.
+_backups/
+
+# Détritus Windows
+Thumbs.db
+desktop.ini
+ehthumbs.db
+$RECYCLE.BIN/
+
+# Éditeurs (au cas où)
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Exports JSON de progression (si jamais sauvegardés ici par accident)
+carnet-de-savoirs-*.json

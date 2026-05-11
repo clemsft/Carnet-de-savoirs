@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carnet de Savoirs</title>
+  <meta name="description" content="Mon atelier d'apprentissage personnel">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,800&family=Spectral:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- KaTeX pour le widget Equation. Chargement asynchrone — l'app
+       fonctionne sans (le widget retombe sur le texte brut). -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <link rel="stylesheet" href="styles.css">
+  <!-- Le <link rel="manifest"> n'est pas posé ici car en file:// il
+       déclenche des erreurs CORS. Il est attaché en JS dans CDS.start
+       uniquement si on est en HTTP(S), où la PWA peut fonctionner. -->
+  <link rel="icon" href="carnet.ico" type="image/x-icon">
+  <meta name="theme-color" content="#ff6b35">
+</head>
+<body>
+  <div id="app"></div>
+
+  <!-- ============ CŒUR DE L'APP ============ -->
+  <script src="app.js" charset="UTF-8"></script>
+
+  <!-- ============ SUJETS ============
+       Chaque sujet est un fichier .js qui s'auto-enregistre.
+       Cowork ajoute une nouvelle ligne <script> ici à chaque
+       nouveau sujet généré.
+  -->
+  <script src="sujets/trous-noirs.js" charset="UTF-8"></script>
+  <script src="sujets/abysses-oceaniques.js" charset="UTF-8"></script>
+  <script src="sujets/adn-genetique.js" charset="UTF-8"></script>
+  <script src="sujets/antibiotiques.js" charset="UTF-8"></script>
+  <script src="sujets/big-bang.js" charset="UTF-8"></script>
+  <script src="sujets/cerveau-humain.js" charset="UTF-8"></script>
+  <script src="sujets/changement-climatique.js" charset="UTF-8"></script>
+  <script src="sujets/conquete-spatiale-moderne.js" charset="UTF-8"></script>
+  <script src="sujets/detroit-de-taiwan.js" charset="UTF-8"></script>
+  <script src="sujets/ecriture-cuneiforme.js" charset="UTF-8"></script>
+  <script src="sujets/effet-placebo.js" charset="UTF-8"></script>
+  <script src="sujets/empire-byzantin.js" charset="UTF-8"></script>
+  <script src="sujets/empire-mongol.js" charset="UTF-8"></script>
+  <script src="sujets/empire-ottoman.js" charset="UTF-8"></script>
+  <script src="sujets/energie-nucleaire.js" charset="UTF-8"></script>
+  <script src="sujets/evolution-darwin.js" charset="UTF-8"></script>
+  <script src="sujets/ia-generative.js" charset="UTF-8"></script>
+  <script src="sujets/infini-mathematiques.js" charset="UTF-8"></script>
+  <script src="sujets/le-sommeil.js" charset="UTF-8"></script>
+  <script src="sujets/les-volcans.js" charset="UTF-8"></script>
+  <script src="sujets/mecanique-quantique.js" charset="UTF-8"></script>
+  <script src="sujets/megafeux.js" charset="UTF-8"></script>
+  <script src="sujets/memoire-humaine.js" charset="UTF-8"></script>
+  <script src="sujets/monnaies-numeriques.js" charset="UTF-8"></script>
+  <script src="sujets/paris-geographie.js" charset="UTF-8"></script>
+  <script src="sujets/photosynthese.js" charset="UTF-8"></script>
+  <script src="sujets/renaissance-italienne.js" charset="UTF-8"></script>
+  <script src="sujets/revolution-francaise.js" charset="UTF-8"></script>
+  <script src="sujets/rome-antique.js" charset="UTF-8"></script>
+  <script src="sujets/route-de-la-soie.js" charset="UTF-8"></script>
+  <script src="sujets/stoicisme.js" charset="UTF-8"></script>
+  <script src="sujets/syndrome-stendhal.js" charset="UTF-8"></script>
+  <script src="sujets/systeme-immunitaire.js" charset="UTF-8"></script>
+  <script src="sujets/theorie-relativite.js" charset="UTF-8"></script>
+
+  <!-- ============ DÉMARRAGE ============ -->
+  <script charset="UTF-8">window.CarnetDeSavoirs.start();</script>
+</body>
+</html>
