@@ -185,6 +185,38 @@ La frontière actuelle : les **ordinateurs quantiques**, qui exploitent superpos
 
   quiz: [
     {
+      type: 'vrai-faux',
+      q: 'Vrai ou faux ?',
+      affirmation: 'L\'intrication quantique permet d\'envoyer un message plus vite que la lumière entre deux particules distantes.',
+      reponse: false,
+      explication: 'Bien que les corrélations entre particules intriquées soient instantanées, on ne peut pas s\'en servir pour transmettre de l\'information : les résultats individuels des mesures sont aléatoires. La causalité relativiste reste respectée — c\'est l\'une des subtilités les plus profondes de la théorie.'
+    },
+    {
+      type: 'ordre-chrono',
+      q: 'Remets ces jalons fondateurs de la mécanique quantique dans l\'ordre chronologique :',
+      items: [
+        'Planck postule les quanta d\'énergie (1900)',
+        'Einstein propose le photon pour expliquer l\'effet photoélectrique (1905)',
+        'Bohr publie son modèle atomique avec orbites discrètes (1913)',
+        'Heisenberg énonce le principe d\'incertitude (1927)',
+        'Le congrès Solvay oppose Bohr et Einstein (1927)',
+        'Aspect réalise à Orsay l\'expérience qui tranche en faveur de la non-localité (1982)'
+      ],
+      explication: 'La mécanique quantique se construit en moins de trente ans, de Planck (1900) à Heisenberg et au congrès Solvay (1927). Le débat Einstein-Bohr sur l\'intrication, ouvert en 1935 (EPR), ne sera tranché expérimentalement qu\'en 1982 par Aspect.'
+    },
+    {
+      type: 'associer',
+      q: 'Associe chaque physicien à sa contribution majeure :',
+      paires: [
+        { gauche: 'Planck', droite: 'Quanta d\'énergie (1900)' },
+        { gauche: 'Heisenberg', droite: 'Principe d\'incertitude' },
+        { gauche: 'Schrödinger', droite: 'Équation d\'onde' },
+        { gauche: 'Bohr', droite: 'Modèle atomique à orbites discrètes' },
+        { gauche: 'Aspect', droite: 'Confirmation expérimentale de l\'intrication' }
+      ],
+      explication: 'Chacun des pères fondateurs apporte une pierre. Planck ouvre le bal en 1900, Bohr quantifie l\'atome en 1913, Heisenberg et Schrödinger formalisent la théorie en 1925-1926, et Aspect (Nobel 2022) tranche expérimentalement en 1982 le débat ouvert par Einstein.'
+    },
+    {
       q: 'Que signifie "quantification" en mécanique quantique ?',
       options: [
         'L\'utilisation de mathématiques pour décrire les phénomènes',

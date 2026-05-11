@@ -198,6 +198,31 @@ La **volatilité** reste extrême : le Bitcoin peut perdre 30 % en une semaine. 
 
   quiz: [
     {
+      type: 'vrai-faux',
+      q: 'Vrai ou faux ?',
+      affirmation: 'Le Bitcoin garantit l\'anonymat complet de ses utilisateurs.',
+      reponse: false,
+      explication: 'Bitcoin est pseudonyme, pas anonyme. Toutes les transactions sont publiquement inscrites sur la blockchain et associées à des adresses : si une adresse est reliée à une identité réelle (via un exchange régulé, par exemple), tout l\'historique devient traçable.'
+    },
+    {
+      type: 'ordre-chrono',
+      q: 'Remets ces étapes de l\'histoire des monnaies numériques dans l\'ordre :',
+      items: [
+        'Publication du white paper de Satoshi Nakamoto',
+        'Minage du bloc genesis de Bitcoin',
+        'Bulle spéculative des ICO',
+        'Bitcoin atteint ses records autour de 69 000 $',
+        'Effondrement de Terra/Luna et faillite de FTX'
+      ],
+      explication: 'Octobre 2008 (white paper) → janvier 2009 (bloc genesis) → 2017 (bulle des ICO) → 2021 (records à ~69 000 $) → 2022 (chute de Terra/Luna puis FTX). Chaque cycle a oscillé entre euphorie et crise.'
+    },
+    {
+      type: 'texte-a-trou',
+      q: 'Complète :',
+      texte: 'Le protocole Bitcoin limite à jamais l\'émission à {21} millions d\'unités, ce qui en fait, selon ses partisans, un {or} numérique.',
+      explication: 'Cette rareté programmée est inscrite dans le code et ne peut être modifiée sans l\'accord de la quasi-totalité du réseau. C\'est l\'opposé absolu d\'une monnaie d\'État dont la quantité peut être augmentée par décision politique.'
+    },
+    {
       q: 'Qui a inventé le Bitcoin ?',
       options: [
         'Elon Musk en 2010',

@@ -185,6 +185,33 @@ Le troisième, c'est l'**unification avec la mécanique quantique**. À l'instan
 
   quiz: [
     {
+      type: 'vrai-faux',
+      q: 'Vrai ou faux ?',
+      affirmation: 'Le Big Bang est une explosion qui a eu lieu en un point précis de l\'espace, à partir duquel la matière s\'est éparpillée.',
+      reponse: false,
+      explication: 'Le Big Bang n\'est pas une explosion dans l\'espace : c\'est l\'expansion de l\'espace lui-même, en tout point à la fois. Il n\'a pas de centre et l\'univers n\'a pas de "bord" depuis lequel la matière se disperserait.'
+    },
+    {
+      type: 'ordre-chrono',
+      q: 'Remets ces grandes phases de l\'univers dans l\'ordre chronologique :',
+      items: [
+        'Inflation cosmique (10⁻³² s)',
+        'Nucléosynthèse primordiale (~3 minutes)',
+        'Recombinaison et émission du fond diffus (380 000 ans)',
+        'Premières étoiles (~100 à 400 millions d\'années)',
+        'Premières galaxies (~1 milliard d\'années)',
+        'Naissance du Soleil (~9 milliards d\'années)',
+        'Expansion accélérée par l\'énergie noire (aujourd\'hui, ~13,8 Gda)'
+      ],
+      explication: 'L\'inflation déploie l\'univers dans la première fraction de seconde, puis la nucléosynthèse fige les proportions H/He en 3 minutes. À 380 000 ans, la recombinaison rend l\'univers transparent (fond diffus). Puis viennent les âges sombres, les premières étoiles, les galaxies, et enfin notre Soleil il y a ~4,6 Gda.'
+    },
+    {
+      type: 'texte-a-trou',
+      q: 'Complète :',
+      texte: 'Le fond diffus cosmologique, découvert par Penzias et Wilson en {1965}, est un rayonnement micro-onde uniforme à {2,7} K. L\'univers est devenu transparent à environ {380000} ans après le Big Bang.',
+      explication: 'Penzias et Wilson ont détecté en 1965 ce rayonnement résiduel à 2,7 K qui constitue l\'écho refroidi du moment où l\'univers, à 380 000 ans, est devenu transparent à la lumière.'
+    },
+    {
       q: `Qu'est-ce que le Big Bang, au sens du modèle cosmologique standard ?`,
       options: [
         `Une explosion qui a eu lieu en un point précis de l'espace`,

@@ -186,6 +186,30 @@ Et le **libre arbitre** ? Les expériences classiques de **Benjamin Libet** (198
 
   quiz: [
     {
+      type: 'vrai-faux',
+      q: 'Vrai ou faux ?',
+      affirmation: 'Le cervelet contient à lui seul plus de 50 % des neurones du cerveau, alors qu\'il n\'occupe qu\'environ 10 % de son volume.',
+      reponse: true,
+      explication: 'Surprenant mais vrai : le cervelet — situé à l\'arrière du crâne — concentre plus de la moitié des neurones du cerveau humain malgré son volume modeste. C\'est sa densité neuronale extrême qui en est la cause.'
+    },
+    {
+      type: 'associer',
+      q: 'Associe chaque lobe du cortex à sa fonction principale :',
+      paires: [
+        { gauche: 'Lobe frontal', droite: 'Décision, planification, inhibition' },
+        { gauche: 'Lobe pariétal', droite: 'Sensations corporelles, perception spatiale' },
+        { gauche: 'Lobe temporal', droite: 'Audition, langage compris, mémoire' },
+        { gauche: 'Lobe occipital', droite: 'Vision' }
+      ],
+      explication: 'Les quatre lobes du cortex : frontal (le "PDG" — décision, planification, langage moteur de Broca, maturation jusque vers 25 ans), pariétal (sensations, perception spatiale), temporal (audition, aire de Wernicke, hippocampe), occipital (~30 % du cortex dédié à la vision).'
+    },
+    {
+      type: 'texte-a-trou',
+      q: 'Complète ces chiffres clés sur le cerveau humain :',
+      texte: 'Le cerveau humain pèse environ {1,4} kg, contient environ {86} milliards de neurones, et consomme {20} % de l\'énergie totale du corps.',
+      explication: '~1,4 kg (soit 2 % de la masse corporelle), ~86 milliards de neurones (chiffre établi en 2009 par Suzana Herculano-Houzel, corrigeant l\'ancienne estimation de 100 milliards), ~20 % de la consommation énergétique totale.'
+    },
+    {
       q: 'Combien de neurones contient approximativement le cerveau humain ?',
       options: [
         '~1 milliard',

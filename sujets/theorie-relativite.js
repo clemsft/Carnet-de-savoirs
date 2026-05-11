@@ -193,6 +193,12 @@ Aujourd'hui, les satellites embarquent une horloge dont la fréquence est **dél
 
   quiz: [
     {
+      type: 'texte-a-trou',
+      q: 'Complète l\'équation et l\'année :',
+      texte: 'En {1905}, Einstein publie sa relativité restreinte, qui aboutit à la fameuse équivalence masse-énergie E = m {c}².',
+      explication: 'Année miraculeuse 1905 : Einstein publie quatre articles révolutionnaires dont la relativité restreinte. L\'équivalence E = mc² (où c est la vitesse de la lumière) découle directement des postulats de la théorie.'
+    },
+    {
       q: `Sur quels deux postulats repose la relativité restreinte ?`,
       options: [
         `La gravité est universelle, et le temps est absolu`,

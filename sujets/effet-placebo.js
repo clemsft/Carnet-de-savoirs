@@ -169,6 +169,13 @@ Reste, au bout du compte, une leçon plus profonde : le cerveau et le corps ne s
 
   quiz: [
     {
+      type: 'vrai-faux',
+      q: 'Vrai ou faux ?',
+      affirmation: 'L\'effet placebo nécessite obligatoirement que le patient ignore qu\'il prend un placebo (duperie).',
+      reponse: false,
+      explication: 'Faux. L\'étude de Ted Kaptchuk en 2010 a montré que des patients informés qu\'ils prenaient un placebo (placebo "ouvert") s\'amélioraient quand même significativement. Ce qui compte, c\'est apparemment le rituel thérapeutique, pas la croyance dans une molécule active.'
+    },
+    {
       q: 'Qu\'est-ce qu\'un placebo ?',
       options: [
         'Un médicament homéopathique',

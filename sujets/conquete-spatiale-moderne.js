@@ -197,6 +197,36 @@ Le risque est celui du [syndrome de Kessler]{accent} — un emballement où les 
 
   quiz: [
     {
+      type: 'vrai-faux',
+      q: 'Vrai ou faux ?',
+      affirmation: 'Avant SpaceX, les fusées orbitales étaient en pratique des objets jetables, utilisés une seule fois.',
+      reponse: true,
+      explication: 'Pendant six décennies, les lanceurs étaient construits à plusieurs centaines de millions de dollars, utilisés une fois, puis laissés se désintégrer. La navette spatiale, pourtant "réutilisable", coûtait extrêmement cher à remettre en état. SpaceX a brisé ce modèle en faisant atterrir le premier étage de Falcon 9 en décembre 2015.'
+    },
+    {
+      type: 'ordre-chrono',
+      q: 'Remets ces étapes de la conquête spatiale dans l\'ordre :',
+      items: [
+        'Lancement de Spoutnik 1',
+        'Apollo 11 se pose sur la Lune',
+        'Premier vol opérationnel de Falcon 9',
+        'Premier atterrissage réussi d\'un booster orbital',
+        'Inspiration4 : premier vol orbital entièrement privé'
+      ],
+      explication: '1957 (Spoutnik, l\'URSS ouvre l\'ère spatiale) → 1969 (Apollo 11) → 2012 (Falcon 9 en service) → 2015 (premier retour de booster) → 2021 (Inspiration4, premier équipage 100 % privé en orbite).'
+    },
+    {
+      type: 'associer',
+      q: 'Associe chaque agence ou entreprise à son lanceur ou programme phare :',
+      paires: [
+        { gauche: 'NASA', droite: 'Artemis' },
+        { gauche: 'SpaceX', droite: 'Falcon 9' },
+        { gauche: 'CNSA', droite: 'Long March' },
+        { gauche: 'ESA', droite: 'Ariane' }
+      ],
+      explication: 'La NASA pilote le programme Artemis de retour sur la Lune ; SpaceX opère les Falcon 9 réutilisables ; l\'agence chinoise (CNSA) s\'appuie sur la famille Longue Marche (Long March) ; l\'ESA développe les lanceurs Ariane (Ariane 6 opérationnel depuis 2024).'
+    },
+    {
       q: 'Quand le dernier humain a-t-il marché sur la Lune avant le retour planifié dans le programme Artemis ?',
       options: ['1969', '1972', '1986', '2000'],
       correcte: 1,

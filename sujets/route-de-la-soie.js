@@ -233,6 +233,37 @@ Aujourd\'hui, la Chine relance le concept, sous le nom de **« Nouvelles Routes 
 
   quiz: [
     {
+      type: 'vrai-faux',
+      q: 'Vrai ou faux ?',
+      affirmation: 'La "Route de la Soie" est une seule route bien tracée, parcourue de bout en bout par des caravanes allant de Chine à Rome.',
+      reponse: false,
+      explication: 'Faux sur les deux points. C\'est un réseau dense de corridors terrestres et maritimes, articulé autour d\'oasis et de ports. Et aucune caravane ne fait le trajet complet de Xi\'an à Antioche (~8 000 km) : les marchandises sont transportées par étapes, achetées et revendues à chaque grand carrefour. Le terme lui-même n\'est inventé qu\'en 1877.'
+    },
+    {
+      type: 'ordre-chrono',
+      q: 'Remets ces grandes phases de la Route de la Soie dans l\'ordre chronologique :',
+      items: [
+        'Mission de Zhang Qian envoyé en Asie centrale par les Han (138 av. J.-C.)',
+        'Bataille du Talas : les prisonniers chinois transmettent le secret du papier (751)',
+        'Marco Polo séjourne à la cour de Kubilaï Khan en Chine (1271-1295)',
+        'Peste noire partie des steppes mongoles atteint l\'Europe (1346-1353)',
+        'Vasco de Gama arrive à Calicut par voie maritime (1498)'
+      ],
+      explication: 'Quinze siècles d\'échanges : ouverture sous les Han, transmission technique au Talas, apogée sous la Pax Mongolica avec Marco Polo, choc de la peste noire, puis déclin avec l\'ouverture des routes maritimes européennes qui contournent les intermédiaires.'
+    },
+    {
+      type: 'associer',
+      q: 'Associe chaque marchandise à sa principale région d\'origine :',
+      paires: [
+        { gauche: 'Soie', droite: 'Chine (monopole jusqu\'au VIᵉ siècle)' },
+        { gauche: 'Épices (poivre, cannelle, muscade)', droite: 'Inde et Indonésie' },
+        { gauche: 'Chevaux', droite: 'Steppes d\'Asie centrale' },
+        { gauche: 'Papier', droite: 'Chine (IIᵉ siècle av. J.-C.)' },
+        { gauche: 'Verre', droite: 'Méditerranée (Rome, Syrie)' }
+      ],
+      explication: 'Le commerce est par essence multidirectionnel : la Chine exporte soie et papier ; l\'Inde et l\'Indonésie, les épices ; les steppes, les chevaux qui équipent la cavalerie chinoise (échange classique : soie contre chevaux) ; la Méditerranée exporte du verre vers la Chine où il est rare et précieux.'
+    },
+    {
       q: `Qui a inventé l\'expression "Route de la Soie" ?`,
       options: [
         `Marco Polo, au XIIIᵉ siècle`,

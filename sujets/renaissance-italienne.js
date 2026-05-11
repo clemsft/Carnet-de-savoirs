@@ -216,6 +216,38 @@ Et lointainement, c\'est aussi de Florence que viennent **les Lumières** : sans
 
   quiz: [
     {
+      type: 'vrai-faux',
+      q: 'Vrai ou faux ?',
+      affirmation: 'Le mot "Renaissance" a été utilisé dès le XVᵉ siècle par les artistes italiens eux-mêmes.',
+      reponse: false,
+      explication: 'Faux. Le mot "Renaissance" a été inventé rétrospectivement au XIXᵉ siècle par l\'historien français Jules Michelet. Les humanistes du XVᵉ siècle parlaient plutôt de "rinascita" et avaient conscience de sortir d\'un "medio aevo" (âge intermédiaire) entre l\'Antiquité et leur présent, mais le terme moderne est tardif.'
+    },
+    {
+      type: 'ordre-chrono',
+      q: 'Remets ces événements de la Renaissance italienne dans l\'ordre chronologique :',
+      items: [
+        'Fondation de la banque Médicis à Florence (1397)',
+        'Brunelleschi démontre les lois de la perspective géométrique (1415)',
+        'Invention de l\'imprimerie par Gutenberg à Mayence (~1450)',
+        'Chute de Constantinople, fuite des savants grecs vers l\'Italie (1453)',
+        'Michel-Ange peint le plafond de la chapelle Sixtine (1508-1512)',
+        'Sac de Rome par les troupes de Charles Quint (1527)'
+      ],
+      explication: 'De la banque Médicis (1397) qui financera tout, à la perspective de Brunelleschi (1415), à l\'imprimerie (1450), à l\'arrivée des manuscrits grecs après 1453, au chef-d\'œuvre michelangelesque (1508-1512), jusqu\'au sac de Rome qui brise l\'élan créatif (1527).'
+    },
+    {
+      type: 'associer',
+      q: 'Associe chaque artiste à une de ses œuvres majeures :',
+      paires: [
+        { gauche: 'Léonard de Vinci', droite: 'La Joconde (~1503-1506)' },
+        { gauche: 'Michel-Ange', droite: 'Plafond de la chapelle Sixtine (1508-1512)' },
+        { gauche: 'Raphaël', droite: 'L\'École d\'Athènes (1509-1511)' },
+        { gauche: 'Brunelleschi', droite: 'Coupole de Santa Maria del Fiore (1436)' },
+        { gauche: 'Botticelli', droite: 'Protégé de Laurent le Magnifique à Florence' }
+      ],
+      explication: 'Cinq créateurs, cinq jalons. Léonard archétype du génie universel ; Michel-Ange, 500 m² et 343 figures en quatre ans à la Sixtine ; Raphaël, mort à 37 ans après avoir peint la synthèse picturale de la pensée antique ; Brunelleschi, 42 mètres de coupole sans cintrage ; Botticelli au cœur du cercle médicéen.'
+    },
+    {
       q: `Sur quelle période s\'étend grossièrement la Renaissance italienne ?`,
       options: [
         `XIᵉ-XIIᵉ siècles`,

@@ -216,6 +216,29 @@ Reste, malgré tout, l'extraordinaire **actualité** de l'attitude stoïcienne. 
 
   quiz: [
     {
+      type: 'vrai-faux',
+      q: `Vrai ou faux ?`,
+      affirmation: `Le stoïcisme philosophique consiste à supprimer toute émotion pour rester impassible en toute circonstance.`,
+      reponse: false,
+      explication: `C'est un contresens populaire. Le sage stoïcien ressent les émotions ; il ne les laisse simplement pas dicter ses jugements ni ses actions. Le stoïcisme est une discipline de la raison, pas une anesthésie de la sensibilité.`
+    },
+    {
+      type: 'associer',
+      q: `Associe chaque philosophe stoïcien à son œuvre majeure :`,
+      paires: [
+        { gauche: 'Marc Aurèle', droite: 'Pensées pour moi-même' },
+        { gauche: 'Sénèque', droite: 'Lettres à Lucilius' },
+        { gauche: 'Épictète', droite: 'Manuel' }
+      ],
+      explication: `Marc Aurèle a rédigé les *Pensées* en grec, pour lui seul. Sénèque a écrit ses 124 *Lettres à Lucilius* (entre autres traités). Épictète n'a rien écrit lui-même : ses leçons orales, notées par son disciple Arrien, ont donné les *Entretiens* et le *Manuel*.`
+    },
+    {
+      type: 'texte-a-trou',
+      q: `Complète :`,
+      texte: `Le stoïcisme est fondé vers {-301} à Athènes par {Zénon} de Citium, et son outil pratique central est la {dichotomie} du contrôle, qui distingue ce qui dépend de nous de ce qui n'en dépend pas.`,
+      explication: `Zénon de Citium commence à enseigner sous le portique peint (Stoa Poikilè) vers -301. Sa dichotomie du contrôle, popularisée par Épictète dans l'incipit du *Manuel*, est l'outil pratique fondamental du stoïcien.`
+    },
+    {
       q: `Où et quand le stoïcisme est-il fondé ?`,
       options: [
         `À Rome, au Iᵉʳ siècle de notre ère`,

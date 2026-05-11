@@ -176,6 +176,38 @@ L\'Islande, perchée sur la dorsale atlantique, vit dans une éruption quasi per
 
   quiz: [
     {
+      type: 'vrai-faux',
+      q: 'Vrai ou faux ?',
+      affirmation: 'L\'échelle d\'explosivité volcanique (VEI) est logarithmique : chaque palier correspond à environ 10 fois plus de matière émise que le précédent.',
+      reponse: true,
+      explication: 'Le VEI, défini en 1982, est bien logarithmique : un VEI 7 (Tambora 1815) émet environ 10 fois plus de matière qu\'un VEI 6 (Pinatubo 1991), et un VEI 8 un million de fois plus qu\'un VEI 2.'
+    },
+    {
+      type: 'ordre-chrono',
+      q: 'Remets ces éruptions historiques dans l\'ordre chronologique :',
+      items: [
+        'Vésuve, destruction de Pompéi (79)',
+        'Tambora en Indonésie, "année sans été" qui suit (1815)',
+        'Krakatoa en Indonésie (1883)',
+        'Mont Pelée en Martinique, anéantissement de Saint-Pierre (1902)',
+        'Mont Saint-Helens dans l\'État de Washington (1980)',
+        'Pinatubo aux Philippines (1991)'
+      ],
+      explication: 'Ces éruptions jalonnent l\'histoire de la volcanologie. Le Vésuve (79) reste l\'archétype, le Tambora (1815, VEI 7) a provoqué l\'"année sans été" 1816, le Krakatoa (1883) a fait entendre son explosion à des milliers de km, la Pelée (1902) a tué 28 000 personnes, et le Pinatubo (1991, VEI 6) a refroidi la planète de 0,5 °C pendant deux ans.'
+    },
+    {
+      type: 'associer',
+      q: 'Associe chaque type d\'éruption à un exemple emblématique :',
+      paires: [
+        { gauche: 'Hawaïenne (effusive)', droite: 'Kilauea' },
+        { gauche: 'Strombolienne', droite: 'Stromboli' },
+        { gauche: 'Plinienne (explosive)', droite: 'Vésuve' },
+        { gauche: 'Point chaud océanique', droite: 'Hawaï' },
+        { gauche: 'Super-éruption (caldera)', droite: 'Yellowstone' }
+      ],
+      explication: 'Le type d\'éruption dépend principalement de la viscosité et de la teneur en gaz du magma : fluide et pauvre en gaz pour les hawaïennes ; visqueux et riche en gaz pour les pliniennes. Les points chauds (Hawaï) et les caldeiras (Yellowstone) sont des contextes géologiques particuliers.'
+    },
+    {
       q: 'Combien de volcans actifs estime-t-on présents sur Terre, et où se trouve la majorité d\'entre eux ?',
       options: [
         '~50, en Europe',

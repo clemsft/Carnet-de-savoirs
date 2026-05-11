@@ -190,6 +190,30 @@ Pourquoi cherche-t-on alors à imiter la photosynthèse ? Parce qu'elle fonction
 
   quiz: [
     {
+      type: 'vrai-faux',
+      q: `Vrai ou faux ?`,
+      affirmation: `Les océans assurent environ la moitié de la photosynthèse mondiale, grâce au phytoplancton.`,
+      reponse: true,
+      explication: `Environ la moitié de la photosynthèse globale a lieu dans les océans, opérée par le phytoplancton — un nuage de micro-organismes invisibles à l'œil nu mais dont la masse cumulée surpasse celle de toutes les forêts. Une part importante de l'oxygène que nous respirons vient des océans.`
+    },
+    {
+      type: 'ordre-chrono',
+      q: `Remets ces grands jalons de l'évolution de la photosynthèse oxygénique dans l'ordre chronologique :`,
+      items: [
+        `~3,5 Ga — Apparition des cyanobactéries (premières photosynthèses oxygéniques)`,
+        `~2,4 Ga — Grande Oxygénation : l'oxygène s'accumule dans l'atmosphère`,
+        `~1,5 Ga — Endosymbiose : naissance des eucaryotes photosynthétiques`,
+        `~470 Ma — Colonisation de la terre ferme par les plantes`
+      ],
+      explication: `Les cyanobactéries inventent la photosynthèse oxygénique il y a ~3,5 milliards d'années. Pendant ~1 milliard d'années, l'O₂ produit est absorbé par le fer dissous. Vers -2,4 Ga, l'oxygène s'accumule (Grande Oxygénation). Vers -1,5 Ga, une cellule eucaryote englobe une cyanobactérie (endosymbiose) — naissance du chloroplaste. Vers -470 Ma, les plantes colonisent la terre.`
+    },
+    {
+      type: 'texte-a-trou',
+      q: `Complète l'équation bilan de la photosynthèse :`,
+      texte: `{6} CO₂ + 6 H₂O + lumière → C₆H₁₂O₆ + {6} O₂`,
+      explication: `Six dioxydes de carbone et six eaux donnent, à l'aide de la lumière, un glucose et six dioxygènes. Le glucose stocke l'énergie chimique, l'oxygène est libéré comme sous-produit dont la quasi-totalité de la vie complexe est aujourd'hui dépendante.`
+    },
+    {
       q: `Quels sont les produits de la photosynthèse à partir de CO₂ et d'eau ?`,
       options: [
         `Glucose et oxygène`,

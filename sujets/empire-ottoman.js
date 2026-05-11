@@ -178,6 +178,35 @@ L\'homme prend en 1934 le nom d\'**Atatürk** — « père des Turcs ». Il occi
 
   quiz: [
     {
+      type: 'ordre-chrono',
+      q: 'Remets ces grandes dates de l\'Empire ottoman dans l\'ordre chronologique :',
+      items: [
+        'Fondation du beylicat par Osman Iᵉʳ (1299)',
+        'Prise de Constantinople par Mehmet II (1453)',
+        'Échec du second siège de Vienne (1683)',
+        'Abolition du sultanat par Mustafa Kemal (1922)'
+      ],
+      explication: 'De 1299 à 1922 : six siècles d\'existence. La fondation par Osman, la prise de Constantinople en 1453 qui marque l\'apogée de la conquête, l\'échec devant Vienne en 1683 qui amorce le long déclin, et l\'abolition du sultanat par Mustafa Kemal en 1922.'
+    },
+    {
+      type: 'associer',
+      q: 'Associe chaque sultan (ou figure ottomane) à sa réalisation principale :',
+      paires: [
+        { gauche: 'Osman Iᵉʳ', droite: 'Fonde le beylicat ottoman (1299)' },
+        { gauche: 'Mehmet II le Conquérant', droite: 'Prend Constantinople en 1453' },
+        { gauche: 'Sélim Iᵉʳ', droite: 'Conquiert l\'Égypte et devient calife (1517)' },
+        { gauche: 'Soliman le Magnifique', droite: 'Apogée de l\'empire (1520-1566)' },
+        { gauche: 'Mustafa Kemal', droite: 'Abolit le sultanat et fonde la République (1922-1923)' }
+      ],
+      explication: 'Cinq figures qui jalonnent l\'histoire ottomane : du fondateur Osman au "père des Turcs" Atatürk, en passant par les grands conquérants Mehmet II, Sélim Iᵉʳ et Soliman, qui porte l\'empire à son apogée — 30 millions de sujets sur trois continents.'
+    },
+    {
+      type: 'texte-a-trou',
+      q: 'Complète cette phrase sur les janissaires :',
+      texte: 'Les {janissaires} étaient un corps d\'élite recruté par le {devchirmé} : enrôlement forcé d\'enfants {chrétiens}, convertis à l\'islam et formés à Istanbul.',
+      explication: 'Système paradoxal — à la fois oppressif (enlèvement d\'enfants chrétiens dans les Balkans) et voie d\'ascension sociale (plusieurs grands vizirs étaient d\'origine chrétienne). Les janissaires constituent la principale force militaire ottomane pendant des siècles.'
+    },
+    {
       q: 'En quelle année est traditionnellement fondé l\'Empire ottoman ?',
       options: ['1071', '1299', '1453', '1517'],
       correcte: 1,

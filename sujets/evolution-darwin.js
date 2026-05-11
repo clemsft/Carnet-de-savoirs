@@ -220,6 +220,17 @@ Aujourd'hui, l'évolution n'est plus discutée dans son principe — elle est **
 
   quiz: [
     {
+      type: 'associer',
+      q: 'Associe chaque concept à son auteur principal :',
+      paires: [
+        { gauche: 'Sélection naturelle', droite: 'Charles Darwin' },
+        { gauche: 'Lois de l\'hérédité (génétique)', droite: 'Gregor Mendel' },
+        { gauche: 'Hérédité des caractères acquis', droite: 'Jean-Baptiste de Lamarck' },
+        { gauche: 'Synthèse moderne (génétique + sélection)', droite: 'Theodosius Dobzhansky' }
+      ],
+      explication: 'La théorie évolutionniste s\'est construite par étapes : Lamarck (transformisme avant Darwin), Darwin (mécanisme de sélection naturelle, 1859), Mendel (lois de l\'hérédité, redécouvertes en 1900), puis la synthèse néo-darwinienne du XXᵉ siècle qui fusionne génétique et sélection.'
+    },
+    {
       q: `En quelle année Darwin publie-t-il L'Origine des espèces ?`,
       options: [`1809`, `1831`, `1859`, `1900`],
       correcte: 2,

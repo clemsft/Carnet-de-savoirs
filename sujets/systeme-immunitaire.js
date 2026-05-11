@@ -180,6 +180,36 @@ Autre dérèglement : l\'**allergie**, où le système réagit fort à des subst
 
   quiz: [
     {
+      type: 'ordre-chrono',
+      q: 'Remets ces grandes étapes de l\'histoire de l\'immunologie dans l\'ordre chronologique :',
+      items: [
+        '1796 — Jenner : première vaccination (variole)',
+        '1880-1885 — Pasteur développe les vaccins atténués',
+        '1890 — Behring et Kitasato isolent les antitoxines (anticorps)',
+        '1987 — Tonegawa explique la diversité des anticorps (Nobel)',
+        '2020 — Premiers vaccins à ARN messager déployés (COVID-19)'
+      ],
+      explication: 'Jenner pose la prophylaxie vaccinale (1796), Pasteur étend par les vaccins atténués (1880s), Behring découvre les antitoxines (1890), Tonegawa élucide la recombinaison génétique des anticorps (Nobel 1987), vaccins à ARNm déployés à grande échelle en 2020-2021 (Nobel Karikó & Weissman 2023).'
+    },
+    {
+      type: 'associer',
+      q: 'Associe chaque cellule immunitaire à sa fonction principale :',
+      paires: [
+        { gauche: 'Lymphocyte B', droite: 'Produit les anticorps' },
+        { gauche: 'Lymphocyte T CD8', droite: 'Tue les cellules infectées' },
+        { gauche: 'Macrophage', droite: 'Phagocyte les pathogènes' },
+        { gauche: 'Cellule NK', droite: 'Détruit cellules virales et tumorales' }
+      ],
+      explication: 'Lymphocytes B : produits dans la moelle osseuse, fabriquent les anticorps. Lymphocytes T CD8 : tueurs au contact. Macrophages : "mangeurs" innés présents dans tous les tissus. Cellules NK (Natural Killers) : reconnaissent et détruisent les cellules "anormales" sans entraînement préalable.'
+    },
+    {
+      type: 'vrai-faux',
+      q: 'Vrai ou faux ?',
+      affirmation: 'Le corps humain peut produire environ un milliard d\'anticorps différents grâce à un mécanisme génétique de recombinaison aléatoire dans les lymphocytes B.',
+      reponse: true,
+      explication: 'Mécanisme élucidé par Susumu Tonegawa (Nobel 1987). Pendant la maturation des lymphocytes B, des enzymes coupent et recollent les gènes des anticorps dans des combinaisons quasi infinies. C\'est la seule fonction du corps humain qui réorganise activement l\'ADN.'
+    },
+    {
       q: 'Quelle est la différence principale entre immunité innée et adaptative ?',
       options: [
         'L\'innée est génétique, l\'adaptative est apprise',

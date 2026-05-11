@@ -198,6 +198,32 @@ La justice climatique est l'angle moral et géopolitique du problème. Les pays 
 
   quiz: [
     {
+      type: 'vrai-faux',
+      q: 'Vrai ou faux ?',
+      affirmation: 'L\'effet de serre est un phénomène artificiel entièrement créé par l\'industrie humaine.',
+      reponse: false,
+      explication: 'L\'effet de serre est un phénomène naturel indispensable à l\'habitabilité de la Terre : sans lui, la température moyenne serait d\'environ -18 °C au lieu de +15 °C. Le problème climatique actuel n\'est pas son existence, mais son renforcement rapide par les émissions humaines.'
+    },
+    {
+      type: 'ordre-chrono',
+      q: 'Remets ces jalons de la science et de la politique du climat dans l\'ordre chronologique :',
+      items: [
+        'Arrhenius publie le premier calcul quantitatif de l\'effet du CO₂ (1896)',
+        'Keeling lance les mesures continues du CO₂ au Mauna Loa (1958)',
+        'Création du GIEC sous l\'égide de l\'ONU et de l\'OMM (1988)',
+        'Sommet de Rio et signature de la CCNUCC (1992)',
+        'Protocole de Kyoto (1997)',
+        'Accord de Paris signé par 195 États (2015)'
+      ],
+      explication: 'La science du climat s\'établit avec Arrhenius (1896) et Keeling (1958) ; les institutions politiques mondiales se mettent en place avec le GIEC (1988), Rio (1992), Kyoto (1997) et Paris (2015), où 195 États s\'engagent à limiter le réchauffement à "bien en deçà de 2 °C".'
+    },
+    {
+      type: 'texte-a-trou',
+      q: 'Complète :',
+      texte: 'La concentration de CO₂ atmosphérique mesurée au Mauna Loa dépasse aujourd\'hui {425} ppm, contre environ 280 ppm à l\'ère préindustrielle. Le réchauffement global moyen actuel est d\'environ {1,3} °C au-dessus de l\'ère préindustrielle, et l\'Accord de Paris vise à le contenir bien en deçà de {2} °C.',
+      explication: 'Le CO₂ atmosphérique a augmenté de 280 à plus de 425 ppm depuis 1850 — le niveau le plus élevé depuis 3 millions d\'années. Le réchauffement moyen atteint déjà ~1,3 °C selon le 6ᵉ rapport du GIEC. L\'Accord de Paris vise à contenir le réchauffement bien en deçà de 2 °C, en visant 1,5 °C.'
+    },
+    {
       q: `Quelle serait la température moyenne terrestre sans effet de serre ?`,
       options: [
         `Identique à aujourd'hui`,

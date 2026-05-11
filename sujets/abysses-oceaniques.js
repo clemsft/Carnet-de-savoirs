@@ -208,6 +208,42 @@ Pourtant, le constat reste vertigineux : **plus de 80 % des fonds océaniques** 
   // ============== QUIZ ==============
   quiz: [
     {
+      type: 'vrai-faux',
+      q: 'Vrai ou faux ?',
+      affirmation: 'La surface visible de Mars est mieux cartographiée que celle des fonds océaniques terrestres.',
+      reponse: true,
+      explication: 'Plus de 80 % des fonds océaniques sont aujourd\'hui non cartographiés en haute résolution. La surface visible de Mars et de la Lune est paradoxalement mieux connue que celle de notre propre planète sous-marine.'
+    },
+    {
+      type: 'ordre-chrono',
+      q: 'Remets ces grandes étapes de l\'exploration des abysses dans l\'ordre :',
+      items: [
+        'Expédition du HMS Challenger',
+        'Bathysphère de William Beebe',
+        'Bathyscaphe Trieste au fond du Challenger Deep',
+        'Descente solo de James Cameron'
+      ],
+      explication: '1872 (Challenger, première campagne océanographique mondiale) → 1934 (bathysphère Beebe, premier regard humain dans la zone bathyale) → 1960 (Trieste, Walsh et Piccard touchent le fond des Mariannes) → 2012 (Cameron y descend en solo à bord du Deepsea Challenger).'
+    },
+    {
+      type: 'associer',
+      q: 'Associe chaque zone océanique à sa tranche de profondeur :',
+      paires: [
+        { gauche: 'Épipélagique', droite: '0 — 200 m' },
+        { gauche: 'Mésopélagique', droite: '200 — 1 000 m' },
+        { gauche: 'Bathypélagique', droite: '1 000 — 4 000 m' },
+        { gauche: 'Abyssopélagique', droite: '4 000 — 6 000 m' },
+        { gauche: 'Hadale', droite: 'au-delà de 6 000 m' }
+      ],
+      explication: 'Les océanographes découpent la colonne d\'eau en cinq zones : épipélagique (éclairée), mésopélagique (crépusculaire), bathypélagique (obscurité totale), abyssopélagique (fond moyen), et hadale (fosses, au nom inspiré d\'Hadès).'
+    },
+    {
+      type: 'texte-a-trou',
+      q: 'Complète :',
+      texte: 'Le Challenger Deep, dans la fosse des {Mariannes}, atteint environ {-11 000} mètres de profondeur — plus que l\'Everest n\'est haut.',
+      explication: 'Le Challenger Deep culmine précisément à -10 984 m. C\'est le point connu le plus profond de l\'océan mondial, et la pression y atteint environ 1 100 atmosphères, soit ~8 tonnes par cm².'
+    },
+    {
       q: 'À partir de quelle profondeur commencent les abysses, c\'est-à-dire la zone privée de toute lumière solaire ?',
       options: ['200 m', '1 000 m', '4 000 m', '11 000 m'],
       correcte: 1,

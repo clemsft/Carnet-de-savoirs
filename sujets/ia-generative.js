@@ -218,6 +218,35 @@ C\'est ce qui rend la dépendance à TSMC si stratégique — et pourquoi le [d�
 
   quiz: [
     {
+      type: 'vrai-faux',
+      q: 'Vrai ou faux ?',
+      affirmation: 'Les grands modèles de langage "comprennent" le sens des mots de la même manière qu\'un humain.',
+      reponse: false,
+      explication: 'Un LLM n\'a pas de modèle du monde au sens fort : il prédit du texte plausible à partir de régularités statistiques apprises sur d\'énormes corpus. Quand il "raisonne", c\'est en générant des étapes plausibles — souvent justes, parfois dangereusement fausses sans baisse de confiance.'
+    },
+    {
+      type: 'ordre-chrono',
+      q: 'Remets ces jalons de l\'IA générative dans l\'ordre chronologique :',
+      items: [
+        'Article "Attention Is All You Need" (Transformers)',
+        'Publication de GPT-3',
+        'Lancement de ChatGPT',
+        'Sortie de GPT-4'
+      ],
+      explication: 'Transformers (juin 2017) → GPT-3 (mai 2020) → ChatGPT (30 novembre 2022) → GPT-4 (mars 2023). Chaque étape a marqué un saut quantitatif ou qualitatif majeur.'
+    },
+    {
+      type: 'associer',
+      q: 'Associe chaque modèle d\'IA à son laboratoire :',
+      paires: [
+        { gauche: 'GPT', droite: 'OpenAI' },
+        { gauche: 'Claude', droite: 'Anthropic' },
+        { gauche: 'Gemini', droite: 'Google' },
+        { gauche: 'Llama', droite: 'Meta' }
+      ],
+      explication: 'OpenAI produit la série GPT, Anthropic la famille Claude, Google DeepMind la famille Gemini, et Meta publie Llama (open source). Ces quatre acteurs structurent la course frontière en 2026.'
+    },
+    {
       q: 'Quelle est l\'innovation technologique majeure de 2017 qui a rendu possible l\'IA générative moderne ?',
       options: [
         'Les réseaux de neurones convolutifs',

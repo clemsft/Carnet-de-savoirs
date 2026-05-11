@@ -91,6 +91,15 @@
     return {
       progress: {},      // sujetId -> { lastTab, courseProgress (0-100), visited: bool, lastVisit: iso }
       quizScores: {},    // sujetId -> { best: int, total: int, attempts: [{ score, date }] }
+      // Suivi par-question : pour chaque sujet, pour chaque index de question,
+      // historique succinct. Permet le mode Révision et les stats fines.
+      quizAnswers: {},   // sujetId -> qIdx -> { ok, ko, lastCorrect, lastAttempt }
+      // Log chronologique de toutes les réponses (capé) pour stats récentes.
+      quizLog: [],       // [{ date, sujetId, qIdx, type, correct, durationMs, mode }] (max 500)
+      // Streak de bonnes réponses consécutives toutes sources confondues.
+      quizStreak: { current: 0, best: 0 },
+      // Quiz quotidien : date du dernier complété, score, total.
+      dailyQuiz: {},     // { date: 'YYYY-MM-DD', score, total, completed: bool }
       favorites: [],     // sujetIds
       notes: {},         // sujetId -> markdown text
       filters: { domain: null, search: '', state: null, tag: null },
@@ -192,10 +201,29 @@
       } else {
         s.quiz.forEach((q, i) => {
           if (!q || typeof q.q !== 'string' || !q.q.trim()) w.push(`quiz[${i}].q vide ou absent`);
-          if (!Array.isArray(q.options) || q.options.length < 2) {
-            w.push(`quiz[${i}].options doit être un tableau d'au moins 2 propositions`);
-          } else if (!Number.isInteger(q.correcte) || q.correcte < 0 || q.correcte >= q.options.length) {
-            w.push(`quiz[${i}].correcte=${q.correcte} hors plage [0..${q.options.length - 1}]`);
+          const type = (q && q.type) || 'qcm';
+          if (type === 'qcm') {
+            if (!Array.isArray(q.options) || q.options.length < 2) {
+              w.push(`quiz[${i}].options doit être un tableau d'au moins 2 propositions`);
+            } else if (!Number.isInteger(q.correcte) || q.correcte < 0 || q.correcte >= q.options.length) {
+              w.push(`quiz[${i}].correcte=${q.correcte} hors plage [0..${q.options.length - 1}]`);
+            }
+          } else if (type === 'vrai-faux') {
+            if (typeof q.reponse !== 'boolean') w.push(`quiz[${i}].reponse (vrai-faux) doit être true ou false`);
+          } else if (type === 'ordre-chrono') {
+            if (!Array.isArray(q.items) || q.items.length < 2) {
+              w.push(`quiz[${i}].items (ordre-chrono) doit avoir au moins 2 éléments`);
+            }
+          } else if (type === 'texte-a-trou') {
+            if (typeof q.texte !== 'string' || !/\{[^}]+\}/.test(q.texte)) {
+              w.push(`quiz[${i}].texte (texte-a-trou) doit contenir au moins un trou {motif}`);
+            }
+          } else if (type === 'associer') {
+            if (!Array.isArray(q.paires) || q.paires.length < 2) {
+              w.push(`quiz[${i}].paires (associer) doit avoir au moins 2 paires`);
+            }
+          } else {
+            w.push(`quiz[${i}].type="${type}" inconnu (attendu : qcm, vrai-faux, ordre-chrono, texte-a-trou, associer)`);
           }
         });
       }
@@ -619,6 +647,20 @@
         el('span', null, (meta.duree_estimee_min ? meta.duree_estimee_min + ' min' : ''))
       )
     );
+
+    // Badge "maîtrise quiz" : visible si l'utilisateur a déjà tenté le quiz
+    const quizScore = (state.user.quizScores || {})[meta.id];
+    if (quizScore && quizScore.total > 0) {
+      const pct = quizScore.best / quizScore.total;
+      const cls = pct === 1 ? 'sujet-card-quiz perfect'
+                : pct >= 0.75 ? 'sujet-card-quiz great'
+                : pct >= 0.5 ? 'sujet-card-quiz good'
+                : 'sujet-card-quiz poor';
+      card.appendChild(el('div', { class: cls, title: 'Meilleur score du quiz' },
+        pct === 1 ? '★' : '✓',
+        ' ' + quizScore.best + '/' + quizScore.total
+      ));
+    }
 
     return card;
   }
@@ -1175,6 +1217,56 @@
       check: () => {
         const sujets = state.sujetsOrder.map(id => state.sujets[id]);
         return Object.keys(extractGlossaryTerms(sujets)).length >= 30;
+      } },
+    // ----- Quiz dédiés -----
+    { id: 'quiz-cent',     label: 'Cent questions',     desc: '100 questions répondues, tous quiz confondus.',
+      check: () => (state.user.quizLog || []).length >= 100 },
+    { id: 'quiz-millier',  label: 'Millier',            desc: '1000 questions répondues, tous quiz confondus.',
+      check: () => (state.user.quizLog || []).length >= 1000 },
+    { id: 'streak-10',     label: 'Tireur d\'élite',    desc: '10 bonnes réponses d\'affilée.',
+      check: () => ((state.user.quizStreak || {}).best || 0) >= 10 },
+    { id: 'streak-25',     label: 'Tireur d\'or',       desc: '25 bonnes réponses d\'affilée.',
+      check: () => ((state.user.quizStreak || {}).best || 0) >= 25 },
+    { id: 'quiz-rapide',   label: 'Vif d\'esprit',      desc: 'Répondre juste en moins de 5 secondes 10 fois.',
+      check: () => (state.user.quizLog || []).filter(e => e.correct && e.durationMs > 0 && e.durationMs < 5000).length >= 10 },
+    { id: 'revision-pro',  label: 'Réviseur',           desc: '20 questions rattrapées en mode Révision.',
+      check: () => (state.user.quizLog || []).filter(e => e.correct && e.mode === 'revision').length >= 20 },
+    { id: 'quotidien-7',   label: 'Habitué du jour',    desc: '7 quiz du jour complétés.',
+      check: () => {
+        // On compte via quizLog : nombre de jours distincts où un quiz du mode quotidien a été répondu
+        const days = new Set();
+        (state.user.quizLog || []).forEach(e => {
+          if (e.mode === 'quotidien' && e.date) days.add(e.date.slice(0, 10));
+        });
+        return days.size >= 7;
+      } },
+    { id: 'defi-sans-faute', label: 'Sang-froid',       desc: 'Sans-faute sur un Mode Défi complet (10 questions).',
+      check: () => {
+        // Approximation : 10 réponses consécutives en mode defi toutes correctes
+        const log = (state.user.quizLog || []).filter(e => e.mode === 'defi');
+        for (let i = 0; i <= log.length - 10; i++) {
+          if (log.slice(i, i + 10).every(e => e.correct)) return true;
+        }
+        return false;
+      } },
+    { id: 'maitre-domaine', label: 'Maître d\'un domaine', desc: 'Tous les quiz d\'un même domaine répondus parfaitement.',
+      check: () => {
+        const qs = state.user.quizScores || {};
+        const perfectByDomain = {};
+        const totalByDomain = {};
+        state.sujetsOrder.forEach(id => {
+          const s = state.sujets[id];
+          if (!s || !Array.isArray(s.quiz) || s.quiz.length === 0) return;
+          const doms = s.meta.domaines || [];
+          doms.forEach(d => {
+            totalByDomain[d] = (totalByDomain[d] || 0) + 1;
+            const sc = qs[id];
+            if (sc && sc.total && sc.best === sc.total) {
+              perfectByDomain[d] = (perfectByDomain[d] || 0) + 1;
+            }
+          });
+        });
+        return Object.keys(totalByDomain).some(d => totalByDomain[d] >= 2 && perfectByDomain[d] === totalByDomain[d]);
       } }
   ];
 
@@ -1210,6 +1302,125 @@
       toast.classList.remove('is-visible');
       setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 400);
     }, 4500);
+  }
+
+  // ---------------------------------------------------------------
+  // TRACKING FIN DES RÉPONSES (par-question, log chronologique, streak)
+  // ---------------------------------------------------------------
+  // Centralise l'enregistrement de chaque réponse, peu importe le type
+  // de question et le mode (quiz d'un sujet / mixte / révision / défi).
+  // C'est ça qui nourrit les stats par domaine, le mode Révision, les
+  // achievements quiz et le streak temps réel.
+
+  function recordQuizAnswer(opts) {
+    if (!state.user) return;
+    const sujetId = opts.sujetId || null;
+    const qIdx = (typeof opts.qIdx === 'number') ? opts.qIdx : -1;
+    const correct = !!opts.correct;
+    const type = opts.type || 'qcm';
+    const durationMs = (typeof opts.durationMs === 'number') ? opts.durationMs : null;
+    const mode = opts.mode || 'sujet';
+    const nowIso = new Date().toISOString();
+
+    // 1. Aggregé par-question pour le sujet
+    if (sujetId && qIdx >= 0) {
+      if (!state.user.quizAnswers) state.user.quizAnswers = {};
+      if (!state.user.quizAnswers[sujetId]) state.user.quizAnswers[sujetId] = {};
+      const cell = state.user.quizAnswers[sujetId][qIdx] ||
+        { ok: 0, ko: 0, lastCorrect: false, lastAttempt: null };
+      if (correct) cell.ok++; else cell.ko++;
+      cell.lastCorrect = correct;
+      cell.lastAttempt = nowIso;
+      state.user.quizAnswers[sujetId][qIdx] = cell;
+    }
+
+    // 2. Log chronologique capé
+    if (!Array.isArray(state.user.quizLog)) state.user.quizLog = [];
+    state.user.quizLog.push({
+      date: nowIso,
+      sujetId: sujetId,
+      qIdx: qIdx,
+      type: type,
+      correct: correct,
+      durationMs: durationMs,
+      mode: mode
+    });
+    if (state.user.quizLog.length > 500) {
+      state.user.quizLog = state.user.quizLog.slice(-500);
+    }
+
+    // 3. Streak temps réel
+    if (!state.user.quizStreak || typeof state.user.quizStreak.current !== 'number') {
+      state.user.quizStreak = { current: 0, best: 0 };
+    }
+    if (correct) {
+      state.user.quizStreak.current++;
+      if (state.user.quizStreak.current > state.user.quizStreak.best) {
+        state.user.quizStreak.best = state.user.quizStreak.current;
+      }
+    } else {
+      state.user.quizStreak.current = 0;
+    }
+
+    saveUserState();
+    // Vérifie les achievements quiz (streak, nb questions, etc.) à chaque réponse
+    checkAchievements();
+  }
+
+  // Helper : retourne la liste des questions ratées au moins une fois et
+  // jamais résolues correctement depuis (utile pour le mode Révision).
+  function getQuestionsToReview() {
+    const out = [];
+    const qa = state.user.quizAnswers || {};
+    Object.keys(qa).forEach(sujetId => {
+      const sujet = state.sujets[sujetId];
+      if (!sujet || !Array.isArray(sujet.quiz)) return;
+      Object.keys(qa[sujetId]).forEach(qIdxStr => {
+        const qIdx = parseInt(qIdxStr, 10);
+        const cell = qa[sujetId][qIdxStr];
+        // À réviser si on a déjà raté ET la dernière tentative n'a pas été correcte
+        if (cell.ko > 0 && !cell.lastCorrect) {
+          const q = sujet.quiz[qIdx];
+          if (q) out.push({ sujet: sujet, q: q, qIdx: qIdx });
+        }
+      });
+    });
+    return out;
+  }
+
+  // Stats globales du quiz
+  function computeQuizStats() {
+    const log = Array.isArray(state.user.quizLog) ? state.user.quizLog : [];
+    const totalAnswered = log.length;
+    const totalCorrect = log.filter(e => e.correct).length;
+    const successRate = totalAnswered ? totalCorrect / totalAnswered : 0;
+    // Sujets complétés (≥1 réponse) et nombre à 100% sur best
+    const quizScores = state.user.quizScores || {};
+    const sujetsAttempted = Object.keys(quizScores).length;
+    const sujetsPerfect = Object.values(quizScores).filter(s => s.total && s.best === s.total).length;
+    // Stats par domaine
+    const byDomain = {}; // domain -> { ok, total }
+    log.forEach(e => {
+      if (!e.sujetId) return;
+      const sujet = state.sujets[e.sujetId];
+      if (!sujet) return;
+      (sujet.meta.domaines || ['Autre']).forEach(d => {
+        if (!byDomain[d]) byDomain[d] = { ok: 0, total: 0 };
+        byDomain[d].total++;
+        if (e.correct) byDomain[d].ok++;
+      });
+    });
+    return {
+      totalAnswered: totalAnswered,
+      totalCorrect: totalCorrect,
+      successRate: successRate,
+      sujetsAttempted: sujetsAttempted,
+      sujetsPerfect: sujetsPerfect,
+      streakCurrent: (state.user.quizStreak || {}).current || 0,
+      streakBest: (state.user.quizStreak || {}).best || 0,
+      byDomain: byDomain,
+      toReview: getQuestionsToReview().length
+    };
   }
 
   // ---------------------------------------------------------------
@@ -2200,55 +2411,340 @@
     renderQuizQuestion(quizCard, sujet);
   }
 
+  // Normalisation pour comparaison de texte (insensible casse + accents + espaces)
+  function normalizeAnswer(s) {
+    return String(s || '').normalize('NFD')
+      .replace(new RegExp('[\\u0300-\\u036f]', 'g'), '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, '');
+  }
+
+  // Mélange Fisher-Yates en place (retourne le tableau pour chaînage)
+  function shuffleArray(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+    }
+    return arr;
+  }
+
   function renderQuizQuestion(quizCard, sujet) {
     clear(quizCard);
     const sess = state.quizSession;
     if (!sess) return;
 
     if (sess.currentQ >= sess.questions.length) {
-      renderQuizFinal(quizCard, sujet);
+      if (sess.isMixed) renderMixedQuizFinal(quizCard);
+      else if (sess.mode === 'revision') renderRevisionFinal(quizCard);
+      else if (sess.mode === 'quotidien') renderDailyQuizFinal(quizCard);
+      else renderQuizFinal(quizCard, sujet);
       return;
     }
 
     const q = sess.questions[sess.currentQ];
+    const sujetForQ = sujet || (q._sujet ? state.sujets[q._sujet.id] : null);
+    const sujetId = sujetForQ ? sujetForQ.meta.id : (q._sujet && q._sujet.id) || null;
+    const qIdx = (typeof q._qIdx === 'number') ? q._qIdx : sess.currentQ;
+    const mode = sess.mode || (sess.isMixed ? 'mixte' : 'sujet');
 
-    quizCard.appendChild(el('div', { class: 'quiz-progress' },
-      `Question ${sess.currentQ + 1} sur ${sess.questions.length}`));
-    quizCard.appendChild(el('div', { class: 'quiz-question' }, q.q));
+    // Marque le début pour mesurer la durée de réponse
+    sess._questionStart = Date.now();
 
-    const options = el('div', { class: 'quiz-options' });
+    // Bandeau de progression + streak temps réel + source (mixte)
+    const progress = el('div', { class: 'quiz-progress' },
+      'Question ' + (sess.currentQ + 1) + ' sur ' + sess.questions.length);
+    if (sess.isMixed && q._sujet) {
+      const titre = String(q._sujet.titre).replace(/<[^>]+>/g, '');
+      progress.appendChild(document.createTextNode(' · issue de '));
+      progress.appendChild(el('em', null, titre));
+    }
+    quizCard.appendChild(progress);
+
+    // Badge streak si > 1
+    const streak = (state.user.quizStreak || {}).current || 0;
+    if (streak >= 2) {
+      quizCard.appendChild(el('div', { class: 'quiz-streak' },
+        '🔥 ' + streak + ' bonnes réponses d\'affilée'));
+    }
+
+    // Question (toujours présente sauf pour texte-a-trou qui se débrouille seul)
+    if (q.q) quizCard.appendChild(el('div', { class: 'quiz-question' }, q.q));
+
     const feedback = el('div', { class: 'quiz-feedback', style: { display: 'none' } });
 
+    // Timer pour le mode Défi : compteur qui descend, timeout = mauvaise réponse
+    let timerEl = null;
+    let timerId = null;
+    if (mode === 'defi') {
+      sess._timerLeft = sess._timerSecs || 30;
+      timerEl = el('div', { class: 'quiz-timer' }, sess._timerLeft + ' s');
+      quizCard.insertBefore(timerEl, progress.nextSibling);
+      timerId = setInterval(() => {
+        sess._timerLeft--;
+        if (timerEl) timerEl.textContent = sess._timerLeft + ' s';
+        if (sess._timerLeft <= 5 && timerEl) timerEl.classList.add('quiz-timer-urgent');
+        if (sess._timerLeft <= 0) {
+          clearInterval(timerId);
+          timerId = null;
+          onAnswer(false, true); // timeout
+        }
+      }, 1000);
+    }
+
+    // Callback uniforme après réponse, peu importe le type
+    function onAnswer(isCorrect, isTimeout) {
+      // Arrête le timer du défi si présent
+      if (timerId) { clearInterval(timerId); timerId = null; }
+      const durationMs = Date.now() - sess._questionStart;
+      if (isCorrect) sess.score++;
+      // Bonus de vitesse en mode défi
+      let bonus = 0;
+      if (mode === 'defi' && isCorrect && typeof sess._timerLeft === 'number') {
+        bonus = Math.max(0, Math.round(sess._timerLeft * 0.5));
+        sess.bonusPoints = (sess.bonusPoints || 0) + bonus;
+      }
+      recordQuizAnswer({
+        sujetId: sujetId, qIdx: qIdx, type: q.type || 'qcm',
+        correct: isCorrect, durationMs: durationMs, mode: mode
+      });
+
+      let msg;
+      if (isTimeout) msg = 'Temps écoulé.';
+      else if (isCorrect) msg = bonus > 0 ? 'Exact ! +' + bonus + ' bonus de vitesse' : 'Exact !';
+      else msg = 'Pas tout à fait.';
+      feedback.innerHTML = '<strong>' + msg + '</strong> ' + (q.explication || '');
+      feedback.style.display = 'block';
+
+      const isLast = sess.currentQ === sess.questions.length - 1;
+      const nextBtn = el('button', {
+        class: 'btn',
+        onclick: () => {
+          sess.currentQ++;
+          renderQuizQuestion(quizCard, sujet);
+        }
+      }, isLast ? 'Voir mon score →' : 'Question suivante →');
+      feedback.appendChild(el('div', { class: 'quiz-next-row' }, nextBtn));
+
+      // Re-render le badge streak après la réponse
+      const oldStreak = quizCard.querySelector('.quiz-streak');
+      if (oldStreak) oldStreak.remove();
+      if (timerEl) timerEl.remove();
+    }
+
+    // Dispatch par type de question
+    const type = q.type || 'qcm';
+    const interactionHost = el('div', { class: 'quiz-interaction' });
+    quizCard.appendChild(interactionHost);
+
+    if (type === 'qcm') {
+      renderQCMQuestion(interactionHost, q, onAnswer);
+    } else if (type === 'vrai-faux') {
+      renderVraiFauxQuestion(interactionHost, q, onAnswer);
+    } else if (type === 'ordre-chrono') {
+      renderOrdreChronoQuestion(interactionHost, q, onAnswer);
+    } else if (type === 'texte-a-trou') {
+      renderTexteATrouQuestion(interactionHost, q, onAnswer);
+    } else if (type === 'associer') {
+      renderAssocierQuestion(interactionHost, q, onAnswer);
+    } else {
+      // Type inconnu : fallback en bypass
+      interactionHost.appendChild(el('p', { class: 'block-error' },
+        'Type de question inconnu : « ' + type + ' »'));
+      const skip = el('button', { class: 'btn', onclick: () => onAnswer(false) }, 'Passer');
+      interactionHost.appendChild(skip);
+    }
+
+    quizCard.appendChild(feedback);
+  }
+
+  // -----------------------------------------------------------------
+  // RENDERERS PAR TYPE DE QUESTION
+  // -----------------------------------------------------------------
+
+  function renderQCMQuestion(host, q, onAnswer) {
+    const options = el('div', { class: 'quiz-options' });
     q.options.forEach((opt, i) => {
       const btn = el('button', {
         onclick: () => {
           if (btn.disabled) return;
           const isCorrect = i === q.correcte;
-          if (isCorrect) sess.score++;
           Array.from(options.children).forEach((b, j) => {
             b.disabled = true;
             if (j === q.correcte) b.classList.add('correct');
             if (j === i && j !== q.correcte) b.classList.add('wrong');
           });
-          feedback.innerHTML = `<strong>${isCorrect ? 'Exact !' : 'Pas tout à fait.'}</strong> ${q.explication || ''}`;
-          feedback.style.display = 'block';
-
-          const isLast = sess.currentQ === sess.questions.length - 1;
-          const nextBtn = el('button', {
-            class: 'btn',
-            onclick: () => {
-              sess.currentQ++;
-              renderQuizQuestion(quizCard, sujet);
-            }
-          }, isLast ? 'Voir mon score →' : 'Question suivante →');
-          feedback.appendChild(el('div', { class: 'quiz-next-row' }, nextBtn));
+          onAnswer(isCorrect);
         }
       }, opt);
       options.appendChild(btn);
     });
+    host.appendChild(options);
+  }
 
-    quizCard.appendChild(options);
-    quizCard.appendChild(feedback);
+  function renderVraiFauxQuestion(host, q, onAnswer) {
+    if (q.affirmation) {
+      host.appendChild(el('div', { class: 'quiz-affirmation' }, '« ' + q.affirmation + ' »'));
+    }
+    const options = el('div', { class: 'quiz-options quiz-options-vf' });
+    [['Vrai', true], ['Faux', false]].forEach(([label, val]) => {
+      const btn = el('button', {
+        onclick: () => {
+          if (btn.disabled) return;
+          const isCorrect = val === q.reponse;
+          Array.from(options.children).forEach(b => { b.disabled = true; });
+          // Marque la bonne réponse
+          Array.from(options.children).forEach((b, j) => {
+            const isThisCorrect = (j === 0 ? true : false) === q.reponse;
+            if (isThisCorrect) b.classList.add('correct');
+          });
+          if (!isCorrect) btn.classList.add('wrong');
+          onAnswer(isCorrect);
+        }
+      }, label);
+      options.appendChild(btn);
+    });
+    host.appendChild(options);
+  }
+
+  function renderOrdreChronoQuestion(host, q, onAnswer) {
+    // q.items est l'ordre CORRECT. On le mélange pour l'affichage.
+    const correctOrder = q.items.slice();
+    const shuffled = shuffleArray(q.items.map((it, i) => ({ label: it, originalIdx: i })));
+
+    host.appendChild(el('p', { class: 'quiz-hint' },
+      'Réordonne avec les flèches puis valide.'));
+    const list = el('ol', { class: 'quiz-ordre-list' });
+    function rebuild() {
+      clear(list);
+      shuffled.forEach((item, i) => {
+        const row = el('li', { class: 'quiz-ordre-item' },
+          el('span', { class: 'quiz-ordre-label' }, item.label));
+        const ctrl = el('div', { class: 'quiz-ordre-ctrl' });
+        if (i > 0) ctrl.appendChild(el('button', {
+          class: 'quiz-ordre-btn', title: 'Monter',
+          onclick: () => {
+            const t = shuffled[i]; shuffled[i] = shuffled[i - 1]; shuffled[i - 1] = t;
+            rebuild();
+          }
+        }, '↑'));
+        if (i < shuffled.length - 1) ctrl.appendChild(el('button', {
+          class: 'quiz-ordre-btn', title: 'Descendre',
+          onclick: () => {
+            const t = shuffled[i]; shuffled[i] = shuffled[i + 1]; shuffled[i + 1] = t;
+            rebuild();
+          }
+        }, '↓'));
+        row.appendChild(ctrl);
+        list.appendChild(row);
+      });
+    }
+    rebuild();
+    host.appendChild(list);
+    const validate = el('button', {
+      class: 'btn',
+      onclick: () => {
+        validate.disabled = true;
+        // Compare l'ordre rendu avec l'ordre correct
+        const isCorrect = shuffled.every((item, i) => item.label === correctOrder[i]);
+        // Afficher l'ordre correct sous chaque ligne en cas d'erreur
+        Array.from(list.children).forEach((row, i) => {
+          const expected = correctOrder[i];
+          if (shuffled[i].label === expected) row.classList.add('correct');
+          else row.classList.add('wrong');
+        });
+        // Désactive les boutons de tri
+        list.querySelectorAll('.quiz-ordre-btn').forEach(b => { b.disabled = true; });
+        onAnswer(isCorrect);
+      }
+    }, 'Valider l\'ordre');
+    host.appendChild(el('div', { class: 'quiz-next-row' }, validate));
+  }
+
+  function renderTexteATrouQuestion(host, q, onAnswer) {
+    // Parse le texte : {motif} → input ; reste inchangé
+    const re = /\{([^}]+)\}/g;
+    const parts = [];
+    let lastIdx = 0, m;
+    const blanks = []; // input elements + expected normalized
+    while ((m = re.exec(q.texte)) !== null) {
+      if (m.index > lastIdx) parts.push({ type: 'text', value: q.texte.slice(lastIdx, m.index) });
+      parts.push({ type: 'blank', expected: m[1] });
+      lastIdx = m.index + m[0].length;
+    }
+    if (lastIdx < q.texte.length) parts.push({ type: 'text', value: q.texte.slice(lastIdx) });
+
+    const sentence = el('p', { class: 'quiz-trou' });
+    parts.forEach(p => {
+      if (p.type === 'text') {
+        sentence.appendChild(document.createTextNode(p.value));
+      } else {
+        const input = el('input', {
+          type: 'text',
+          class: 'quiz-trou-input',
+          autocapitalize: 'off',
+          autocomplete: 'off',
+          spellcheck: 'false',
+          size: String(Math.max(6, p.expected.length + 2))
+        });
+        blanks.push({ input: input, expected: p.expected });
+        sentence.appendChild(input);
+      }
+    });
+    host.appendChild(sentence);
+
+    const validate = el('button', {
+      class: 'btn',
+      onclick: () => {
+        validate.disabled = true;
+        const isCorrect = blanks.every(b => normalizeAnswer(b.input.value) === normalizeAnswer(b.expected));
+        blanks.forEach(b => {
+          b.input.disabled = true;
+          const ok = normalizeAnswer(b.input.value) === normalizeAnswer(b.expected);
+          b.input.classList.add(ok ? 'correct' : 'wrong');
+          if (!ok) b.input.setAttribute('data-expected', b.expected);
+        });
+        onAnswer(isCorrect);
+      }
+    }, 'Valider');
+    host.appendChild(el('div', { class: 'quiz-next-row' }, validate));
+  }
+
+  function renderAssocierQuestion(host, q, onAnswer) {
+    const paires = q.paires || [];
+    // Affiche les "gauches" dans l'ordre, et "droites" en sélecteur shuffled
+    const droitesShuffled = shuffleArray(paires.map(p => p.droite));
+    const selects = [];
+    const list = el('ul', { class: 'quiz-associer-list' });
+    paires.forEach((p, i) => {
+      const row = el('li', { class: 'quiz-associer-row' },
+        el('span', { class: 'quiz-associer-gauche' }, p.gauche),
+        el('span', { class: 'quiz-associer-sep' }, '↔')
+      );
+      const sel = el('select', { class: 'quiz-associer-select' });
+      sel.appendChild(el('option', { value: '' }, '— choisir —'));
+      droitesShuffled.forEach(d => sel.appendChild(el('option', { value: d }, d)));
+      selects.push({ sel: sel, expected: p.droite });
+      row.appendChild(sel);
+      list.appendChild(row);
+    });
+    host.appendChild(list);
+    const validate = el('button', {
+      class: 'btn',
+      onclick: () => {
+        validate.disabled = true;
+        let allOk = true;
+        selects.forEach((s, i) => {
+          s.sel.disabled = true;
+          const ok = s.sel.value === s.expected;
+          if (!ok) allOk = false;
+          const row = list.children[i];
+          row.classList.add(ok ? 'correct' : 'wrong');
+          if (!ok) row.setAttribute('data-expected', s.expected);
+        });
+        onAnswer(allOk);
+      }
+    }, 'Valider');
+    host.appendChild(el('div', { class: 'quiz-next-row' }, validate));
   }
 
   function renderQuizFinal(quizCard, sujet) {
@@ -3435,29 +3931,107 @@
   // VIEW: QUIZ MIXTE — pioche au hasard dans tous les sujets
   // =================================================================
 
-  function startMixedQuiz(count) {
+  // Pool unique de toutes les questions disponibles avec leurs métadonnées
+  function buildQuestionPool() {
     const all = [];
     state.sujetsOrder.forEach(id => {
       const sujet = state.sujets[id];
       if (Array.isArray(sujet.quiz)) {
-        sujet.quiz.forEach(q => {
-          all.push(Object.assign({}, q, { _sujet: { id, titre: sujet.meta.titre } }));
+        sujet.quiz.forEach((q, qIdx) => {
+          all.push(Object.assign({}, q, {
+            _sujet: { id: id, titre: sujet.meta.titre },
+            _qIdx: qIdx
+          }));
         });
       }
     });
+    return all;
+  }
+
+  function startMixedQuiz(count) {
+    const all = buildQuestionPool();
     if (all.length === 0) return false;
-    // Mélange Fisher-Yates
-    for (let i = all.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      const tmp = all[i]; all[i] = all[j]; all[j] = tmp;
-    }
+    shuffleArray(all);
     const picked = all.slice(0, Math.min(count, all.length));
     state.quizSession = {
       sujetId: '__mixte__',
       currentQ: 0,
       score: 0,
       questions: picked,
-      isMixed: true
+      isMixed: true,
+      mode: 'mixte'
+    };
+    return true;
+  }
+
+  // Mode Révision : tire les questions que l'utilisateur a déjà ratées
+  // et qui ne sont pas encore résolues (lastCorrect === false).
+  function startReviewQuiz(count) {
+    const toReview = getQuestionsToReview();
+    if (toReview.length === 0) return false;
+    shuffleArray(toReview);
+    const picked = toReview.slice(0, Math.min(count, toReview.length)).map(item =>
+      Object.assign({}, item.q, {
+        _sujet: { id: item.sujet.meta.id, titre: item.sujet.meta.titre },
+        _qIdx: item.qIdx
+      })
+    );
+    state.quizSession = {
+      sujetId: '__revision__',
+      currentQ: 0,
+      score: 0,
+      questions: picked,
+      isMixed: true,
+      mode: 'revision'
+    };
+    return true;
+  }
+
+  // Mode Quiz du jour : sélection DÉTERMINISTE pour la date du jour
+  // (8 questions). Même tirage si lancé deux fois le même jour.
+  function startDailyQuiz() {
+    const all = buildQuestionPool();
+    if (all.length === 0) return false;
+    const today = dateKey(new Date());
+    // Seed basé sur la date pour un tirage reproductible
+    let seed = 0;
+    for (let i = 0; i < today.length; i++) seed = (seed * 31 + today.charCodeAt(i)) >>> 0;
+    function rand() { seed = (seed * 1103515245 + 12345) >>> 0; return seed / 0xFFFFFFFF; }
+    const pool = all.slice();
+    // Fisher-Yates avec le RNG seedé
+    for (let i = pool.length - 1; i > 0; i--) {
+      const j = Math.floor(rand() * (i + 1));
+      const t = pool[i]; pool[i] = pool[j]; pool[j] = t;
+    }
+    const picked = pool.slice(0, Math.min(8, pool.length));
+    state.quizSession = {
+      sujetId: '__quotidien__',
+      currentQ: 0,
+      score: 0,
+      questions: picked,
+      isMixed: true,
+      mode: 'quotidien',
+      _dailyDate: today
+    };
+    return true;
+  }
+
+  // Mode Défi : 10 questions, chacune avec timer 30s.
+  // Le timer est porté par session ; renderQuizQuestion détecte le mode défi.
+  function startChallengeQuiz(count) {
+    const all = buildQuestionPool();
+    if (all.length === 0) return false;
+    shuffleArray(all);
+    const picked = all.slice(0, Math.min(count || 10, all.length));
+    state.quizSession = {
+      sujetId: '__defi__',
+      currentQ: 0,
+      score: 0,
+      bonusPoints: 0,
+      questions: picked,
+      isMixed: true,
+      mode: 'defi',
+      _timerSecs: 30
     };
     return true;
   }
@@ -3468,93 +4042,197 @@
     const isFinished = sess && sess.isMixed && sess.questions.length > 0 && sess.currentQ >= sess.questions.length;
 
     if (!isActive && !isFinished) {
-      // Page d'accueil
-      main.appendChild(el('span', { class: 'eyebrow' }, 'Défi transverse'));
-      main.appendChild(el('h1', { class: 'page-title', html: 'Quiz <em>mixte</em>' }));
-
-      const sujets = state.sujetsOrder.map(id => state.sujets[id]);
-      const totalQ = sujets.reduce((s, su) => s + (Array.isArray(su.quiz) ? su.quiz.length : 0), 0);
-
-      if (totalQ === 0) {
-        main.appendChild(el('p', { class: 'lead' },
-          'Aucune question n\'est disponible pour le moment. Attends d\'avoir au moins un sujet avec un quiz.'));
-        return;
-      }
-
-      main.appendChild(el('p', { class: 'page-subtitle' },
-        'Pioche au hasard des questions parmi tous tes sujets pour tester ta culture transverse. ' +
-        totalQ + ' question' + (totalQ > 1 ? 's' : '') + ' disponible' + (totalQ > 1 ? 's' : '') +
-        ' sur ' + sujets.length + ' sujet' + (sujets.length > 1 ? 's' : '') + '.'));
-
-      const buttons = [];
-      buttons.push(el('button', {
-        class: 'btn',
-        onclick: () => { startMixedQuiz(Math.min(10, totalQ)); rerender(); }
-      }, 'Lancer 10 questions →'));
-      if (totalQ >= 5) buttons.push(el('button', {
-        class: 'btn btn-secondary',
-        onclick: () => { startMixedQuiz(5); rerender(); }
-      }, '5 questions'));
-      if (totalQ >= 20) buttons.push(el('button', {
-        class: 'btn btn-secondary',
-        onclick: () => { startMixedQuiz(20); rerender(); }
-      }, '20 questions'));
-
-      main.appendChild(el('div', { class: 'btn-row' }, ...buttons));
+      renderQuizHub(main);
       return;
     }
 
-    main.appendChild(el('span', { class: 'eyebrow' }, 'Quiz mixte en cours'));
+    const eyebrowText = sess.mode === 'revision' ? 'Mode révision'
+      : sess.mode === 'quotidien' ? 'Quiz du jour'
+      : sess.mode === 'defi' ? 'Mode défi'
+      : 'Quiz mixte en cours';
+    main.appendChild(el('span', { class: 'eyebrow' }, eyebrowText));
 
     const card = el('div', { class: 'quiz-card' });
     main.appendChild(card);
 
-    if (isFinished) renderMixedQuizFinal(card);
-    else            renderMixedQuizQuestion(card);
+    if (isFinished) {
+      if (sess.mode === 'revision') renderRevisionFinal(card);
+      else if (sess.mode === 'quotidien') renderDailyQuizFinal(card);
+      else renderMixedQuizFinal(card);
+    } else {
+      renderQuizQuestion(card, null);
+    }
   }
 
-  function renderMixedQuizQuestion(quizCard) {
-    clear(quizCard);
-    const sess = state.quizSession;
-    if (sess.currentQ >= sess.questions.length) { renderMixedQuizFinal(quizCard); return; }
-    const q = sess.questions[sess.currentQ];
-    const titre = String(q._sujet.titre).replace(/<[^>]+>/g, '');
+  // Hub de la page Quiz mixte : quatre modes accessibles depuis des cartes.
+  function renderQuizHub(main) {
+    const sujets = state.sujetsOrder.map(id => state.sujets[id]);
+    const totalQ = sujets.reduce((s, su) => s + (Array.isArray(su.quiz) ? su.quiz.length : 0), 0);
 
-    quizCard.appendChild(el('div', { class: 'quiz-progress' },
-      'Question ' + (sess.currentQ + 1) + ' sur ' + sess.questions.length + ' · issue de ',
-      el('em', null, titre)));
-    quizCard.appendChild(el('div', { class: 'quiz-question' }, q.q));
+    main.appendChild(el('span', { class: 'eyebrow' }, 'Défi transverse'));
+    main.appendChild(el('h1', { class: 'page-title', html: 'Quiz <em>mixte</em>' }));
 
-    const options = el('div', { class: 'quiz-options' });
-    const feedback = el('div', { class: 'quiz-feedback', style: { display: 'none' } });
+    if (totalQ === 0) {
+      main.appendChild(el('p', { class: 'lead' },
+        'Aucune question disponible pour le moment.'));
+      return;
+    }
 
-    q.options.forEach((opt, i) => {
-      const btn = el('button', {
-        onclick: () => {
-          if (btn.disabled) return;
-          const isCorrect = i === q.correcte;
-          if (isCorrect) sess.score++;
-          Array.from(options.children).forEach((b, j) => {
-            b.disabled = true;
-            if (j === q.correcte) b.classList.add('correct');
-            if (j === i && j !== q.correcte) b.classList.add('wrong');
-          });
-          feedback.innerHTML = '<strong>' + (isCorrect ? 'Exact !' : 'Pas tout à fait.') + '</strong> ' + (q.explication || '');
-          feedback.style.display = 'block';
+    const stats = computeQuizStats();
+    const toReview = stats.toReview;
+    const today = dateKey(new Date());
+    const dailyDone = state.user.dailyQuiz && state.user.dailyQuiz.date === today && state.user.dailyQuiz.completed;
 
-          const isLast = sess.currentQ === sess.questions.length - 1;
-          const nextBtn = el('button', {
-            class: 'btn',
-            onclick: () => { sess.currentQ++; renderMixedQuizQuestion(quizCard); }
-          }, isLast ? 'Voir mon score →' : 'Question suivante →');
-          feedback.appendChild(el('div', { class: 'quiz-next-row' }, nextBtn));
-        }
-      }, opt);
-      options.appendChild(btn);
+    main.appendChild(el('p', { class: 'page-subtitle' },
+      totalQ + ' questions disponibles sur ' + sujets.length + ' sujets · ' +
+      stats.totalAnswered + ' réponses enregistrées · ' +
+      Math.round(stats.successRate * 100) + ' % de réussite globale.'));
+
+    // Quatre cartes de mode
+    const grid = el('div', { class: 'quiz-modes-grid' });
+
+    // 1. Quiz du jour
+    const cardDaily = el('div', { class: 'quiz-mode-card quiz-mode-daily' });
+    cardDaily.appendChild(el('div', { class: 'quiz-mode-eyebrow' }, '🌅 Quiz du jour'));
+    cardDaily.appendChild(el('h3', { class: 'quiz-mode-title' }, '8 questions du jour'));
+    cardDaily.appendChild(el('p', { class: 'quiz-mode-desc' },
+      dailyDone
+        ? 'Tu as déjà fait le quiz du jour : ' + state.user.dailyQuiz.score + '/' + state.user.dailyQuiz.total + '. Reviens demain !'
+        : 'Sélection quotidienne mixte, identique pour tout le monde aujourd\'hui. Une fois par jour.'));
+    cardDaily.appendChild(el('button', {
+      class: 'btn',
+      disabled: dailyDone || undefined,
+      onclick: () => { if (startDailyQuiz()) rerender(); }
+    }, dailyDone ? 'Déjà fait aujourd\'hui' : 'Lancer le quiz du jour →'));
+    grid.appendChild(cardDaily);
+
+    // 2. Mode Révision
+    const cardReview = el('div', { class: 'quiz-mode-card quiz-mode-review' });
+    cardReview.appendChild(el('div', { class: 'quiz-mode-eyebrow' }, '🔁 Révision'));
+    cardReview.appendChild(el('h3', { class: 'quiz-mode-title' }, 'Questions ratées à reprendre'));
+    cardReview.appendChild(el('p', { class: 'quiz-mode-desc' },
+      toReview === 0
+        ? 'Aucune question à reviser pour le moment — fais des quiz et reviens ici si tu en rates.'
+        : toReview + ' question' + (toReview > 1 ? 's' : '') + ' à revisiter, tous sujets confondus.'));
+    cardReview.appendChild(el('button', {
+      class: 'btn',
+      disabled: toReview === 0 || undefined,
+      onclick: () => { if (startReviewQuiz(Math.min(10, toReview))) rerender(); }
+    }, toReview === 0 ? 'Rien à réviser' : 'Lancer la révision →'));
+    grid.appendChild(cardReview);
+
+    // 3. Quiz mixte classique
+    const cardMixte = el('div', { class: 'quiz-mode-card quiz-mode-mixte' });
+    cardMixte.appendChild(el('div', { class: 'quiz-mode-eyebrow' }, '🎲 Mixte'));
+    cardMixte.appendChild(el('h3', { class: 'quiz-mode-title' }, 'Pioche aléatoire'));
+    cardMixte.appendChild(el('p', { class: 'quiz-mode-desc' },
+      'Tirage au sort dans toute la bibliothèque. Choisis ta longueur.'));
+    const mixteBtns = el('div', { class: 'quiz-mode-btn-row' });
+    [['5 questions', 5], ['10 questions', 10], ['20 questions', 20]].forEach(([label, n]) => {
+      if (totalQ < n && n !== 5) return;
+      mixteBtns.appendChild(el('button', {
+        class: 'btn btn-secondary',
+        onclick: () => { startMixedQuiz(Math.min(n, totalQ)); rerender(); }
+      }, label));
     });
+    cardMixte.appendChild(mixteBtns);
+    grid.appendChild(cardMixte);
 
-    quizCard.appendChild(options);
-    quizCard.appendChild(feedback);
+    // 4. Mode Défi
+    const cardDefi = el('div', { class: 'quiz-mode-card quiz-mode-defi' });
+    cardDefi.appendChild(el('div', { class: 'quiz-mode-eyebrow' }, '⚡ Défi'));
+    cardDefi.appendChild(el('h3', { class: 'quiz-mode-title' }, 'Contre la montre'));
+    cardDefi.appendChild(el('p', { class: 'quiz-mode-desc' },
+      '10 questions, 30 secondes chacune. Bonus de vitesse selon ce qu\'il te reste au compteur.'));
+    cardDefi.appendChild(el('button', {
+      class: 'btn',
+      onclick: () => { startChallengeQuiz(10); rerender(); }
+    }, 'Lancer le défi →'));
+    grid.appendChild(cardDefi);
+
+    main.appendChild(grid);
+
+    // Bloc SR : quizzes complets à refaire (algorithme SM-2)
+    const dueSR = getDueQuizzes();
+    if (dueSR.length > 0) {
+      const srBox = el('section', { class: 'quiz-sr-box' });
+      srBox.appendChild(el('h3', { class: 'quiz-sr-title' }, '🔔 Quiz à refaire (répétition espacée)'));
+      srBox.appendChild(el('p', { class: 'quiz-sr-sub' },
+        dueSR.length + ' sujet' + (dueSR.length > 1 ? 's' : '') + ' dont l\'algorithme estime que la mémoire commence à fléchir.'));
+      const list = el('div', { class: 'sr-due-list' });
+      dueSR.forEach(d => {
+        const sujet = state.sujets[d.id];
+        const repInfo = d.sr.repetitions === 0
+          ? 'Première révision'
+          : 'Révision n°' + d.sr.repetitions + ' · intervalle ' + d.sr.interval + ' j';
+        list.appendChild(el('a', {
+          class: 'sr-due-item',
+          href: '#/sujet/' + encodeURIComponent(d.id) + '/quiz'
+        },
+          el('span', { class: 'sr-due-title', html: htmlEscapeButKeepEm(sujet.meta.titre) }),
+          el('span', { class: 'sr-due-meta' }, repInfo)
+        ));
+      });
+      srBox.appendChild(list);
+      main.appendChild(srBox);
+    }
+  }
+
+  // Écran final du mode Révision
+  function renderRevisionFinal(quizCard) {
+    const sess = state.quizSession;
+    const total = sess.questions.length;
+    const score = sess.score;
+    recordActivity('quiz', null);
+    clear(quizCard);
+    const stillToReview = getQuestionsToReview().length;
+    quizCard.appendChild(el('div', { class: 'quiz-final' },
+      el('div', { class: 'score' }, score + ' / ' + total + ' rattrapés'),
+      el('div', { class: 'verdict' },
+        stillToReview === 0
+          ? 'Tu n\'as plus rien à réviser pour le moment. Tout est carré.'
+          : 'Il te reste ' + stillToReview + ' question' + (stillToReview > 1 ? 's' : '') + ' à reprendre.'),
+      el('div', { class: 'btn-row' },
+        el('button', {
+          class: 'btn',
+          disabled: stillToReview === 0 || undefined,
+          onclick: () => { state.quizSession = null; if (startReviewQuiz(Math.min(10, stillToReview))) rerender(); }
+        }, 'Continuer la révision'),
+        el('a', { class: 'btn btn-secondary', href: '#/quiz-mixte' }, 'Retour au hub')
+      )
+    ));
+  }
+
+  // Écran final du Quiz du jour
+  function renderDailyQuizFinal(quizCard) {
+    const sess = state.quizSession;
+    const total = sess.questions.length;
+    const score = sess.score;
+    recordActivity('quiz', null);
+    // Enregistre le résultat du jour
+    state.user.dailyQuiz = {
+      date: sess._dailyDate || dateKey(new Date()),
+      score: score,
+      total: total,
+      completed: true
+    };
+    saveUserState();
+    checkAchievements();
+    clear(quizCard);
+    const pct = total > 0 ? (score / total) * 100 : 0;
+    let verdict;
+    if (pct === 100) verdict = 'Sans-faute sur le quiz du jour. Brillant.';
+    else if (pct >= 75) verdict = 'Très belle journée d\'apprentissage.';
+    else if (pct >= 50) verdict = 'Quelques sujets à revoir.';
+    else verdict = 'Demain est un autre jour.';
+    quizCard.appendChild(el('div', { class: 'quiz-final' },
+      el('div', { class: 'score' }, score + ' / ' + total),
+      el('div', { class: 'verdict' }, verdict),
+      el('div', { class: 'best-score' }, 'Reviens demain pour le prochain quiz quotidien.'),
+      el('div', { class: 'btn-row' },
+        el('a', { class: 'btn btn-secondary', href: '#/quiz-mixte' }, 'Retour au hub')
+      )
+    ));
   }
 
   function renderMixedQuizFinal(quizCard) {
@@ -3562,30 +4240,33 @@
     const total = sess.questions.length;
     const score = sess.score;
     const pct = (score / total) * 100;
+    const isDefi = sess.mode === 'defi';
+    const bonus = sess.bonusPoints || 0;
     let verdict;
-    if (pct === 100) verdict = 'Sans-faute sur ' + total + ' questions transverses — bravo !';
+    if (pct === 100) verdict = isDefi ? 'Sans-faute, et avec la vitesse en plus !' : 'Sans-faute sur ' + total + ' questions transverses — bravo !';
     else if (pct >= 80) verdict = 'Excellent — culture transverse solide.';
     else if (pct >= 60) verdict = 'Bien — quelques sujets à revisiter.';
     else if (pct >= 40) verdict = 'Une bonne base.';
     else verdict = 'Plusieurs sujets méritent une seconde lecture.';
 
-    // Tracking : on enregistre comme un quiz quel que soit le sujet d'origine
     recordActivity('quiz', null);
+    checkAchievements();
 
     clear(quizCard);
     quizCard.appendChild(el('div', { class: 'quiz-final' },
-      el('div', { class: 'score' }, score + ' / ' + total),
+      el('div', { class: 'score' }, score + ' / ' + total + (isDefi && bonus > 0 ? ' (+' + bonus + ' bonus)' : '')),
       el('div', { class: 'verdict' }, verdict),
+      isDefi && bonus > 0 ? el('div', { class: 'best-score' }, 'Score total avec bonus : ' + (score + bonus)) : null,
       el('div', { class: 'btn-row' },
         el('button', {
           class: 'btn',
           onclick: () => {
             state.quizSession = null;
-            startMixedQuiz(total);
+            if (isDefi) startChallengeQuiz(total); else startMixedQuiz(total);
             rerender();
           }
-        }, 'Recommencer un quiz mixte'),
-        el('a', { class: 'btn btn-secondary', href: '#/' }, 'Retour à la bibliothèque')
+        }, 'Recommencer'),
+        el('a', { class: 'btn btn-secondary', href: '#/quiz-mixte' }, 'Retour au hub')
       )
     ));
   }
@@ -3774,6 +4455,98 @@
   // VIEW: PROFIL
   // =================================================================
 
+  // Section Quiz du Profil : stats fines, performance par domaine, top maîtrisés
+  function renderQuizSection() {
+    const section = el('section', { class: 'profil-section quiz-section' });
+    section.appendChild(el('h3', { style: { fontStyle: 'italic', fontWeight: 400 } }, 'Mon quiz'));
+
+    const stats = computeQuizStats();
+
+    if (stats.totalAnswered === 0) {
+      section.appendChild(el('p', { class: 'sr-section-sub' },
+        'Tu n\'as pas encore répondu à de questions. Lance ton premier quiz pour faire vivre cette section.'));
+      section.appendChild(el('a', { class: 'btn', href: '#/quiz-mixte' }, 'Aller au hub Quiz →'));
+      return section;
+    }
+
+    // 4 mini-stats
+    const grid = el('div', { class: 'stats-grid stats-grid-extras' },
+      bigStat(stats.totalAnswered, 'Questions répondues', stats.totalCorrect + ' justes'),
+      bigStat(Math.round(stats.successRate * 100) + '%', 'Taux de réussite global', 'Sur l\'ensemble du log'),
+      bigStat(stats.streakCurrent, 'Streak actuelle',
+        stats.streakBest > stats.streakCurrent ? 'Record : ' + stats.streakBest : 'Bonnes réponses d\'affilée'),
+      bigStat(stats.sujetsPerfect, 'Sujets à 100%', stats.sujetsAttempted + ' tentés au total')
+    );
+    section.appendChild(grid);
+
+    // Performance par domaine — barres horizontales
+    const byDomain = Object.entries(stats.byDomain)
+      .map(([d, s]) => ({ domain: d, rate: s.total ? s.ok / s.total : 0, ok: s.ok, total: s.total }))
+      .sort((a, b) => b.total - a.total);
+
+    if (byDomain.length > 0) {
+      const domBox = el('div', { class: 'quiz-domain-perf' });
+      domBox.appendChild(el('h4', { class: 'quiz-domain-perf-title' }, 'Performance par domaine'));
+      byDomain.forEach(d => {
+        const pct = Math.round(d.rate * 100);
+        const row = el('div', { class: 'quiz-domain-row' });
+        const label = el('div', { class: 'quiz-domain-label' }, d.domain);
+        const bar = el('div', { class: 'quiz-domain-bar' });
+        const fill = el('div', { class: 'quiz-domain-fill' });
+        fill.style.width = pct + '%';
+        fill.style.background = domainColor(d.domain);
+        bar.appendChild(fill);
+        const num = el('div', { class: 'quiz-domain-num' }, pct + '% · ' + d.ok + '/' + d.total);
+        row.appendChild(label);
+        row.appendChild(bar);
+        row.appendChild(num);
+        domBox.appendChild(row);
+      });
+      section.appendChild(domBox);
+    }
+
+    // Top sujets — mieux/moins maîtrisés
+    const scores = Object.entries(state.user.quizScores)
+      .filter(([id, s]) => s.total > 0 && state.sujets[id])
+      .map(([id, s]) => ({ id: id, sujet: state.sujets[id], pct: s.best / s.total, score: s.best + '/' + s.total }))
+      .sort((a, b) => b.pct - a.pct);
+
+    if (scores.length > 0) {
+      const topBox = el('div', { class: 'quiz-top-sujets' });
+      const bestList = el('div', { class: 'quiz-top-list' });
+      const worstList = el('div', { class: 'quiz-top-list' });
+      const best3 = scores.slice(0, Math.min(3, scores.length));
+      const worst3 = scores.slice().reverse().slice(0, Math.min(3, scores.length));
+      function renderEntry(entry) {
+        return el('a', {
+          class: 'quiz-top-entry',
+          href: '#/sujet/' + encodeURIComponent(entry.id) + '/quiz'
+        },
+          el('span', { class: 'quiz-top-entry-title', html: htmlEscapeButKeepEm(entry.sujet.meta.titre) }),
+          el('span', { class: 'quiz-top-entry-score' }, entry.score)
+        );
+      }
+      topBox.appendChild(el('div', { class: 'quiz-top-col' },
+        el('h4', { class: 'quiz-top-col-title' }, 'Tes meilleurs scores'),
+        bestList,
+        ...best3.map(renderEntry)
+      ));
+      topBox.appendChild(el('div', { class: 'quiz-top-col' },
+        el('h4', { class: 'quiz-top-col-title' }, 'À approfondir'),
+        worstList,
+        ...worst3.map(renderEntry)
+      ));
+      section.appendChild(topBox);
+    }
+
+    // Lien vers le hub
+    section.appendChild(el('div', { style: { marginTop: '1.2rem', textAlign: 'right' } },
+      el('a', { class: 'btn btn-secondary', href: '#/quiz-mixte' }, 'Aller au hub Quiz →')
+    ));
+
+    return section;
+  }
+
   function renderProfil(main) {
     setAccent(null);
     main.appendChild(el('span', { class: 'eyebrow' }, 'Mon parcours'));
@@ -3870,6 +4643,9 @@
         )
       ));
     }
+
+    // ---- Section Quiz : stats fines, performance par domaine, top sujets ----
+    main.appendChild(renderQuizSection());
 
     // Heatmap d'activité — 12 derniers mois
     main.appendChild(renderHeatmap());

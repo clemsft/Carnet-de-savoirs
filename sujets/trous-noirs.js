@@ -356,6 +356,35 @@ Cette corrélation est intrigante : comment un objet aussi compact peut-il être
   // ============== QUIZ ==============
   quiz: [
     {
+      type: 'vrai-faux',
+      q: 'Vrai ou faux ?',
+      affirmation: 'L\'horizon des événements d\'un trou noir est une paroi physique faite de matière très dense.',
+      reponse: false,
+      explication: 'L\'horizon n\'est pas une paroi physique : c\'est une frontière mathématique dans l\'espace, un seuil de non-retour au-delà duquel la vitesse de libération dépasse celle de la lumière. Un astronaute le franchirait sans rien sentir de particulier sur le moment.'
+    },
+    {
+      type: 'ordre-chrono',
+      q: 'Remets ces jalons de l\'histoire des trous noirs dans l\'ordre chronologique :',
+      items: [
+        'Einstein publie la relativité générale qui prédit les trous noirs (1915-1916)',
+        'Cygnus X-1 est confirmé comme premier trou noir stellaire (années 1970)',
+        'LIGO détecte les premières ondes gravitationnelles issues d\'une fusion de trous noirs (2015)',
+        'L\'Event Horizon Telescope publie la première image de M87* (2019)',
+        'L\'EHT publie l\'image de Sagittarius A* au centre de notre galaxie (2022)'
+      ],
+      explication: 'La relativité générale prédit théoriquement les trous noirs dès 1916. Il faudra attendre les années 1970 pour la première confirmation observationnelle (Cygnus X-1), puis LIGO en 2015 pour les ondes gravitationnelles, et enfin l\'EHT pour les premières images directes (M87* en 2019, Sgr A* en 2022).'
+    },
+    {
+      type: 'associer',
+      q: 'Associe chaque famille de trous noirs à son ordre de grandeur de masse :',
+      paires: [
+        { gauche: 'Stellaires', droite: '3 à 100 masses solaires' },
+        { gauche: 'Intermédiaires', droite: '100 à 100 000 masses solaires' },
+        { gauche: 'Supermassifs', droite: 'Millions à milliards de masses solaires' }
+      ],
+      explication: 'Les trous noirs se classent par leur masse : les stellaires naissent de l\'effondrement d\'étoiles très massives ; les intermédiaires restent le "chaînon manquant" très rare à observer ; les supermassifs trônent au centre des galaxies (Sgr A* ≈ 4 millions M☉, M87* ≈ 6,5 milliards M☉).'
+    },
+    {
       q: 'De quoi dépend la vitesse de libération d\'un astre ?',
       options: [
         'Uniquement de sa masse',

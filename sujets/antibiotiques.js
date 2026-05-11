@@ -225,6 +225,36 @@ D'autres pistes sont explorées : **peptides antimicrobiens** naturels (présent
 
   quiz: [
     {
+      type: 'vrai-faux',
+      q: `Vrai ou faux ?`,
+      affirmation: `Dès son discours de réception du Nobel en 1945, Alexander Fleming avait prévenu qu'un usage déraisonnable de la pénicilline "éduquerait les microbes à résister".`,
+      reponse: true,
+      explication: `Fleming a effectivement prononcé cette mise en garde prophétique en 1945. Les premières résistances aux staphylocoques apparaissent dès 1947 — confirmation immédiate de sa prédiction. C'est un cas exemplaire de sélection naturelle accélérée par la pression antibiotique.`
+    },
+    {
+      type: 'ordre-chrono',
+      q: `Remets ces étapes de l'histoire des antibiotiques dans l'ordre chronologique :`,
+      items: [
+        `1928 — Fleming découvre la pénicilline`,
+        `1941-1945 — Florey et Chain : production industrielle`,
+        `1950-1970 — Âge d'or des antibiotiques`,
+        `~1980 — Fin de l'innovation : plus aucune nouvelle classe`,
+        `2019 — ~1,3 million de décès annuels attribués à la résistance`
+      ],
+      explication: `Découverte fortuite par Fleming (1928), production de masse pendant la Seconde Guerre mondiale (1941-1945) avec Florey et Chain, âge d'or jusque vers 1980, panne de l'innovation depuis (modèle économique brisé), montée actuelle de la crise de la résistance.`
+    },
+    {
+      type: 'associer',
+      q: `Associe chaque famille d'antibiotiques à sa cible bactérienne :`,
+      paires: [
+        { gauche: `Pénicillines (bêta-lactamines)`, droite: `Paroi cellulaire (peptidoglycane)` },
+        { gauche: `Macrolides et tétracyclines`, droite: `Ribosome bactérien (synthèse des protéines)` },
+        { gauche: `Quinolones`, droite: `ADN bactérien (ADN gyrase)` },
+        { gauche: `Sulfamides`, droite: `Métabolisme (synthèse de l'acide folique)` }
+      ],
+      explication: `Quatre grandes cibles spécifiques des bactéries (absentes ou différentes chez l'humain) : paroi (bêta-lactamines), ribosome 70S (macrolides, tétracyclines), ADN gyrase (quinolones), voies métaboliques comme l'acide folique (sulfamides).`
+    },
+    {
       q: `Qui a découvert la pénicilline et en quelle année ?`,
       options: [
         `Louis Pasteur, 1885`,

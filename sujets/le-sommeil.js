@@ -178,6 +178,33 @@ Les **cauchemars**, les **rêves lucides** (où tu es conscient de rêver), la *
 
   quiz: [
     {
+      type: 'ordre-chrono',
+      q: 'Remets les phases d\'un cycle de sommeil dans l\'ordre où elles se succèdent normalement :',
+      items: [
+        'N1 — Endormissement (sommeil léger)',
+        'N2 — Sommeil léger établi',
+        'N3 — Sommeil lent profond',
+        'REM — Sommeil paradoxal'
+      ],
+      explication: 'Chaque cycle de ~90 minutes suit la même séquence : tu plonges progressivement vers les stades de plus en plus profonds (N1 → N2 → N3), puis tu remontes vers une phase de sommeil paradoxal (REM) avant de redescendre. On enchaîne 4 à 6 cycles par nuit.'
+    },
+    {
+      type: 'associer',
+      q: 'Associe chaque stade de sommeil à sa caractéristique principale :',
+      paires: [
+        { gauche: 'Sommeil lent profond (N3)', droite: 'Système glymphatique le plus actif' },
+        { gauche: 'Sommeil paradoxal (REM)', droite: 'Rêves narratifs, atonie musculaire' },
+        { gauche: 'Sommeil léger (N1-N2)', droite: 'Majorité du temps total de la nuit' }
+      ],
+      explication: 'N3 (lent profond) : la phase la plus réparatrice ; le système glymphatique nettoie le cerveau. REM (paradoxal) : cerveau aussi actif qu\'à l\'éveil mais corps paralysé, lieu des rêves narratifs. N1-N2 (léger) : ~50 % du temps total, le rythme cardiaque ralentit.'
+    },
+    {
+      type: 'texte-a-trou',
+      q: 'Complète ces chiffres clés du sommeil :',
+      texte: 'Un cycle de sommeil dure environ {90} minutes. Un adulte en bonne santé a besoin de {7-9} heures de sommeil par nuit selon la National Sleep Foundation.',
+      explication: 'Cycle de ~90 minutes (alternance lent / paradoxal), répété 4 à 6 fois par nuit. Recommandation officielle de la National Sleep Foundation : 7-9 h pour un adulte (18-64 ans).'
+    },
+    {
       q: 'Quelle est la durée moyenne d\'un cycle de sommeil chez l\'adulte ?',
       options: ['Environ 30 minutes', 'Environ 60 minutes', 'Environ 90 minutes', 'Environ 3 heures'],
       correcte: 2,

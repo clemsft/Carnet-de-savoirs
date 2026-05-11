@@ -209,6 +209,33 @@ L'outil ouvre des perspectives vertigineuses (correction de maladies génétique
 
   quiz: [
     {
+      type: 'ordre-chrono',
+      q: `Remets ces grandes étapes de l'histoire de la génétique dans l'ordre chronologique :`,
+      items: [
+        `1869 — Miescher isole la "nucléine"`,
+        `1953 — Watson et Crick publient la structure en double hélice`,
+        `2003 — Achèvement du Projet Génome Humain`,
+        `2012 — Charpentier et Doudna adaptent CRISPR-Cas9`,
+        `2023 — Première thérapie CRISPR approuvée (Casgevy, drépanocytose)`
+      ],
+      explication: `Repères clés : Miescher (1869, découverte de l'ADN sans en mesurer la portée), Watson-Crick (1953, double hélice), Projet Génome Humain (1990-2003), CRISPR (2012), première thérapie CRISPR approuvée (2023).`
+    },
+    {
+      type: 'associer',
+      q: `Associe chaque base de l'ADN à sa partenaire complémentaire :`,
+      paires: [
+        { gauche: `Adénine (A)`, droite: `Thymine (T)` },
+        { gauche: `Guanine (G)`, droite: `Cytosine (C)` }
+      ],
+      explication: `Règle de complémentarité : A s'apparie toujours avec T (par 2 liaisons hydrogène), G s'apparie toujours avec C (par 3 liaisons hydrogène, paire plus stable). Cette complémentarité permet à chaque brin de contenir toute l'information de l'autre.`
+    },
+    {
+      type: 'texte-a-trou',
+      q: `Complète cette phrase sur le génome humain :`,
+      texte: `Le génome humain contient environ {3,2} milliards de paires de bases, réparties sur {23} paires de chromosomes.`,
+      explication: `3,2 milliards de paires de bases séquencées par le Projet Génome Humain (1990-2003), 23 paires de chromosomes (46 chromosomes au total). Seuls ~1,5 % codent directement pour des protéines.`
+    },
+    {
       q: `Qui a élucidé la structure en double hélice de l'ADN en 1953 ?`,
       options: [
         `Mendel et Pasteur`,

@@ -220,6 +220,36 @@ Mais l\'empire ne disparaît pas vraiment. À l\'**est**, à Constantinople, il 
 
   quiz: [
     {
+      type: 'ordre-chrono',
+      q: `Remets ces grandes dates romaines dans l\'ordre chronologique :`,
+      items: [
+        'Fondation légendaire de Rome (753 av. J.-C.)',
+        'Naissance de la République (509 av. J.-C.)',
+        'Auguste instaure l\'Empire (27 av. J.-C.)',
+        'Édit de Milan, Constantin légalise le christianisme (313 ap. J.-C.)',
+        'Chute de l\'Empire romain d\'Occident (476 ap. J.-C.)'
+      ],
+      explication: `Cinq dates pour douze siècles : la fondation légendaire par Romulus (753 av. J.-C.), la chute du roi étrusque qui donne la République (509 av. J.-C.), l\'instauration de l\'Empire par Auguste (27 av. J.-C.), la légalisation du christianisme par Constantin (313 ap. J.-C.), et la déposition de Romulus Augustule (476 ap. J.-C.).`
+    },
+    {
+      type: 'associer',
+      q: `Associe chaque figure romaine à son fait marquant :`,
+      paires: [
+        { gauche: 'Romulus', droite: 'Fonde Rome en 753 av. J.-C.' },
+        { gauche: 'Jules César', droite: 'Franchit le Rubicon en 49 av. J.-C.' },
+        { gauche: 'Auguste', droite: 'Premier empereur en 27 av. J.-C.' },
+        { gauche: 'Trajan', droite: 'Extension maximale de l\'empire (117 ap. J.-C.)' },
+        { gauche: 'Caracalla', droite: 'Étend la citoyenneté à tous les hommes libres (212)' }
+      ],
+      explication: `De Romulus à Caracalla, cinq figures qui jalonnent l\'histoire romaine. Auguste est le petit-neveu de César ; Trajan porte l\'empire à 5 millions de km² ; Caracalla universalise la citoyenneté en 212.`
+    },
+    {
+      type: 'texte-a-trou',
+      q: `Complète cette phrase sur le franchissement du Rubicon :`,
+      texte: 'Le 10 janvier {49} av. J.-C., {César} franchit le {Rubicon} et aurait prononcé la formule "Alea jacta est" — le sort en est jeté.',
+      explication: `Acte interdit par la loi romaine : tout général entrant en armes en Italie déclare la guerre civile. César deviendra dictateur à vie cinq ans plus tard, puis sera assassiné aux Ides de mars 44 av. J.-C.`
+    },
+    {
       q: `À quelle date traditionnelle Rome est-elle fondée ?`,
       options: ['1000 av. J.-C.', '753 av. J.-C.', '509 av. J.-C.', '27 av. J.-C.'],
       correcte: 1,

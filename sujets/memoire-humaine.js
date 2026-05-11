@@ -226,6 +226,30 @@ Les premiers traitements **modificateurs** de la maladie — notamment le **léc
 
   quiz: [
     {
+      type: 'vrai-faux',
+      q: `Vrai ou faux ?`,
+      affirmation: `Chaque fois que tu rappelles un souvenir, celui-ci est réécrit et peut être modifié — la mémoire n'est pas une lecture passive.`,
+      reponse: true,
+      explication: `Chaque rappel d'un souvenir le rend à nouveau malléable : il est extrait, lu, puis réécrit — pas exactement comme il était. C'est ce qui rend possibles les faux souvenirs, démontrés par Elizabeth Loftus (qui a fait croire à des adultes qu'ils s'étaient perdus enfants dans un centre commercial).`
+    },
+    {
+      type: 'associer',
+      q: `Associe chaque type de mémoire à long terme à un exemple représentatif :`,
+      paires: [
+        { gauche: `Mémoire épisodique`, droite: `Souvenir de mes dernières vacances` },
+        { gauche: `Mémoire sémantique`, droite: `Paris est la capitale de la France` },
+        { gauche: `Mémoire procédurale`, droite: `Faire du vélo` },
+        { gauche: `Mémoire émotionnelle`, droite: `Peur des araignées` }
+      ],
+      explication: `Épisodique : événements vécus situés dans le temps/l'espace (hippocampe). Sémantique : connaissances générales sans contexte personnel (cortex temporal). Procédurale : savoir-faire automatisés indépendants de l'hippocampe (cervelet, ganglions de la base — d'où la capacité de H.M. à apprendre des compétences motrices malgré son amnésie). Émotionnelle : associations stimulus-émotion (amygdale).`
+    },
+    {
+      type: 'texte-a-trou',
+      q: `Complète cette phrase sur la "courbe de l'oubli" :`,
+      texte: `En {1885}, le psychologue allemand Hermann {Ebbinghaus} a quantifié pour la première fois la courbe de l'oubli en s'expérimentant lui-même sur des listes de syllabes sans signification.`,
+      explication: `Ebbinghaus a montré qu'on oublie environ 50 % d'une liste neuve dans l'heure et 70 % en une journée — mais que chaque répétition espacée aplatit cette courbe. C'est le fondement des méthodes modernes de répétition espacée (Anki, SuperMemo).`
+    },
+    {
       q: `Quelle structure cérébrale est indispensable à la formation des nouveaux souvenirs explicites ?`,
       options: [
         `Le cervelet`,

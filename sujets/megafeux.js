@@ -172,6 +172,38 @@ C\'est cette transformation **qualitative** que désigne le mot mégafeu : moins
 
   quiz: [
     {
+      type: 'vrai-faux',
+      q: 'Vrai ou faux ?',
+      affirmation: 'Les mégafeux représentent moins de 3 % du nombre d\'incendies dans le monde, mais sont responsables d\'environ 50 % des surfaces brûlées.',
+      reponse: true,
+      explication: 'C\'est précisément la statistique frappante établie par le Muséum national d\'Histoire naturelle : une minorité d\'incendies hors-normes accapare l\'essentiel de l\'énergie destructrice, alors que la plupart des feux sont petits et vite éteints.'
+    },
+    {
+      type: 'ordre-chrono',
+      q: 'Remets ces mégafeux marquants dans l\'ordre chronologique :',
+      items: [
+        'Black Saturday en Australie (2009)',
+        'Camp Fire en Californie, destruction de Paradise (2018)',
+        'Black Summer australien (2019-2020)',
+        'Mégafeux de Gironde en France (2022)',
+        'Saison record du Canada, 150 000 km² brûlés (2023)',
+        'Incendies de Pacific Palisades et Eaton à Los Angeles (janvier 2025)'
+      ],
+      explication: 'Ces grands feux jalonnent l\'entrée du monde dans l\'âge des mégafeux : Black Saturday (2009) puis Camp Fire (2018) inaugurent la décennie, le Black Summer (2019-2020) et Gironde (2022) marquent un seuil, le Canada (2023) bat tous les records, et LA en plein hiver 2025 symbolise une saison qui n\'en finit plus.'
+    },
+    {
+      type: 'associer',
+      q: 'Associe chaque mégafeu à son lieu :',
+      paires: [
+        { gauche: 'Black Summer (2019-2020)', droite: 'Australie' },
+        { gauche: 'Camp Fire / Paradise (2018)', droite: 'Californie' },
+        { gauche: 'Saison record de 2023', droite: 'Canada' },
+        { gauche: 'Mégafeux de Gironde (2022)', droite: 'France' },
+        { gauche: 'Pacific Palisades et Eaton (2025)', droite: 'Los Angeles' }
+      ],
+      explication: 'Les mégafeux ne sont plus l\'apanage d\'une seule région : Australie, États-Unis, Canada, Europe méditerranéenne et même villes côtières (Los Angeles en plein hiver 2025) sont touchés. Cette diversité géographique illustre la transformation qualitative du risque feu sous l\'effet du changement climatique.'
+    },
+    {
       q: 'Quelle est la part des mégafeux dans la surface totale brûlée à l\'échelle mondiale ?',
       options: [
         'Marginale, environ 5 %',

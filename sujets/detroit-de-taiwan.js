@@ -201,6 +201,30 @@ C\'est ce que les analystes appellent le [bouclier de silicium]{accent} : l\'id�
 
   quiz: [
     {
+      type: 'vrai-faux',
+      q: 'Vrai ou faux ?',
+      affirmation: 'Taïwan est officiellement reconnue par l\'ONU comme un État membre.',
+      reponse: false,
+      explication: 'Taïwan a perdu son siège à l\'ONU en 1971 lorsque l\'Assemblée générale a transféré la représentation de la Chine de Taïpei à Pékin. Seule une douzaine de petits pays maintiennent aujourd\'hui des relations diplomatiques officielles avec Taïpei.'
+    },
+    {
+      type: 'ordre-chrono',
+      q: 'Remets ces dates clés du dossier taïwanais dans l\'ordre :',
+      items: [
+        'Fuite du Kuomintang à Taïwan',
+        'L\'ONU transfère le siège de la Chine de Taïpei à Pékin',
+        'Les États-Unis reconnaissent diplomatiquement la RPC',
+        'Visite de Nancy Pelosi à Taïpei'
+      ],
+      explication: '1949 (séparation Tchang Kaï-chek/Mao) → 1971 (ROC remplacée par RPC à l\'ONU) → 1979 (Washington reconnaît Pékin et adopte le Taiwan Relations Act) → 2022 (visite très tendue de la speaker Pelosi).'
+    },
+    {
+      type: 'texte-a-trou',
+      q: 'Complète :',
+      texte: 'L\'entreprise {TSMC}, basée à Taïwan, fabrique plus de {90}% des semi-conducteurs les plus avancés au monde — d\'où la notion de bouclier de silicium.',
+      explication: 'Cette concentration extrême de la fabrication des puces avancées (≤ 5 nm) chez TSMC est la base du concept de "bouclier de silicium" : tout choc à Taïwan paralyserait l\'économie numérique mondiale.'
+    },
+    {
       q: 'Quelle est l\'origine historique de la séparation entre Taïwan et la Chine continentale ?',
       options: [
         'Un traité international signé en 1900',

@@ -194,6 +194,33 @@ Le **Grand Paris Express**, en cours de construction depuis 2016, ajoutera **200
 
   quiz: [
     {
+      type: 'vrai-faux',
+      q: 'Vrai ou faux ?',
+      affirmation: 'Le Pont Neuf est l\'un des ponts les plus récents de Paris.',
+      reponse: false,
+      explication: 'Faux — paradoxalement, le Pont Neuf, achevé sous Henri IV en 1607, est en réalité le plus vieux pont subsistant aujourd\'hui à Paris. Son nom le distinguait à l\'époque des ponts médiévaux qui le précédaient — il a survécu, eux non.'
+    },
+    {
+      type: 'ordre-chrono',
+      q: 'Remets ces étapes de l\'histoire urbaine de Paris dans l\'ordre chronologique :',
+      items: [
+        'Lutèce gallo-romaine (~50 av. J.-C.)',
+        'Construction de Notre-Dame de Paris (1163-1345)',
+        'Création des Catacombes (1786)',
+        'Transformation haussmannienne (1853-1870)',
+        'Inauguration du métro pour l\'Exposition universelle (1900)',
+        'Centre Pompidou (1977)',
+        'Réouverture de Notre-Dame après l\'incendie (2024)'
+      ],
+      explication: 'Vingt siècles de strates : Lutèce romaine, Notre-Dame gothique, Catacombes au XVIIIᵉ, refonte haussmannienne au XIXᵉ, métro en 1900, Centre Pompidou comme premier "grand chantier" récent, et la spectaculaire réouverture de Notre-Dame en décembre 2024, cinq ans après l\'incendie.'
+    },
+    {
+      type: 'texte-a-trou',
+      q: 'Complète cette phrase sur les chiffres-clés du sous-sol parisien :',
+      texte: 'Le sous-sol de Paris comporte environ {300} km de carrières anciennes, {2600} km d\'égouts, et accueille les {Catacombes} où reposent près de 6 millions de squelettes depuis 1786.',
+      explication: 'Trois mondes superposés sous Paris : les carrières médiévales d\'extraction du calcaire et du gypse, les égouts haussmanniens dessinés par Belgrand, et l\'ossuaire des Catacombes créé pour vider les cimetières insalubres. Le tout sous une ville de 105 km² seulement en surface.'
+    },
+    {
       q: 'Comment s\'appelait Paris à l\'époque gallo-romaine ?',
       options: ['Paristia', 'Lutèce (Lutetia)', 'Roma Gallica', 'Sequana'],
       correcte: 1,

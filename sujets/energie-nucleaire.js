@@ -197,6 +197,38 @@ Les défis restent immenses : coûts de construction qui dérivent (l'EPR de Fla
 
   quiz: [
     {
+      type: 'vrai-faux',
+      q: 'Vrai ou faux ?',
+      affirmation: 'Sur l\'ensemble de son cycle de vie, le nucléaire émet plus de CO₂ par kWh produit que le charbon.',
+      reponse: false,
+      explication: 'C\'est l\'inverse : le nucléaire émet environ 12 g CO₂/kWh sur son cycle de vie complet, contre ~820 g pour le charbon. C\'est l\'une des sources d\'électricité les moins carbonées, ce qui explique son retour dans le débat climatique.'
+    },
+    {
+      type: 'ordre-chrono',
+      q: 'Remets ces événements majeurs de l\'histoire nucléaire dans l\'ordre chronologique :',
+      items: [
+        'Découverte de la fission par Hahn et Strassmann (1938)',
+        'Première réaction en chaîne contrôlée par Fermi à Chicago (1942)',
+        'Hiroshima et Nagasaki (août 1945)',
+        'Première centrale nucléaire civile à Obninsk (1954)',
+        'Catastrophe de Tchernobyl (1986)',
+        'Accident de Fukushima (2011)',
+        'Ignition au NIF par confinement laser (2022)'
+      ],
+      explication: 'L\'histoire nucléaire enchaîne la découverte scientifique (1938), la première réaction contrôlée (1942), l\'usage militaire (1945), puis civil (1954), avant les deux catastrophes majeures (Tchernobyl 1986, Fukushima 2011) et l\'étape symbolique de la fusion au NIF en 2022.'
+    },
+    {
+      type: 'associer',
+      q: 'Associe chaque type de réaction à sa description :',
+      paires: [
+        { gauche: 'Fission', droite: 'Cassure d\'un noyau lourd (uranium 235)' },
+        { gauche: 'Fusion', droite: 'Assemblage de noyaux légers (deutérium + tritium)' },
+        { gauche: 'Réaction en chaîne', droite: 'Chaque fission libère 2-3 neutrons déclenchant d\'autres fissions' },
+        { gauche: 'Chaîne proton-proton', droite: 'Fusion qui alimente le Soleil' }
+      ],
+      explication: 'La fission casse les noyaux lourds (base de toutes les centrales actuelles) ; la fusion en assemble des légers (énergie du Soleil et objectif d\'ITER). La réaction en chaîne contrôlée est le principe d\'un réacteur ; la chaîne proton-proton est le moteur stellaire.'
+    },
+    {
       q: `Quelle équation justifie le caractère extraordinairement dense de l'énergie nucléaire ?`,
       options: [
         `F = ma`,

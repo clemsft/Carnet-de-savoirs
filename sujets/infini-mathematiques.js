@@ -209,6 +209,41 @@ Aujourd\'hui, la **théorie des ensembles** est le langage standard des mathéma
 
   quiz: [
     {
+      type: 'vrai-faux',
+      q: 'Vrai ou faux ?',
+      affirmation: 'Dans le cas des ensembles infinis, une partie stricte peut avoir le même cardinal que le tout.',
+      reponse: true,
+      explication: 'C\'est précisément la définition que Cantor a opposée à l\'intuition de Galilée : il y a autant d\'entiers pairs que d\'entiers tout court, car la correspondance n ↔ 2n est une bijection. Contre-intuitif mais cohérent — c\'est une caractéristique des ensembles infinis.'
+    },
+    {
+      type: 'ordre-chrono',
+      q: 'Remets ces étapes-clés de la théorie des ensembles dans l\'ordre chronologique :',
+      items: [
+        'Cantor publie l\'argument diagonal et fonde la théorie des ensembles (1891)',
+        'Hilbert présente l\'hypothèse du continu comme premier problème de sa liste (1900)',
+        'Gödel démontre que l\'hypothèse du continu ne peut être réfutée dans ZFC (1940)',
+        'Cohen démontre qu\'elle ne peut pas non plus être prouvée — donc indécidable (1963)'
+      ],
+      explication: 'Cantor ouvre le chantier en 1891 avec son argument diagonal. Hilbert en fait le premier problème de son célèbre programme en 1900. Il faudra Gödel (1940) puis Cohen (1963) pour montrer que l\'hypothèse du continu est indécidable dans les axiomes standards ZFC.'
+    },
+    {
+      type: 'associer',
+      q: 'Associe chaque mathématicien à son résultat majeur :',
+      paires: [
+        { gauche: 'Cantor', droite: 'Argument diagonal, hiérarchie des infinis' },
+        { gauche: 'Hilbert', droite: 'Liste des 23 problèmes pour le XXᵉ siècle' },
+        { gauche: 'Gödel', droite: 'Théorème d\'incomplétude (1931)' },
+        { gauche: 'Cohen', droite: 'Indécidabilité de l\'hypothèse du continu (1963)' }
+      ],
+      explication: 'Cantor pose les fondations, Hilbert formule les questions ouvertes, Gödel et Cohen démontrent l\'indécidabilité de certaines de ces questions — chacun apportant une pièce essentielle au paysage de la logique mathématique du XXᵉ siècle.'
+    },
+    {
+      type: 'texte-a-trou',
+      q: 'Complète :',
+      texte: 'Le plus petit cardinal infini, celui des entiers naturels, est la lettre hébraïque {aleph} indice zéro. Les axiomes standards de la théorie des ensembles sont notés {ZFC}.',
+      explication: 'ℵ₀ (aleph zéro) désigne le cardinal des ensembles dénombrables (ℕ, ℤ, ℚ). ZFC (Zermelo-Fraenkel + axiome du Choix) est le système d\'axiomes standard de la théorie des ensembles dans lequel l\'hypothèse du continu est indécidable.'
+    },
+    {
       q: 'Quelle est la différence entre infini potentiel et infini actuel ?',
       options: [
         'Il n\'y en a aucune',

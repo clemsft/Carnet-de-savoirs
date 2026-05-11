@@ -196,6 +196,30 @@ Au-delà de la querelle nosologique, le syndrome conserve une **valeur épistém
 
   quiz: [
     {
+      type: 'vrai-faux',
+      q: `Vrai ou faux ?`,
+      affirmation: `Le syndrome de Stendhal est officiellement reconnu comme entité clinique distincte dans le DSM-5 et la CIM-11.`,
+      reponse: false,
+      explication: `Faux. Le syndrome n'est admis ni dans le DSM-5 (2013) ni dans la CIM-11 (2022). Il est plutôt étudié comme syndrome culturellement spécifique. Critiques : échantillon de Magherini limité (100 cas en 10 ans à Florence), symptômes non spécifiques, possible artefact culturel. Il reste cliniquement reconnu à Florence.`
+    },
+    {
+      type: 'associer',
+      q: `Associe chaque syndrome au lieu (ou personnage) auquel il est associé :`,
+      paires: [
+        { gauche: `Stendhal`, droite: `Florence (1817)` },
+        { gauche: `Magherini`, droite: `Hôpital Santa Maria Nuova` },
+        { gauche: `Hiroaki Ota`, droite: `Syndrome de Paris` },
+        { gauche: `Régis Airault`, droite: `Syndrome de l'Inde` }
+      ],
+      explication: `Stendhal décrit son malaise à Florence en 1817 (sortie de Santa Croce). Graziella Magherini, psychiatre au Santa Maria Nuova (hôpital florentin le plus proche des Offices), formalise le syndrome en 1989. Hiroaki Ota décrit le syndrome de Paris en 1986. Régis Airault étudie le syndrome de l'Inde (livre "Fous de l'Inde", 2000).`
+    },
+    {
+      type: 'texte-a-trou',
+      q: `Complète ces deux dates clés du syndrome :`,
+      texte: `Stendhal décrit son malaise à Florence en {1817}. La psychiatre Graziella Magherini formalise cliniquement le syndrome en {1989}, soit 172 ans plus tard.`,
+      explication: `1817 : Stendhal visite Santa Croce le 22 janvier et décrit son fameux vertige dans "Rome, Naples et Florence" (1818). 1989 : Magherini publie "La Sindrome di Stendhal" après dix ans d'observation systématique d'environ 100 cas à l'hôpital Santa Maria Nuova.`
+    },
+    {
       q: `Qui a décrit le premier épisode connu du syndrome qui porte son nom, et où ?`,
       options: [
         `Goethe à Rome en 1786`,

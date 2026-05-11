@@ -174,6 +174,30 @@ Quand Mehmet II prend Constantinople en 1453 (revoir [[empire-byzantin]]), c\'es
 
   quiz: [
     {
+      type: 'vrai-faux',
+      q: 'Vrai ou faux ?',
+      affirmation: 'L\'écriture cunéiforme a été inventée par des poètes pour fixer la beauté du monde.',
+      reponse: false,
+      explication: 'Faux. Contrairement au mythe romantique, les premières tablettes sont parfaitement prosaïques : des bordereaux comptables. Les temples sumériens géraient stocks de céréales, troupeaux, rations — pour cela, il fallait noter durablement des transactions. La littérature viendra plus tard, vers 2400 av. J.-C.'
+    },
+    {
+      type: 'ordre-chrono',
+      q: 'Remets ces étapes de l\'écriture cunéiforme dans l\'ordre chronologique :',
+      items: [
+        'Premières tablettes pictographiques à Ourouk (~3300 av. J.-C.)',
+        'Phonétisation : les signes représentent des sons (~2700 av. J.-C.)',
+        'Code d\'Hammurabi gravé sur stèle (~1750 av. J.-C.)',
+        'Dernière tablette cunéiforme connue, à Babylone (~75 ap. J.-C.)'
+      ],
+      explication: 'Plus de trois mille ans d\'évolution : naissance comptable à Ourouk, phonétisation qui permet d\'écrire n\'importe quelle parole, codification du droit babylonien, puis extinction silencieuse vers 75 ap. J.-C. — il faudra 18 siècles pour redéchiffrer le système.'
+    },
+    {
+      type: 'texte-a-trou',
+      q: 'Complète cette phrase sur l\'origine du nom :',
+      texte: 'Le mot "cunéiforme" vient du latin {cuneus} qui signifie {coin}, car les signes sont formés en pressant un {calame} de roseau biseauté dans l\'argile fraîche.',
+      explication: 'Cette technique produit ces petites empreintes triangulaires en forme de clous, caractéristiques. La forme des signes a été disciplinée par le support matériel : difficile de tracer des courbes au calame dans l\'argile.'
+    },
+    {
       q: 'Vers quelle date apparaît l\'écriture cunéiforme ?',
       options: ['~10 000 av. J.-C.', '~3300 av. J.-C.', '~1000 av. J.-C.', '~500 av. J.-C.'],
       correcte: 1,

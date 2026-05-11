@@ -170,6 +170,36 @@ L\'empire unifié n\'aura duré que **cent cinquante ans environ**. Mais ses des
 
   quiz: [
     {
+      type: 'vrai-faux',
+      q: 'Vrai ou faux ?',
+      affirmation: 'Les Mongols n\'étaient que des destructeurs : ils n\'ont rien apporté en termes de culture ou d\'organisation.',
+      reponse: false,
+      explication: 'Faux. Cette vision vient largement de leurs ennemis (chroniqueurs persans, russes, chinois). En réalité : tolérance religieuse remarquable pour l\'époque, méritocratie (les fils de bergers pouvaient devenir généraux), codification du droit (le Yassa), première poste rapide de l\'histoire (le yam), et la Pax Mongolica qui a permis l\'un des plus grands brassages culturels pré-modernes.'
+    },
+    {
+      type: 'ordre-chrono',
+      q: 'Remets ces événements de l\'Empire mongol dans l\'ordre chronologique :',
+      items: [
+        'Gengis Khan unifie les tribus mongoles (1206)',
+        'Invasion mongole de l\'Europe orientale par Batu Khan (1236-1242)',
+        'Sac de Bagdad par Houlagou, fin du califat abbasside (1258)',
+        'Kubilaï Khan fonde la dynastie Yuan en Chine (1271)',
+        'La dynastie Ming chasse les Mongols de Pékin (1368)'
+      ],
+      explication: 'En 1206 Gengis devient khan universel ; ses petits-fils étendent l\'empire à l\'Europe orientale (1236-1242), prennent Bagdad (1258), fondent la dynastie Yuan en Chine (1271). En 1368, les Ming chassent les Mongols : fin du contrôle mongol sur la Chine.'
+    },
+    {
+      type: 'associer',
+      q: 'Associe chaque khanat à sa région de domination :',
+      paires: [
+        { gauche: 'Dynastie Yuan', droite: 'Chine (Kubilaï Khan)' },
+        { gauche: 'Horde d\'Or', droite: 'Russie et Ukraine' },
+        { gauche: 'Ilkhanat', droite: 'Perse (sac de Bagdad)' },
+        { gauche: 'Chagatai', droite: 'Asie centrale (Transoxiane)' }
+      ],
+      explication: 'L\'empire est partagé en quatre khanats au fil des successions. Kubilaï fonde la dynastie Yuan en Chine. La Horde d\'Or domine les principautés russes pendant deux siècles. L\'Ilkhanat persan est fondé par Houlagou. Le khanat Chagatai, en Asie centrale, donnera plus tard l\'empire de Tamerlan.'
+    },
+    {
       q: 'En quelle année Gengis Khan est-il proclamé "khan universel" et fonde-t-il l\'Empire mongol ?',
       options: ['1162', '1206', '1227', '1271'],
       correcte: 1,

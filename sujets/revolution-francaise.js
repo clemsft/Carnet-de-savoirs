@@ -253,6 +253,18 @@ Plus largement, la Révolution est l\'événement qui invente la modernité poli
 
   quiz: [
     {
+      type: 'ordre-chrono',
+      q: 'Remets ces événements clés de la Révolution dans l\'ordre chronologique :',
+      items: [
+        'Prise de la Bastille (juillet 1789)',
+        'Fuite de Varennes (juin 1791)',
+        'Exécution de Louis XVI (janvier 1793)',
+        'Chute de Robespierre, fin de la Terreur (juillet 1794)',
+        'Coup d\'État du 18 Brumaire par Bonaparte (novembre 1799)'
+      ],
+      explication: 'L\'enchaînement résume la dynamique : monarchie constitutionnelle ébranlée par la fuite (1791), République proclamée puis radicalisée (1792-1793), Terreur jacobine renversée par Thermidor (1794), puis Directoire jusqu\'au coup d\'État qui ouvre l\'ère napoléonienne.'
+    },
+    {
       q: `Quand Louis XVI convoque-t-il les États généraux qui ouvrent la Révolution française ?`,
       options: [
         `Le 14 juillet 1789`,

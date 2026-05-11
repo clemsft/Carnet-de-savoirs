@@ -195,6 +195,31 @@ Mehmet II entre dans la ville et y prie à Sainte-Sophie, désormais **convertie
 
   quiz: [
     {
+      type: 'vrai-faux',
+      q: 'Vrai ou faux ?',
+      affirmation: 'Les habitants de l\'Empire byzantin s\'appelaient eux-mêmes "byzantins".',
+      reponse: false,
+      explication: 'Faux. Ils se nommaient eux-mêmes "Romaioi" — Romains. Le terme "byzantin" est une invention rétrospective de l\'historiographie occidentale (à partir du XVIᵉ siècle), construite sur le nom de l\'antique Byzance, sur laquelle Constantinople a été bâtie.'
+    },
+    {
+      type: 'ordre-chrono',
+      q: 'Remets ces grandes dates byzantines dans l\'ordre chronologique :',
+      items: [
+        'Constantin Iᵉʳ fonde Constantinople (330)',
+        'Apogée sous Justinien et construction de Sainte-Sophie (527-537)',
+        'Grand Schisme entre catholiques et orthodoxes (1054)',
+        'Sac de Constantinople par les croisés (1204)',
+        'Chute de Constantinople, prise par Mehmet II (1453)'
+      ],
+      explication: 'Cinq dates pour mille ans : la fondation par Constantin (330), l\'apogée de Justinien et Sainte-Sophie (532-537), le schisme (1054), le sac latin qui amorce le déclin irréversible (1204), et la chute finale face à Mehmet II (29 mai 1453).'
+    },
+    {
+      type: 'texte-a-trou',
+      q: 'Complète cette phrase sur la chute de Constantinople :',
+      texte: 'En {1453}, {Mehmet II} prend Constantinople après un siège de {deux mois}, grâce à une artillerie de canons géants capables de percer les murs théodosiens.',
+      explication: 'Mehmet II, alors âgé de 21 ans, met le siège en avril 1453 et prend la ville dans la nuit du 28 au 29 mai. Une bombarde de 8 mètres parvient à percer les remparts invincibles depuis mille ans.'
+    },
+    {
       q: 'Pourquoi parle-t-on d\'"Empire byzantin" alors que ses habitants se nommaient eux-mêmes Romains ?',
       options: [
         'Parce qu\'ils ont changé de nom au XᵉI siècle',
