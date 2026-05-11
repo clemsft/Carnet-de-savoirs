@@ -10,7 +10,7 @@ window.CarnetDeSavoirs.register({
   meta: {
     id: 'memoire-humaine',
     titre: `La <em>mémoire</em> humaine`,
-    domaines: ['Neurosciences', 'Psychologie'],
+    domaines: ['Sciences cognitives'],
     tags: ['cerveau', 'hippocampe', 'apprentissage', 'oubli', 'alzheimer'],
     difficulte: 2,
     duree_estimee_min: 30,

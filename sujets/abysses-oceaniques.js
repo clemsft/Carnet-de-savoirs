@@ -11,7 +11,7 @@ window.CarnetDeSavoirs.register({
   meta: {
     id: 'abysses-oceaniques',
     titre: 'Les <em>abysses</em> océaniques',
-    domaines: ['Océanographie'],
+    domaines: ['Sciences de la Terre'],
     tags: ['océan', 'pression', 'biologie marine', 'exploration'],
     difficulte: 1,
     duree_estimee_min: 20,

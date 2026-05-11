@@ -53,20 +53,26 @@ meta: {
 
 ## 3. Domaines & couleurs
 
-Les 8 domaines avec couleur prédéfinie :
+Les **14 domaines** retenus pour le carnet (palette consolidée et volontairement large) :
 
-| Domaine          | Couleur (rappel visuel) |
-|------------------|-------------------------|
-| `Astrophysique`  | orange feu              |
-| `Physique`       | bleu cobalt             |
-| `Mathématiques`  | magenta                 |
-| `Histoire`       | ambre                   |
-| `Biologie`       | vert                    |
-| `Philosophie`    | violet                  |
-| `Informatique`   | cyan                    |
-| `Littérature`    | rose                    |
+| Domaine                  | Couleur (rappel visuel) | Englobe |
+|--------------------------|-------------------------|---------|
+| `Astrophysique`          | orange feu              | astronomie, cosmologie, espace |
+| `Physique`               | bleu cobalt             | physique fondamentale, énergie |
+| `Mathématiques`          | magenta                 | maths pures et appliquées |
+| `Biologie`               | vert                    | vie, ADN, génétique, microbio, évolution |
+| `Médecine`               | rouge clinique          | médecine, santé |
+| `Sciences cognitives`    | violet doux             | neurosciences, psychologie, cognition |
+| `Sciences de la Terre`   | brun terre              | géologie, géographie, océanographie |
+| `Environnement`          | vert profond            | climat, écologie |
+| `Histoire`               | ambre                   | histoire, urbanisme |
+| `Géopolitique`           | rouge brique            | relations internationales |
+| `Informatique`           | cyan                    | tech, IA, réseaux |
+| `Économie`               | jaune-or                | finance, marchés |
+| `Philosophie`            | violet                  | philosophie, éthique |
+| `Arts`                   | magenta profond         | art, littérature, linguistique |
 
-Si tu utilises un autre nom de domaine (ex. `Géologie`, `Linguistique`), l'app génère automatiquement une couleur stable à partir du nom — pas besoin d'éditer le CSS. Mais reste cohérent : si plusieurs sujets parlent de géologie, écris exactement `Géologie` partout (la casse et les accents comptent pour le matching, pas pour la couleur).
+**Reste dans cette liste autant que possible.** Si vraiment un sujet n'entre dans aucune de ces 14 cases, tu peux en inventer une, l'app générera une couleur stable automatiquement — mais préfère élargir une catégorie existante.
 
 Un sujet peut appartenir à plusieurs domaines (ex. `['Astrophysique', 'Physique']` pour les trous noirs). La couleur d'accent du sujet est celle du **premier** domaine listé.
 

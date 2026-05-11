@@ -10,7 +10,7 @@ window.CarnetDeSavoirs.register({
   meta: {
     id: 'changement-climatique',
     titre: `Le <em>changement climatique</em>`,
-    domaines: ['Climat'],
+    domaines: ['Environnement'],
     tags: ['co2', 'giec', 'effet de serre', 'keeling', 'points de bascule'],
     difficulte: 2,
     duree_estimee_min: 30,

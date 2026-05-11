@@ -10,7 +10,7 @@ window.CarnetDeSavoirs.register({
   meta: {
     id: 'big-bang',
     titre: `Le <em>Big Bang</em>`,
-    domaines: ['Cosmologie', 'Astrophysique'],
+    domaines: ['Astrophysique'],
     tags: ['univers', 'hubble', 'inflation', 'matière noire', 'fond diffus'],
     difficulte: 2,
     duree_estimee_min: 30,

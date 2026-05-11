@@ -49,7 +49,34 @@ if errorlevel 1 (
 )
 
 echo.
-echo [OK] Snapshot enregistre.
+echo [OK] Snapshot enregistre localement.
+echo.
+
+REM Push automatique vers GitHub si un remote "origin" est configure.
+git remote get-url origin >nul 2>nul
+if errorlevel 1 (
+    echo [INFO] Aucun remote GitHub configure - snapshot purement local.
+    echo.
+    pause
+    endlocal
+    exit /b 0
+)
+
+echo Deploiement vers GitHub...
+git push origin main
+if errorlevel 1 (
+    echo.
+    echo [ATTENTION] Le push a echoue. Le commit local est OK,
+    echo mais le site en ligne n'est pas mis a jour.
+    echo Verifie ta connexion ou execute "git push" manuellement.
+    echo.
+    pause
+    endlocal
+    exit /b 1
+)
+
+echo.
+echo [OK] Site en ligne mis a jour. GitHub Pages publie en 30-60 secondes.
 echo.
 pause
 endlocal

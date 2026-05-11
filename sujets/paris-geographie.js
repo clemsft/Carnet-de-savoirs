@@ -10,7 +10,7 @@ window.CarnetDeSavoirs.register({
   meta: {
     id: 'paris-geographie',
     titre: '<em>Paris</em> et sa géographie',
-    domaines: ['Géographie', 'Histoire', 'Urbanisme'],
+    domaines: ['Sciences de la Terre', 'Histoire'],
     tags: ['paris', 'haussmann', 'métro', 'catacombes', 'égouts', 'architecture'],
     difficulte: 2,
     duree_estimee_min: 35,

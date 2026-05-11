@@ -10,7 +10,7 @@ window.CarnetDeSavoirs.register({
   meta: {
     id: 'conquete-spatiale-moderne',
     titre: 'La <em>conquête spatiale</em> moderne',
-    domaines: ['Espace', 'Géopolitique'],
+    domaines: ['Astrophysique', 'Géopolitique'],
     tags: ['nasa', 'spacex', 'lune', 'mars', 'artemis', 'starship'],
     difficulte: 2,
     duree_estimee_min: 30,

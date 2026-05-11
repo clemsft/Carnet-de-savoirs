@@ -10,7 +10,7 @@ window.CarnetDeSavoirs.register({
   meta: {
     id: 'cerveau-humain',
     titre: 'Le <em>cerveau</em> humain',
-    domaines: ['Neurosciences'],
+    domaines: ['Sciences cognitives'],
     tags: ['neurones', 'plasticité', 'mémoire', 'conscience', 'cortex'],
     difficulte: 2,
     duree_estimee_min: 30,

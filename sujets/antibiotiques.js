@@ -10,7 +10,7 @@ window.CarnetDeSavoirs.register({
   meta: {
     id: 'antibiotiques',
     titre: `Les <em>antibiotiques</em> et la résistance bactérienne`,
-    domaines: ['Médecine', 'Microbiologie'],
+    domaines: ['Médecine', 'Biologie'],
     tags: ['fleming', 'pénicilline', 'résistance', 'oms', 'phages', 'évolution'],
     difficulte: 2,
     duree_estimee_min: 30,

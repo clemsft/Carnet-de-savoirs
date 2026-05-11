@@ -10,7 +10,7 @@ window.CarnetDeSavoirs.register({
   meta: {
     id: 'adn-genetique',
     titre: `L'<em>ADN</em> et le code génétique`,
-    domaines: ['Biologie', 'Génétique'],
+    domaines: ['Biologie'],
     tags: ['adn', 'gènes', 'watson-crick', 'crispr', 'génome', 'protéines'],
     difficulte: 2,
     duree_estimee_min: 30,

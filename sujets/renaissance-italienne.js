@@ -10,7 +10,7 @@ window.CarnetDeSavoirs.register({
   meta: {
     id: 'renaissance-italienne',
     titre: 'La <em>Renaissance</em> italienne',
-    domaines: ['Histoire', 'Art'],
+    domaines: ['Histoire', 'Arts'],
     tags: ['florence', 'médicis', 'léonard', 'michel-ange', 'mécénat', 'humanisme'],
     difficulte: 2,
     duree_estimee_min: 30,

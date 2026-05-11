@@ -122,20 +122,26 @@ Documentation complète : voir `README.md` joint et commentaires dans `app.js`.
 
 ## 6. Domaines & couleurs
 
-Couleurs prédéfinies dans `styles.css` (variables CSS `--d-{slug}`) :
+Couleurs prédéfinies dans `styles.css` (variables CSS `--d-{slug}`). Palette **consolidée à 14 domaines** :
 
 | Domaine | Slug | Couleur |
 |---|---|---|
 | Astrophysique | `astrophysique` | `#ff6b35` (orange feu) |
 | Physique | `physique` | `#5b8def` (bleu cobalt) |
 | Mathématiques | `mathematiques` | `#d946ef` (magenta) |
-| Histoire | `histoire` | `#f5b342` (ambre) |
 | Biologie | `biologie` | `#4ade80` (vert) |
-| Philosophie | `philosophie` | `#a78bfa` (violet) |
+| Médecine | `medecine` | `#ef4444` (rouge clinique) |
+| Sciences cognitives | `sciencescognitives` | `#c084fc` (violet doux) |
+| Sciences de la Terre | `sciencesdelaterre` | `#92400e` (brun terre) |
+| Environnement | `environnement` | `#16a34a` (vert profond) |
+| Histoire | `histoire` | `#f5b342` (ambre) |
+| Géopolitique | `geopolitique` | `#dc2626` (rouge brique) |
 | Informatique | `informatique` | `#06b6d4` (cyan) |
-| Littérature | `litterature` | `#fb7185` (rose) |
+| Économie | `economie` | `#eab308` (jaune-or) |
+| Philosophie | `philosophie` | `#a78bfa` (violet) |
+| Arts | `arts` | `#be185d` (magenta profond) |
 
-**Pour ajouter un nouveau domaine** : ajouter une variable CSS dans `styles.css` (section `:root`), puis utiliser ce nom de domaine dans le tableau `meta.domaines` du sujet. Le slug est obtenu en minusculisant et retirant accents/caractères non-alphabétiques.
+**Pour ajouter un nouveau domaine** : préférer rester dans cette palette (élargir l'interprétation d'un domaine existant). Si vraiment nécessaire, ajouter une variable CSS dans `styles.css` (section `:root`), puis utiliser ce nom de domaine dans le tableau `meta.domaines` du sujet. Le slug est obtenu en minusculisant et retirant accents/caractères non-alphabétiques. Si aucune variable CSS ne correspond, l'app génère automatiquement une couleur stable par hash.
 
 ---
 

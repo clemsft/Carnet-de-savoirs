@@ -20,37 +20,21 @@
   --line: rgba(236, 228, 211, 0.07);
   --line-strong: rgba(236, 228, 211, 0.16);
 
-  /* Domain colors (one per domaine) */
-  --d-astrophysique: #ff6b35;
-  --d-physique: #5b8def;
-  --d-mathematiques: #d946ef;
-  --d-histoire: #f5b342;
-  --d-biologie: #4ade80;
-  --d-philosophie: #a78bfa;
-  --d-informatique: #06b6d4;
-  --d-litterature: #fb7185;
-  /* Domaines ajoutés au fil des sujets */
-  --d-geopolitique: #dc2626;     /* rouge brique */
-  --d-economie: #eab308;         /* jaune-or */
-  --d-espace: #8b5cf6;            /* violet électrique */
-  --d-oceanographie: #0d9488;    /* teal profond */
-  /* Domaines ajoutés au batch 2 */
-  --d-neurosciences: #f472b6;    /* rose-corail (cerveau, sommeil) */
-  --d-linguistique: #14b8a6;     /* sarcelle */
-  --d-medecine: #ef4444;         /* rouge clinique */
-  --d-sciencescognitives: #c084fc; /* violet doux (cognition) */
-  --d-geologie: #92400e;         /* brun terre */
-  --d-climat: #38bdf8;            /* bleu ciel */
-  --d-ecologie: #16a34a;         /* vert profond */
-  --d-geographie: #f59e0b;       /* sable doré */
-  --d-urbanisme: #64748b;        /* ardoise */
-  /* Domaines ajoutés au batch 3 */
-  --d-genetique: #84cc16;        /* vert citron (ADN, vie) */
-  --d-microbiologie: #65a30d;    /* olive clair (bactéries) */
-  --d-cosmologie: #fbbf24;       /* doré chaud (big bang) */
-  --d-energie: #f97316;          /* orange ardent */
-  --d-art: #be185d;              /* magenta profond (Renaissance) */
-  --d-psychologie: #a855f7;      /* lavande (mémoire, Stendhal) */
+  /* Domain colors — palette consolidée (14 domaines) */
+  --d-astrophysique: #ff6b35;       /* orange feu */
+  --d-physique: #5b8def;            /* bleu cobalt */
+  --d-mathematiques: #d946ef;       /* magenta */
+  --d-histoire: #f5b342;            /* ambre */
+  --d-biologie: #4ade80;            /* vert */
+  --d-medecine: #ef4444;            /* rouge clinique */
+  --d-sciencescognitives: #c084fc;  /* violet doux */
+  --d-sciencesdelaterre: #92400e;   /* brun terre */
+  --d-environnement: #16a34a;       /* vert profond */
+  --d-geopolitique: #dc2626;        /* rouge brique */
+  --d-informatique: #06b6d4;        /* cyan */
+  --d-economie: #eab308;            /* jaune-or */
+  --d-philosophie: #a78bfa;         /* violet */
+  --d-arts: #be185d;                /* magenta profond */
   --d-default: #94a3b8;
 
   /* Dynamic accent (set via JS based on current sujet) */

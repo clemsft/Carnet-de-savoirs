@@ -10,7 +10,7 @@ window.CarnetDeSavoirs.register({
   meta: {
     id: 'syndrome-stendhal',
     titre: 'Le <em>syndrome de Stendhal</em>',
-    domaines: ['Psychologie', 'Médecine'],
+    domaines: ['Sciences cognitives', 'Médecine'],
     tags: ['florence', 'art', 'voyage', 'psychiatrie', 'esthetique'],
     difficulte: 2,
     duree_estimee_min: 25,

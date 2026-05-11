@@ -10,7 +10,7 @@ window.CarnetDeSavoirs.register({
   meta: {
     id: 'energie-nucleaire',
     titre: `L'<em>énergie nucléaire</em>`,
-    domaines: ['Physique', 'Énergie'],
+    domaines: ['Physique'],
     tags: ['fission', 'fusion', 'uranium', 'tchernobyl', 'iter', 'climat'],
     difficulte: 2,
     duree_estimee_min: 30,

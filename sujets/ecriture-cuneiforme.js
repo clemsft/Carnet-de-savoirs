@@ -10,7 +10,7 @@ window.CarnetDeSavoirs.register({
   meta: {
     id: 'ecriture-cuneiforme',
     titre: 'L\'écriture <em>cunéiforme</em>',
-    domaines: ['Histoire', 'Linguistique'],
+    domaines: ['Histoire', 'Arts'],
     tags: ['mésopotamie', 'sumer', 'écriture', 'antiquité', 'archéologie'],
     difficulte: 2,
     duree_estimee_min: 25,

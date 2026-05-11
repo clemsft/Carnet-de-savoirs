@@ -10,7 +10,7 @@ window.CarnetDeSavoirs.register({
   meta: {
     id: 'le-sommeil',
     titre: 'Le <em>sommeil</em>',
-    domaines: ['Biologie', 'Neurosciences'],
+    domaines: ['Biologie', 'Sciences cognitives'],
     tags: ['cerveau', 'rêve', 'cycles', 'mémoire', 'santé'],
     difficulte: 1,
     duree_estimee_min: 25,

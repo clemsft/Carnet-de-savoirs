@@ -10,7 +10,7 @@ window.CarnetDeSavoirs.register({
   meta: {
     id: 'megafeux',
     titre: 'Les <em>mégafeux</em>',
-    domaines: ['Climat', 'Écologie'],
+    domaines: ['Environnement'],
     tags: ['climat', 'incendie', 'forêt', 'co2', 'biodiversité'],
     difficulte: 2,
     duree_estimee_min: 25,

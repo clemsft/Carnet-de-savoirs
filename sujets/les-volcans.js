@@ -10,7 +10,7 @@ window.CarnetDeSavoirs.register({
   meta: {
     id: 'les-volcans',
     titre: 'Les <em>volcans</em>',
-    domaines: ['Géologie'],
+    domaines: ['Sciences de la Terre'],
     tags: ['terre', 'magma', 'tectonique', 'éruption', 'islande'],
     difficulte: 1,
     duree_estimee_min: 25,
