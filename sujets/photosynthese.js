@@ -200,10 +200,10 @@ Pourquoi cherche-t-on alors à imiter la photosynthèse ? Parce qu'elle fonction
       type: 'ordre-chrono',
       q: `Remets ces grands jalons de l'évolution de la photosynthèse oxygénique dans l'ordre chronologique :`,
       items: [
-        `~3,5 Ga — Apparition des cyanobactéries (premières photosynthèses oxygéniques)`,
-        `~2,4 Ga — Grande Oxygénation : l'oxygène s'accumule dans l'atmosphère`,
-        `~1,5 Ga — Endosymbiose : naissance des eucaryotes photosynthétiques`,
-        `~470 Ma — Colonisation de la terre ferme par les plantes`
+        `Apparition des cyanobactéries (premières photosynthèses oxygéniques)`,
+        `Grande Oxygénation : l'oxygène s'accumule dans l'atmosphère`,
+        `Endosymbiose : naissance des eucaryotes photosynthétiques`,
+        `Colonisation de la terre ferme par les plantes`
       ],
       explication: `Les cyanobactéries inventent la photosynthèse oxygénique il y a ~3,5 milliards d'années. Pendant ~1 milliard d'années, l'O₂ produit est absorbé par le fer dissous. Vers -2,4 Ga, l'oxygène s'accumule (Grande Oxygénation). Vers -1,5 Ga, une cellule eucaryote englobe une cyanobactérie (endosymbiose) — naissance du chloroplaste. Vers -470 Ma, les plantes colonisent la terre.`
     },

@@ -179,12 +179,12 @@ L\'homme prend en 1934 le nom d\'**Atatürk** — « père des Turcs ». Il occi
   quiz: [
     {
       type: 'ordre-chrono',
-      q: 'Remets ces grandes dates de l\'Empire ottoman dans l\'ordre chronologique :',
+      q: 'Remets ces grands événements de l\'Empire ottoman dans l\'ordre chronologique :',
       items: [
-        'Fondation du beylicat par Osman Iᵉʳ (1299)',
-        'Prise de Constantinople par Mehmet II (1453)',
-        'Échec du second siège de Vienne (1683)',
-        'Abolition du sultanat par Mustafa Kemal (1922)'
+        'Fondation du beylicat par Osman Iᵉʳ',
+        'Prise de Constantinople par Mehmet II',
+        'Échec du second siège de Vienne',
+        'Abolition du sultanat par Mustafa Kemal'
       ],
       explication: 'De 1299 à 1922 : six siècles d\'existence. La fondation par Osman, la prise de Constantinople en 1453 qui marque l\'apogée de la conquête, l\'échec devant Vienne en 1683 qui amorce le long déclin, et l\'abolition du sultanat par Mustafa Kemal en 1922.'
     },

@@ -212,11 +212,11 @@ L'outil ouvre des perspectives vertigineuses (correction de maladies génétique
       type: 'ordre-chrono',
       q: `Remets ces grandes étapes de l'histoire de la génétique dans l'ordre chronologique :`,
       items: [
-        `1869 — Miescher isole la "nucléine"`,
-        `1953 — Watson et Crick publient la structure en double hélice`,
-        `2003 — Achèvement du Projet Génome Humain`,
-        `2012 — Charpentier et Doudna adaptent CRISPR-Cas9`,
-        `2023 — Première thérapie CRISPR approuvée (Casgevy, drépanocytose)`
+        `Miescher isole la "nucléine"`,
+        `Watson et Crick publient la structure en double hélice`,
+        `Achèvement du Projet Génome Humain`,
+        `Charpentier et Doudna adaptent CRISPR-Cas9`,
+        `Première thérapie CRISPR approuvée (Casgevy, drépanocytose)`
       ],
       explication: `Repères clés : Miescher (1869, découverte de l'ADN sans en mesurer la portée), Watson-Crick (1953, double hélice), Projet Génome Humain (1990-2003), CRISPR (2012), première thérapie CRISPR approuvée (2023).`
     },

@@ -366,11 +366,11 @@ Cette corrélation est intrigante : comment un objet aussi compact peut-il être
       type: 'ordre-chrono',
       q: 'Remets ces jalons de l\'histoire des trous noirs dans l\'ordre chronologique :',
       items: [
-        'Einstein publie la relativité générale qui prédit les trous noirs (1915-1916)',
-        'Cygnus X-1 est confirmé comme premier trou noir stellaire (années 1970)',
-        'LIGO détecte les premières ondes gravitationnelles issues d\'une fusion de trous noirs (2015)',
-        'L\'Event Horizon Telescope publie la première image de M87* (2019)',
-        'L\'EHT publie l\'image de Sagittarius A* au centre de notre galaxie (2022)'
+        'Einstein publie la relativité générale qui prédit les trous noirs',
+        'Cygnus X-1 est confirmé comme premier trou noir stellaire',
+        'LIGO détecte les premières ondes gravitationnelles issues d\'une fusion de trous noirs',
+        'L\'Event Horizon Telescope publie la première image de M87*',
+        'L\'EHT publie l\'image de Sagittarius A* au centre de notre galaxie'
       ],
       explication: 'La relativité générale prédit théoriquement les trous noirs dès 1916. Il faudra attendre les années 1970 pour la première confirmation observationnelle (Cygnus X-1), puis LIGO en 2015 pour les ondes gravitationnelles, et enfin l\'EHT pour les premières images directes (M87* en 2019, Sgr A* en 2022).'
     },

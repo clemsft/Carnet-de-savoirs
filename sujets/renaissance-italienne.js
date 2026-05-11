@@ -226,12 +226,12 @@ Et lointainement, c\'est aussi de Florence que viennent **les Lumières** : sans
       type: 'ordre-chrono',
       q: 'Remets ces événements de la Renaissance italienne dans l\'ordre chronologique :',
       items: [
-        'Fondation de la banque Médicis à Florence (1397)',
-        'Brunelleschi démontre les lois de la perspective géométrique (1415)',
-        'Invention de l\'imprimerie par Gutenberg à Mayence (~1450)',
-        'Chute de Constantinople, fuite des savants grecs vers l\'Italie (1453)',
-        'Michel-Ange peint le plafond de la chapelle Sixtine (1508-1512)',
-        'Sac de Rome par les troupes de Charles Quint (1527)'
+        'Fondation de la banque Médicis à Florence',
+        'Brunelleschi démontre les lois de la perspective géométrique',
+        'Invention de l\'imprimerie par Gutenberg à Mayence',
+        'Chute de Constantinople, fuite des savants grecs vers l\'Italie',
+        'Michel-Ange peint le plafond de la chapelle Sixtine',
+        'Sac de Rome par les troupes de Charles Quint'
       ],
       explication: 'De la banque Médicis (1397) qui financera tout, à la perspective de Brunelleschi (1415), à l\'imprimerie (1450), à l\'arrivée des manuscrits grecs après 1453, au chef-d\'œuvre michelangelesque (1508-1512), jusqu\'au sac de Rome qui brise l\'élan créatif (1527).'
     },

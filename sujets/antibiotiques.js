@@ -235,11 +235,11 @@ D'autres pistes sont explorées : **peptides antimicrobiens** naturels (présent
       type: 'ordre-chrono',
       q: `Remets ces étapes de l'histoire des antibiotiques dans l'ordre chronologique :`,
       items: [
-        `1928 — Fleming découvre la pénicilline`,
-        `1941-1945 — Florey et Chain : production industrielle`,
-        `1950-1970 — Âge d'or des antibiotiques`,
-        `~1980 — Fin de l'innovation : plus aucune nouvelle classe`,
-        `2019 — ~1,3 million de décès annuels attribués à la résistance`
+        `Fleming découvre la pénicilline`,
+        `Florey et Chain : production industrielle pendant la Seconde Guerre mondiale`,
+        `Âge d'or des antibiotiques : la plupart des classes connues sont découvertes`,
+        `Fin de l'innovation : plus aucune nouvelle classe découverte`,
+        `Bilan global : ~1,3 million de décès annuels attribués à la résistance`
       ],
       explication: `Découverte fortuite par Fleming (1928), production de masse pendant la Seconde Guerre mondiale (1941-1945) avec Florey et Chain, âge d'or jusque vers 1980, panne de l'innovation depuis (modèle économique brisé), montée actuelle de la crise de la résistance.`
     },

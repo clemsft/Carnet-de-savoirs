@@ -243,11 +243,11 @@ Aujourd\'hui, la Chine relance le concept, sous le nom de **« Nouvelles Routes 
       type: 'ordre-chrono',
       q: 'Remets ces grandes phases de la Route de la Soie dans l\'ordre chronologique :',
       items: [
-        'Mission de Zhang Qian envoyé en Asie centrale par les Han (138 av. J.-C.)',
-        'Bataille du Talas : les prisonniers chinois transmettent le secret du papier (751)',
-        'Marco Polo séjourne à la cour de Kubilaï Khan en Chine (1271-1295)',
-        'Peste noire partie des steppes mongoles atteint l\'Europe (1346-1353)',
-        'Vasco de Gama arrive à Calicut par voie maritime (1498)'
+        'Mission de Zhang Qian envoyé en Asie centrale par les Han',
+        'Bataille du Talas : les prisonniers chinois transmettent le secret du papier',
+        'Marco Polo séjourne à la cour de Kubilaï Khan en Chine',
+        'Peste noire partie des steppes mongoles atteint l\'Europe',
+        'Vasco de Gama arrive à Calicut par voie maritime'
       ],
       explication: 'Quinze siècles d\'échanges : ouverture sous les Han, transmission technique au Talas, apogée sous la Pax Mongolica avec Marco Polo, choc de la peste noire, puis déclin avec l\'ouverture des routes maritimes européennes qui contournent les intermédiaires.'
     },

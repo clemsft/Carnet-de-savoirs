@@ -205,11 +205,11 @@ Mehmet II entre dans la ville et y prie à Sainte-Sophie, désormais **convertie
       type: 'ordre-chrono',
       q: 'Remets ces grandes dates byzantines dans l\'ordre chronologique :',
       items: [
-        'Constantin Iᵉʳ fonde Constantinople (330)',
-        'Apogée sous Justinien et construction de Sainte-Sophie (527-537)',
-        'Grand Schisme entre catholiques et orthodoxes (1054)',
-        'Sac de Constantinople par les croisés (1204)',
-        'Chute de Constantinople, prise par Mehmet II (1453)'
+        'Constantin Iᵉʳ fonde Constantinople',
+        'Apogée sous Justinien et construction de Sainte-Sophie',
+        'Grand Schisme entre catholiques et orthodoxes',
+        'Sac de Constantinople par les croisés latins',
+        'Chute de Constantinople, prise par Mehmet II'
       ],
       explication: 'Cinq dates pour mille ans : la fondation par Constantin (330), l\'apogée de Justinien et Sainte-Sophie (532-537), le schisme (1054), le sac latin qui amorce le déclin irréversible (1204), et la chute finale face à Mehmet II (29 mai 1453).'
     },

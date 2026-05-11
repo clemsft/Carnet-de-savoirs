@@ -186,12 +186,12 @@ L\'Islande, perchée sur la dorsale atlantique, vit dans une éruption quasi per
       type: 'ordre-chrono',
       q: 'Remets ces éruptions historiques dans l\'ordre chronologique :',
       items: [
-        'Vésuve, destruction de Pompéi (79)',
-        'Tambora en Indonésie, "année sans été" qui suit (1815)',
-        'Krakatoa en Indonésie (1883)',
-        'Mont Pelée en Martinique, anéantissement de Saint-Pierre (1902)',
-        'Mont Saint-Helens dans l\'État de Washington (1980)',
-        'Pinatubo aux Philippines (1991)'
+        'Vésuve, destruction de Pompéi',
+        'Tambora en Indonésie, "année sans été" qui suit',
+        'Krakatoa en Indonésie',
+        'Mont Pelée en Martinique, anéantissement de Saint-Pierre',
+        'Mont Saint-Helens dans l\'État de Washington',
+        'Pinatubo aux Philippines'
       ],
       explication: 'Ces éruptions jalonnent l\'histoire de la volcanologie. Le Vésuve (79) reste l\'archétype, le Tambora (1815, VEI 7) a provoqué l\'"année sans été" 1816, le Krakatoa (1883) a fait entendre son explosion à des milliers de km, la Pelée (1902) a tué 28 000 personnes, et le Pinatubo (1991, VEI 6) a refroidi la planète de 0,5 °C pendant deux ans.'
     },

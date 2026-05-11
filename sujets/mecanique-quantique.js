@@ -195,12 +195,12 @@ La frontière actuelle : les **ordinateurs quantiques**, qui exploitent superpos
       type: 'ordre-chrono',
       q: 'Remets ces jalons fondateurs de la mécanique quantique dans l\'ordre chronologique :',
       items: [
-        'Planck postule les quanta d\'énergie (1900)',
-        'Einstein propose le photon pour expliquer l\'effet photoélectrique (1905)',
-        'Bohr publie son modèle atomique avec orbites discrètes (1913)',
-        'Heisenberg énonce le principe d\'incertitude (1927)',
-        'Le congrès Solvay oppose Bohr et Einstein (1927)',
-        'Aspect réalise à Orsay l\'expérience qui tranche en faveur de la non-localité (1982)'
+        'Planck postule les quanta d\'énergie',
+        'Einstein propose le photon pour expliquer l\'effet photoélectrique',
+        'Bohr publie son modèle atomique avec orbites discrètes',
+        'Heisenberg énonce le principe d\'incertitude',
+        'Le congrès Solvay oppose Bohr et Einstein quelques mois plus tard',
+        'Aspect réalise à Orsay l\'expérience qui tranche en faveur de la non-localité'
       ],
       explication: 'La mécanique quantique se construit en moins de trente ans, de Planck (1900) à Heisenberg et au congrès Solvay (1927). Le débat Einstein-Bohr sur l\'intrication, ouvert en 1935 (EPR), ne sera tranché expérimentalement qu\'en 1982 par Aspect.'
     },

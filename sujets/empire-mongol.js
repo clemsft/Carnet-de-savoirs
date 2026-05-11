@@ -180,11 +180,11 @@ L\'empire unifié n\'aura duré que **cent cinquante ans environ**. Mais ses des
       type: 'ordre-chrono',
       q: 'Remets ces événements de l\'Empire mongol dans l\'ordre chronologique :',
       items: [
-        'Gengis Khan unifie les tribus mongoles (1206)',
-        'Invasion mongole de l\'Europe orientale par Batu Khan (1236-1242)',
-        'Sac de Bagdad par Houlagou, fin du califat abbasside (1258)',
-        'Kubilaï Khan fonde la dynastie Yuan en Chine (1271)',
-        'La dynastie Ming chasse les Mongols de Pékin (1368)'
+        'Gengis Khan unifie les tribus mongoles',
+        'Invasion mongole de l\'Europe orientale par Batu Khan',
+        'Sac de Bagdad par Houlagou, fin du califat abbasside',
+        'Kubilaï Khan fonde la dynastie Yuan en Chine',
+        'La dynastie Ming chasse les Mongols de Pékin'
       ],
       explication: 'En 1206 Gengis devient khan universel ; ses petits-fils étendent l\'empire à l\'Europe orientale (1236-1242), prennent Bagdad (1258), fondent la dynastie Yuan en Chine (1271). En 1368, les Ming chassent les Mongols : fin du contrôle mongol sur la Chine.'
     },

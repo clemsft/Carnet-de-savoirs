@@ -182,12 +182,12 @@ C\'est cette transformation **qualitative** que désigne le mot mégafeu : moins
       type: 'ordre-chrono',
       q: 'Remets ces mégafeux marquants dans l\'ordre chronologique :',
       items: [
-        'Black Saturday en Australie (2009)',
-        'Camp Fire en Californie, destruction de Paradise (2018)',
-        'Black Summer australien (2019-2020)',
-        'Mégafeux de Gironde en France (2022)',
-        'Saison record du Canada, 150 000 km² brûlés (2023)',
-        'Incendies de Pacific Palisades et Eaton à Los Angeles (janvier 2025)'
+        'Black Saturday en Australie',
+        'Camp Fire en Californie, destruction de Paradise',
+        'Black Summer australien',
+        'Mégafeux de Gironde en France',
+        'Saison record du Canada, 150 000 km² brûlés',
+        'Incendies de Pacific Palisades et Eaton à Los Angeles'
       ],
       explication: 'Ces grands feux jalonnent l\'entrée du monde dans l\'âge des mégafeux : Black Saturday (2009) puis Camp Fire (2018) inaugurent la décennie, le Black Summer (2019-2020) et Gironde (2022) marquent un seuil, le Canada (2023) bat tous les records, et LA en plein hiver 2025 symbolise une saison qui n\'en finit plus.'
     },

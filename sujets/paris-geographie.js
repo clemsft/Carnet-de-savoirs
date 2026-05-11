@@ -204,13 +204,13 @@ Le **Grand Paris Express**, en cours de construction depuis 2016, ajoutera **200
       type: 'ordre-chrono',
       q: 'Remets ces étapes de l\'histoire urbaine de Paris dans l\'ordre chronologique :',
       items: [
-        'Lutèce gallo-romaine (~50 av. J.-C.)',
-        'Construction de Notre-Dame de Paris (1163-1345)',
-        'Création des Catacombes (1786)',
-        'Transformation haussmannienne (1853-1870)',
-        'Inauguration du métro pour l\'Exposition universelle (1900)',
-        'Centre Pompidou (1977)',
-        'Réouverture de Notre-Dame après l\'incendie (2024)'
+        'Lutèce, ville gallo-romaine sur l\'île de la Cité',
+        'Construction de Notre-Dame de Paris',
+        'Création des Catacombes',
+        'Transformation haussmannienne',
+        'Inauguration du métro pour l\'Exposition universelle',
+        'Inauguration du Centre Pompidou',
+        'Réouverture de Notre-Dame après l\'incendie'
       ],
       explication: 'Vingt siècles de strates : Lutèce romaine, Notre-Dame gothique, Catacombes au XVIIIᵉ, refonte haussmannienne au XIXᵉ, métro en 1900, Centre Pompidou comme premier "grand chantier" récent, et la spectaculaire réouverture de Notre-Dame en décembre 2024, cinq ans après l\'incendie.'
     },

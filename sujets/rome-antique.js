@@ -221,13 +221,13 @@ Mais l\'empire ne disparaît pas vraiment. À l\'**est**, à Constantinople, il 
   quiz: [
     {
       type: 'ordre-chrono',
-      q: `Remets ces grandes dates romaines dans l\'ordre chronologique :`,
+      q: `Remets ces grands événements romains dans l\'ordre chronologique :`,
       items: [
-        'Fondation légendaire de Rome (753 av. J.-C.)',
-        'Naissance de la République (509 av. J.-C.)',
-        'Auguste instaure l\'Empire (27 av. J.-C.)',
-        'Édit de Milan, Constantin légalise le christianisme (313 ap. J.-C.)',
-        'Chute de l\'Empire romain d\'Occident (476 ap. J.-C.)'
+        'Fondation légendaire de Rome par Romulus',
+        'Naissance de la République après l\'expulsion des rois étrusques',
+        'Auguste instaure l\'Empire',
+        'Édit de Milan : Constantin légalise le christianisme',
+        'Chute de l\'Empire romain d\'Occident, déposition de Romulus Augustule'
       ],
       explication: `Cinq dates pour douze siècles : la fondation légendaire par Romulus (753 av. J.-C.), la chute du roi étrusque qui donne la République (509 av. J.-C.), l\'instauration de l\'Empire par Auguste (27 av. J.-C.), la légalisation du christianisme par Constantin (313 ap. J.-C.), et la déposition de Romulus Augustule (476 ap. J.-C.).`
     },

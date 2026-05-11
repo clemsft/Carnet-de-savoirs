@@ -219,10 +219,10 @@ Aujourd\'hui, la **théorie des ensembles** est le langage standard des mathéma
       type: 'ordre-chrono',
       q: 'Remets ces étapes-clés de la théorie des ensembles dans l\'ordre chronologique :',
       items: [
-        'Cantor publie l\'argument diagonal et fonde la théorie des ensembles (1891)',
-        'Hilbert présente l\'hypothèse du continu comme premier problème de sa liste (1900)',
-        'Gödel démontre que l\'hypothèse du continu ne peut être réfutée dans ZFC (1940)',
-        'Cohen démontre qu\'elle ne peut pas non plus être prouvée — donc indécidable (1963)'
+        'Cantor publie l\'argument diagonal et fonde la théorie des ensembles',
+        'Hilbert présente l\'hypothèse du continu comme premier problème de sa liste',
+        'Gödel démontre que l\'hypothèse du continu ne peut être réfutée dans ZFC',
+        'Cohen démontre qu\'elle ne peut pas non plus être prouvée — donc indécidable'
       ],
       explication: 'Cantor ouvre le chantier en 1891 avec son argument diagonal. Hilbert en fait le premier problème de son célèbre programme en 1900. Il faudra Gödel (1940) puis Cohen (1963) pour montrer que l\'hypothèse du continu est indécidable dans les axiomes standards ZFC.'
     },

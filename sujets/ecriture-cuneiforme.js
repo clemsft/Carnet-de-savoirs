@@ -184,10 +184,10 @@ Quand Mehmet II prend Constantinople en 1453 (revoir [[empire-byzantin]]), c\'es
       type: 'ordre-chrono',
       q: 'Remets ces étapes de l\'écriture cunéiforme dans l\'ordre chronologique :',
       items: [
-        'Premières tablettes pictographiques à Ourouk (~3300 av. J.-C.)',
-        'Phonétisation : les signes représentent des sons (~2700 av. J.-C.)',
-        'Code d\'Hammurabi gravé sur stèle (~1750 av. J.-C.)',
-        'Dernière tablette cunéiforme connue, à Babylone (~75 ap. J.-C.)'
+        'Premières tablettes pictographiques à Ourouk',
+        'Phonétisation : les signes représentent des sons',
+        'Code d\'Hammurabi gravé sur stèle',
+        'Dernière tablette cunéiforme connue, à Babylone'
       ],
       explication: 'Plus de trois mille ans d\'évolution : naissance comptable à Ourouk, phonétisation qui permet d\'écrire n\'importe quelle parole, codification du droit babylonien, puis extinction silencieuse vers 75 ap. J.-C. — il faudra 18 siècles pour redéchiffrer le système.'
     },

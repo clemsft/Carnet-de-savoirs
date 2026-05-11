@@ -207,13 +207,13 @@ Les défis restent immenses : coûts de construction qui dérivent (l'EPR de Fla
       type: 'ordre-chrono',
       q: 'Remets ces événements majeurs de l\'histoire nucléaire dans l\'ordre chronologique :',
       items: [
-        'Découverte de la fission par Hahn et Strassmann (1938)',
-        'Première réaction en chaîne contrôlée par Fermi à Chicago (1942)',
-        'Hiroshima et Nagasaki (août 1945)',
-        'Première centrale nucléaire civile à Obninsk (1954)',
-        'Catastrophe de Tchernobyl (1986)',
-        'Accident de Fukushima (2011)',
-        'Ignition au NIF par confinement laser (2022)'
+        'Découverte de la fission par Hahn et Strassmann',
+        'Première réaction en chaîne contrôlée par Fermi à Chicago',
+        'Hiroshima et Nagasaki',
+        'Première centrale nucléaire civile à Obninsk',
+        'Catastrophe de Tchernobyl',
+        'Accident de Fukushima',
+        'Ignition au NIF par confinement laser'
       ],
       explication: 'L\'histoire nucléaire enchaîne la découverte scientifique (1938), la première réaction contrôlée (1942), l\'usage militaire (1945), puis civil (1954), avant les deux catastrophes majeures (Tchernobyl 1986, Fukushima 2011) et l\'étape symbolique de la fusion au NIF en 2022.'
     },

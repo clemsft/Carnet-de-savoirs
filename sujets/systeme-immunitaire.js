@@ -183,11 +183,11 @@ Autre dérèglement : l\'**allergie**, où le système réagit fort à des subst
       type: 'ordre-chrono',
       q: 'Remets ces grandes étapes de l\'histoire de l\'immunologie dans l\'ordre chronologique :',
       items: [
-        '1796 — Jenner : première vaccination (variole)',
-        '1880-1885 — Pasteur développe les vaccins atténués',
-        '1890 — Behring et Kitasato isolent les antitoxines (anticorps)',
-        '1987 — Tonegawa explique la diversité des anticorps (Nobel)',
-        '2020 — Premiers vaccins à ARN messager déployés (COVID-19)'
+        'Jenner : première vaccination (variole)',
+        'Pasteur développe les vaccins atténués',
+        'Behring et Kitasato isolent les antitoxines (anticorps)',
+        'Tonegawa explique la diversité des anticorps (Nobel)',
+        'Premiers vaccins à ARN messager déployés (COVID-19)'
       ],
       explication: 'Jenner pose la prophylaxie vaccinale (1796), Pasteur étend par les vaccins atténués (1880s), Behring découvre les antitoxines (1890), Tonegawa élucide la recombinaison génétique des anticorps (Nobel 1987), vaccins à ARNm déployés à grande échelle en 2020-2021 (Nobel Karikó & Weissman 2023).'
     },

@@ -208,12 +208,12 @@ La justice climatique est l'angle moral et géopolitique du problème. Les pays 
       type: 'ordre-chrono',
       q: 'Remets ces jalons de la science et de la politique du climat dans l\'ordre chronologique :',
       items: [
-        'Arrhenius publie le premier calcul quantitatif de l\'effet du CO₂ (1896)',
-        'Keeling lance les mesures continues du CO₂ au Mauna Loa (1958)',
-        'Création du GIEC sous l\'égide de l\'ONU et de l\'OMM (1988)',
-        'Sommet de Rio et signature de la CCNUCC (1992)',
-        'Protocole de Kyoto (1997)',
-        'Accord de Paris signé par 195 États (2015)'
+        'Arrhenius publie le premier calcul quantitatif de l\'effet du CO₂',
+        'Keeling lance les mesures continues du CO₂ au Mauna Loa',
+        'Création du GIEC sous l\'égide de l\'ONU et de l\'OMM',
+        'Sommet de Rio et signature de la CCNUCC',
+        'Protocole de Kyoto',
+        'Accord de Paris signé par 195 États'
       ],
       explication: 'La science du climat s\'établit avec Arrhenius (1896) et Keeling (1958) ; les institutions politiques mondiales se mettent en place avec le GIEC (1988), Rio (1992), Kyoto (1997) et Paris (2015), où 195 États s\'engagent à limiter le réchauffement à "bien en deçà de 2 °C".'
     },

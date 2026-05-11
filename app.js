@@ -80,10 +80,46 @@
       if (!raw) return defaultUserState();
       const parsed = JSON.parse(raw);
       // Merge avec defaults au cas où
-      return Object.assign(defaultUserState(), parsed);
+      const merged = Object.assign(defaultUserState(), parsed);
+      migrateUserState(merged);
+      return merged;
     } catch (e) {
       console.warn('Erreur lecture localStorage', e);
       return defaultUserState();
+    }
+  }
+
+  // Migrations one-shot pour les comptes existants. Idempotent : peut
+  // être rejoué sans dommage.
+  function migrateUserState(u) {
+    // 1. Initialise quizCounters depuis quizLog si jamais quelqu'un avait
+    //    déjà joué avant l'introduction des compteurs cumulatifs.
+    if (!u.quizCounters || typeof u.quizCounters.totalAnswered !== 'number') {
+      u.quizCounters = { totalAnswered: 0, totalCorrect: 0, fastCorrect: 0,
+                         revisionCorrect: 0, defiBestStreakInRow: 0 };
+      const log = Array.isArray(u.quizLog) ? u.quizLog : [];
+      let defiCur = 0;
+      log.forEach(e => {
+        u.quizCounters.totalAnswered++;
+        if (e.correct) u.quizCounters.totalCorrect++;
+        if (e.correct && e.durationMs > 0 && e.durationMs < 5000) u.quizCounters.fastCorrect++;
+        if (e.correct && e.mode === 'revision') u.quizCounters.revisionCorrect++;
+        if (e.mode === 'defi') {
+          if (e.correct) {
+            defiCur++;
+            if (defiCur > u.quizCounters.defiBestStreakInRow) u.quizCounters.defiBestStreakInRow = defiCur;
+          } else defiCur = 0;
+        }
+      });
+    }
+    // 2. Initialise dailyQuizDates depuis le log + dailyQuiz courant si absent
+    if (!Array.isArray(u.dailyQuizDates)) {
+      const set = new Set();
+      (u.quizLog || []).forEach(e => {
+        if (e.mode === 'quotidien' && e.date) set.add(e.date.slice(0, 10));
+      });
+      if (u.dailyQuiz && u.dailyQuiz.completed && u.dailyQuiz.date) set.add(u.dailyQuiz.date);
+      u.dailyQuizDates = Array.from(set);
     }
   }
 
@@ -96,6 +132,18 @@
       quizAnswers: {},   // sujetId -> qIdx -> { ok, ko, lastCorrect, lastAttempt }
       // Log chronologique de toutes les réponses (capé) pour stats récentes.
       quizLog: [],       // [{ date, sujetId, qIdx, type, correct, durationMs, mode }] (max 500)
+      // Compteurs cumulatifs, jamais capés : servent aux achievements de
+      // volume (quiz-cent, quiz-millier, etc.) sans dépendre du quizLog
+      // tronqué à 500 entrées.
+      quizCounters: {
+        totalAnswered: 0,       // toutes les réponses, justes ou non
+        totalCorrect: 0,        // bonnes réponses cumulées
+        fastCorrect: 0,         // bonnes réponses en < 5s
+        revisionCorrect: 0,     // bonnes réponses en mode Révision
+        defiBestStreakInRow: 0  // record de bonnes consécutives en mode Défi
+      },
+      // Dates distinctes où le quiz quotidien a été terminé (YYYY-MM-DD).
+      dailyQuizDates: [],
       // Streak de bonnes réponses consécutives toutes sources confondues.
       quizStreak: { current: 0, best: 0 },
       // Quiz quotidien : date du dernier complété, score, total.
@@ -1219,36 +1267,31 @@
         return Object.keys(extractGlossaryTerms(sujets)).length >= 30;
       } },
     // ----- Quiz dédiés -----
+    // Les compteurs cumulatifs (state.user.quizCounters) sont la source de
+    // vérité pour les achievements de volume — le quizLog est capé à 500
+    // entrées et serait donc une mauvaise base pour "1000 questions".
     { id: 'quiz-cent',     label: 'Cent questions',     desc: '100 questions répondues, tous quiz confondus.',
-      check: () => (state.user.quizLog || []).length >= 100 },
+      check: () => ((state.user.quizCounters || {}).totalAnswered || 0) >= 100 },
     { id: 'quiz-millier',  label: 'Millier',            desc: '1000 questions répondues, tous quiz confondus.',
-      check: () => (state.user.quizLog || []).length >= 1000 },
+      check: () => ((state.user.quizCounters || {}).totalAnswered || 0) >= 1000 },
     { id: 'streak-10',     label: 'Tireur d\'élite',    desc: '10 bonnes réponses d\'affilée.',
       check: () => ((state.user.quizStreak || {}).best || 0) >= 10 },
     { id: 'streak-25',     label: 'Tireur d\'or',       desc: '25 bonnes réponses d\'affilée.',
       check: () => ((state.user.quizStreak || {}).best || 0) >= 25 },
     { id: 'quiz-rapide',   label: 'Vif d\'esprit',      desc: 'Répondre juste en moins de 5 secondes 10 fois.',
-      check: () => (state.user.quizLog || []).filter(e => e.correct && e.durationMs > 0 && e.durationMs < 5000).length >= 10 },
+      check: () => ((state.user.quizCounters || {}).fastCorrect || 0) >= 10 },
     { id: 'revision-pro',  label: 'Réviseur',           desc: '20 questions rattrapées en mode Révision.',
-      check: () => (state.user.quizLog || []).filter(e => e.correct && e.mode === 'revision').length >= 20 },
+      check: () => ((state.user.quizCounters || {}).revisionCorrect || 0) >= 20 },
     { id: 'quotidien-7',   label: 'Habitué du jour',    desc: '7 quiz du jour complétés.',
       check: () => {
-        // On compte via quizLog : nombre de jours distincts où un quiz du mode quotidien a été répondu
-        const days = new Set();
-        (state.user.quizLog || []).forEach(e => {
-          if (e.mode === 'quotidien' && e.date) days.add(e.date.slice(0, 10));
-        });
-        return days.size >= 7;
+        // Jours distincts où le quiz du jour a été terminé. La liste
+        // dailyQuizDates est maintenue par renderDailyQuizFinal, donc
+        // jamais perdue par le capping du quizLog.
+        const dates = Array.isArray(state.user.dailyQuizDates) ? state.user.dailyQuizDates : [];
+        return new Set(dates).size >= 7;
       } },
     { id: 'defi-sans-faute', label: 'Sang-froid',       desc: 'Sans-faute sur un Mode Défi complet (10 questions).',
-      check: () => {
-        // Approximation : 10 réponses consécutives en mode defi toutes correctes
-        const log = (state.user.quizLog || []).filter(e => e.mode === 'defi');
-        for (let i = 0; i <= log.length - 10; i++) {
-          if (log.slice(i, i + 10).every(e => e.correct)) return true;
-        }
-        return false;
-      } },
+      check: () => ((state.user.quizCounters || {}).defiBestStreakInRow || 0) >= 10 },
     { id: 'maitre-domaine', label: 'Maître d\'un domaine', desc: 'Tous les quiz d\'un même domaine répondus parfaitement.',
       check: () => {
         const qs = state.user.quizScores || {};
@@ -1360,6 +1403,32 @@
       }
     } else {
       state.user.quizStreak.current = 0;
+    }
+
+    // 4. Compteurs cumulatifs jamais capés : nourrissent les achievements
+    //    de volume sans dépendre du quizLog tronqué à 500 entrées.
+    if (!state.user.quizCounters || typeof state.user.quizCounters.totalAnswered !== 'number') {
+      state.user.quizCounters = {
+        totalAnswered: 0, totalCorrect: 0, fastCorrect: 0,
+        revisionCorrect: 0, defiBestStreakInRow: 0
+      };
+    }
+    const ctr = state.user.quizCounters;
+    ctr.totalAnswered++;
+    if (correct) ctr.totalCorrect++;
+    if (correct && durationMs && durationMs > 0 && durationMs < 5000) ctr.fastCorrect++;
+    if (correct && mode === 'revision') ctr.revisionCorrect++;
+    // Streak interne au mode Défi : on track le record de bonnes consécutives
+    // strictement entre questions de mode defi (réinitialisé sur erreur).
+    if (mode === 'defi') {
+      if (correct) {
+        ctr._defiCurrent = (ctr._defiCurrent || 0) + 1;
+        if (ctr._defiCurrent > ctr.defiBestStreakInRow) {
+          ctr.defiBestStreakInRow = ctr._defiCurrent;
+        }
+      } else {
+        ctr._defiCurrent = 0;
+      }
     }
 
     saveUserState();
@@ -1761,38 +1830,47 @@
       const completed = _prevSeen.length === totalBlocks;
       const banner = el('div', { class: 'resume-banner' });
 
-      // Lien "réinitialiser ma lecture" — partagé entre les deux branches
-      const resetLink = el('button', {
-        class: 'resume-banner-reset',
-        title: 'Effacer ta progression de lecture sur ce sujet',
-        onclick: () => {
-          const titre = String(sujet.meta.titre || sujet.meta.id).replace(/<[^>]+>/g, '');
-          const ok = confirm(
-            'Effacer ta progression de lecture sur « ' + titre + ' » ?\n\n' +
-            'Les ✓ disparaîtront et le bandeau "Reprendre" repartira à zéro.\n' +
-            'Tes notes, favoris, scores quiz et heatmap ne sont pas touchés.'
-          );
-          if (!ok) return;
-          const cur = state.user.progress[sujet.meta.id];
-          if (cur) { delete cur.seenBlocks; cur.courseProgress = 0; }
-          saveUserState();
-          rerender();
-        }
-      }, 'réinitialiser');
+      // Action commune : efface la progression de lecture (utilisée à la
+      // fois pour le bouton "Recommencer le cours" quand c'est fini, et
+      // pour le lien discret "réinitialiser" en cours de lecture.
+      function resetProgress() {
+        const titre = String(sujet.meta.titre || sujet.meta.id).replace(/<[^>]+>/g, '');
+        const ok = confirm(
+          'Effacer ta progression de lecture sur « ' + titre + ' » ?\n\n' +
+          'Les ✓ disparaîtront et le bandeau repartira à zéro.\n' +
+          'Tes notes, favoris, scores quiz et heatmap ne sont pas touchés.'
+        );
+        if (!ok) return;
+        const cur = state.user.progress[sujet.meta.id];
+        if (cur) { delete cur.seenBlocks; cur.courseProgress = 0; }
+        saveUserState();
+        rerender();
+      }
 
       if (completed) {
+        // Cours terminé : on n'incite plus à "reprendre" (ça n'a pas de
+        // sens, tout est lu) mais on garde la possibilité explicite de
+        // tout recommencer à zéro.
         banner.appendChild(el('span', { class: 'resume-banner-msg' },
-          'Tu as parcouru tous les blocs de ce cours. Tu peux le revoir librement.'));
-        banner.appendChild(resetLink);
+          'Tu as parcouru tous les blocs de ce cours.'));
         banner.appendChild(el('button', {
           class: 'btn',
+          title: 'Effacer ta progression et revenir au tout début du cours',
           onclick: () => {
-            const target = container.querySelector('[data-block-idx="0"]');
-            if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            resetProgress();
+            // rerender va recréer la vue ; on n'a pas besoin de scroller
+            // manuellement, le cours repart en haut naturellement.
           }
-        }, 'Revoir depuis le début →'));
+        }, 'Recommencer le cours'));
       } else {
-        // Bloc à reprendre = le suivant non vu si possible, sinon le dernier vu
+        // Lecture en cours : on propose de reprendre + un lien discret
+        // pour tout réinitialiser si l'utilisateur veut repartir.
+        const resetLink = el('button', {
+          class: 'resume-banner-reset',
+          title: 'Effacer ta progression de lecture sur ce sujet',
+          onclick: resetProgress
+        }, 'réinitialiser');
+
         let resumeIdx = lastSeenIdx + 1;
         while (resumeIdx < totalBlocks && _prevSeen.indexOf(resumeIdx) >= 0) resumeIdx++;
         if (resumeIdx >= totalBlocks) resumeIdx = lastSeenIdx;
@@ -2399,15 +2477,31 @@
       return;
     }
 
-    state.quizSession = {
-      sujetId: sujet.meta.id,
-      currentQ: 0,
-      score: 0,
-      questions: sujet.quiz
-    };
+    // On préserve la session du quiz du sujet si elle existe déjà (en
+    // cours OU terminée) : revenir sur l'onglet quiz ne doit pas remettre
+    // l'utilisateur à la question 1. Une nouvelle session n'est créée que
+    // si on arrive sur un sujet différent (ou jamais commencé), ou si le
+    // sujet a changé de quiz (longueur différente).
+    const existing = state.quizSession;
+    const isSameSujetSession = existing
+      && !existing.isMixed
+      && existing.sujetId === sujet.meta.id
+      && Array.isArray(existing.questions)
+      && existing.questions.length === sujet.quiz.length;
+
+    if (!isSameSujetSession) {
+      state.quizSession = {
+        sujetId: sujet.meta.id,
+        currentQ: 0,
+        score: 0,
+        questions: sujet.quiz
+      };
+    }
 
     const quizCard = el('div', { class: 'quiz-card' });
     container.appendChild(quizCard);
+    // Si la session existante est déjà finie, renderQuizQuestion va de
+    // toute façon basculer vers renderQuizFinal — score + bouton refaire.
     renderQuizQuestion(quizCard, sujet);
   }
 
@@ -2783,11 +2877,15 @@
         el('button', {
           class: 'btn',
           onclick: () => {
+            // On force le reset : renderTabQuiz préserve désormais la
+            // session terminée pour pouvoir afficher le score au retour,
+            // donc il faut explicitement la vider pour repartir à zéro.
+            state.quizSession = null;
             const parent = quizCard.parentNode;
             clear(parent);
             renderTabQuiz(parent, sujet);
           }
-        }, 'Recommencer'),
+        }, 'Refaire le quiz'),
         el('a', { class: 'btn btn-secondary', href: '#/sujet/' + encodeURIComponent(sujet.meta.id) + '/cours' }, 'Revoir le cours')
       )
     ));
@@ -3528,9 +3626,12 @@
 
     let svgInner = '';
 
-    // ---- Champ d'étoiles d'arrière-plan (déterministe, peu dense) ----
+    // ---- Champ d'étoiles d'arrière-plan (déterministe, couvre tout le viewBox) ----
+    // Densité un peu plus généreuse depuis qu'on a retiré la bordure : les
+    // étoiles vont jusqu'au bord du conteneur et il ne doit pas y avoir de
+    // zones "vides" trop visibles.
     let stars = '';
-    for (let i = 0; i < 90; i++) {
+    for (let i = 0; i < 160; i++) {
       const sx = ((i * 9301 + 49297) % 233280) / 233280 * W;
       const sy = ((i * 7919 + 24593) % 233280) / 233280 * H;
       const sr = (0.4 + ((i * 17) % 7) * 0.22).toFixed(2);
@@ -4210,12 +4311,20 @@
     const score = sess.score;
     recordActivity('quiz', null);
     // Enregistre le résultat du jour
+    const dayKey = sess._dailyDate || dateKey(new Date());
     state.user.dailyQuiz = {
-      date: sess._dailyDate || dateKey(new Date()),
+      date: dayKey,
       score: score,
       total: total,
       completed: true
     };
+    // Maintient une liste durable des dates de complétion pour
+    // l'achievement quotidien-7 (le quizLog est capé à 500 entrées et
+    // ne peut donc pas servir de source fiable pour cette mesure).
+    if (!Array.isArray(state.user.dailyQuizDates)) state.user.dailyQuizDates = [];
+    if (state.user.dailyQuizDates.indexOf(dayKey) < 0) {
+      state.user.dailyQuizDates.push(dayKey);
+    }
     saveUserState();
     checkAchievements();
     clear(quizCard);
@@ -4381,9 +4490,21 @@
     });
     const letters = Object.keys(byLetter).sort();
 
-    // Ancres alphabétiques en haut
+    // Ancres alphabétiques en haut. On utilise onclick + scrollIntoView au
+    // lieu d'un vrai href : le routing étant hash-based, naviguer vers
+    // `#glossaire-letter-X` casserait la vue (parseHash ne reconnaîtrait
+    // pas la route). On garde quand même href pour l'accessibilité.
     main.appendChild(el('div', { class: 'glossaire-anchors' },
-      ...letters.map(L => el('a', { class: 'glossaire-anchor', href: '#glossaire-letter-' + L }, L))
+      ...letters.map(L => el('a', {
+        class: 'glossaire-anchor',
+        href: '#/glossaire',
+        'data-letter': L,
+        onclick: (e) => {
+          e.preventDefault();
+          const target = document.getElementById('glossaire-letter-' + L);
+          if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, L))
     ));
 
     letters.forEach(L => {
@@ -4516,7 +4637,11 @@
       const bestList = el('div', { class: 'quiz-top-list' });
       const worstList = el('div', { class: 'quiz-top-list' });
       const best3 = scores.slice(0, Math.min(3, scores.length));
-      const worst3 = scores.slice().reverse().slice(0, Math.min(3, scores.length));
+      // "À approfondir" : on filtre les scores parfaits (10/10), ça n'a aucun
+      // intérêt de proposer d'approfondir un sujet déjà maîtrisé. Si tout est
+      // à 100 %, on cache simplement la colonne.
+      const imperfect = scores.filter(s => s.pct < 1);
+      const worst3 = imperfect.slice().reverse().slice(0, Math.min(3, imperfect.length));
       function renderEntry(entry) {
         return el('a', {
           class: 'quiz-top-entry',
@@ -4531,11 +4656,13 @@
         bestList,
         ...best3.map(renderEntry)
       ));
-      topBox.appendChild(el('div', { class: 'quiz-top-col' },
-        el('h4', { class: 'quiz-top-col-title' }, 'À approfondir'),
-        worstList,
-        ...worst3.map(renderEntry)
-      ));
+      if (worst3.length > 0) {
+        topBox.appendChild(el('div', { class: 'quiz-top-col' },
+          el('h4', { class: 'quiz-top-col-title' }, 'À approfondir'),
+          worstList,
+          ...worst3.map(renderEntry)
+        ));
+      }
       section.appendChild(topBox);
     }
 

@@ -195,13 +195,13 @@ Le troisième, c'est l'**unification avec la mécanique quantique**. À l'instan
       type: 'ordre-chrono',
       q: 'Remets ces grandes phases de l\'univers dans l\'ordre chronologique :',
       items: [
-        'Inflation cosmique (10⁻³² s)',
-        'Nucléosynthèse primordiale (~3 minutes)',
-        'Recombinaison et émission du fond diffus (380 000 ans)',
-        'Premières étoiles (~100 à 400 millions d\'années)',
-        'Premières galaxies (~1 milliard d\'années)',
-        'Naissance du Soleil (~9 milliards d\'années)',
-        'Expansion accélérée par l\'énergie noire (aujourd\'hui, ~13,8 Gda)'
+        'Inflation cosmique',
+        'Nucléosynthèse primordiale (formation des noyaux d\'hydrogène et d\'hélium)',
+        'Recombinaison et émission du fond diffus cosmologique',
+        'Allumage des premières étoiles',
+        'Formation des premières galaxies',
+        'Naissance du Soleil et formation du système solaire',
+        'Expansion accélérée par l\'énergie noire (époque actuelle)'
       ],
       explication: 'L\'inflation déploie l\'univers dans la première fraction de seconde, puis la nucléosynthèse fige les proportions H/He en 3 minutes. À 380 000 ans, la recombinaison rend l\'univers transparent (fond diffus). Puis viennent les âges sombres, les premières étoiles, les galaxies, et enfin notre Soleil il y a ~4,6 Gda.'
     },

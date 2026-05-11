@@ -1932,15 +1932,20 @@ input[type="range"].w-range::-moz-range-thumb {
     radial-gradient(ellipse at 30% 25%, rgba(91, 141, 239, 0.08), transparent 55%),
     radial-gradient(ellipse at 75% 75%, rgba(255, 107, 53, 0.06), transparent 55%),
     var(--bg-card);
-  border: 1px solid var(--line-strong);
   border-radius: var(--r-lg);
-  padding: 1.5rem;
+  /* Pas de padding ni de bordure : le fond étoilé du SVG va jusqu'au bord
+     du conteneur, ce qui évite l'effet "cadre" autour de la carte. */
+  padding: 0;
+  border: none;
   overflow: hidden;
 }
 .globe-fd-svg {
   width: 100%;
   height: auto;
   display: block;
+  /* L'arrière-plan du SVG est tout noir étoilé : on étend les étoiles
+     jusqu'aux bords pour qu'il n'y ait aucun liseré. */
+  background: transparent;
 }
 /* Champ d'étoiles d'arrière-plan : décoratif, jamais cliquable */
 .globe-fd-stars {
