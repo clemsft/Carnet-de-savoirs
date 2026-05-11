@@ -2862,12 +2862,26 @@
     });
 
     // ---- Simulation force-directed ----
-    const ITER = 360;
-    const REPULSION = 16000;
-    const ATTRACTION = 0.020;
+    // Ajout d'une force de cohésion par domaine : les nœuds d'un même
+    // domaine s'attirent vers leur centre de gravité, ce qui crée
+    // visuellement des clusters distincts.
+    const ITER = 380;
+    const REPULSION = 18000;
+    const ATTRACTION = 0.022;
     const CENTER_FORCE = 0.0014;
+    const DOMAIN_COHESION = 0.020;
     const DAMPING = 0.86;
-    const MIN_DIST = 95;
+    const MIN_DIST = 100;
+
+    // Pré-calculer la liste des domaines et l'appartenance des nœuds
+    const nodesByDomain = {};
+    nodes.forEach(n => {
+      if (!nodesByDomain[n.domain]) nodesByDomain[n.domain] = [];
+      nodesByDomain[n.domain].push(n);
+    });
+    // On ne fait du clustering que pour les domaines avec ≥ 2 nœuds
+    const clusterDomains = Object.keys(nodesByDomain).filter(d => nodesByDomain[d].length >= 2);
+
     for (let it = 0; it < ITER; it++) {
       nodes.forEach(n => { n.fx = 0; n.fy = 0; });
       // Répulsion + plancher de distance minimale
@@ -2891,6 +2905,18 @@
         const f = ATTRACTION * d * (e.weight || 1);
         a.fx += (dx / d) * f; a.fy += (dy / d) * f;
         b.fx -= (dx / d) * f; b.fy -= (dy / d) * f;
+      });
+      // Cohésion par domaine : chaque nœud est attiré vers le centre de gravité
+      // de son domaine principal. Effet : les clusters thématiques se forment.
+      clusterDomains.forEach(domain => {
+        const members = nodesByDomain[domain];
+        let mx = 0, my = 0;
+        members.forEach(m => { mx += m.x; my += m.y; });
+        mx /= members.length; my /= members.length;
+        members.forEach(m => {
+          m.fx += (mx - m.x) * DOMAIN_COHESION;
+          m.fy += (my - m.y) * DOMAIN_COHESION;
+        });
       });
       // Centrage doux
       nodes.forEach(n => {
@@ -2990,7 +3016,14 @@
       cb,
       el('span', null, 'Masquer les isolés')
     );
-    main.appendChild(el('div', { class: 'globe-toolbar' }, search, domSel, isolatedToggle));
+    // Par défaut : les arêtes de poids 1 (un seul tag partagé, souvent du
+    // bruit thématique) sont masquées. Coché = on affiche tout.
+    const cbWeakEdges = el('input', { type: 'checkbox' });
+    const weakEdgesToggle = el('label', { class: 'globe-toggle' },
+      cbWeakEdges,
+      el('span', null, 'Afficher les liens faibles')
+    );
+    main.appendChild(el('div', { class: 'globe-toolbar' }, search, domSel, isolatedToggle, weakEdgesToggle));
 
     // ---- Rendu SVG ----
     function attrEscape(s) {
@@ -3010,20 +3043,52 @@
     }
     svgInner += `<g class="globe-fd-stars" aria-hidden="true">${stars}</g>`;
 
+    // ---- Bulles de cluster : aura floue colorée derrière chaque domaine
+    // qui regroupe au moins 2 sujets. Donne une lecture immédiate des
+    // "constellations" thématiques sans saturer l'image. ----
+    let bubbles = '';
+    clusterDomains.forEach(domain => {
+      const members = nodesByDomain[domain];
+      if (members.length < 2) return;
+      let mx = 0, my = 0;
+      members.forEach(m => { mx += m.x; my += m.y; });
+      mx /= members.length; my /= members.length;
+      let maxR = 0;
+      members.forEach(m => {
+        const dxm = m.x - mx, dym = m.y - my;
+        const dd = Math.sqrt(dxm * dxm + dym * dym);
+        if (dd > maxR) maxR = dd;
+      });
+      const radius = maxR + 55;
+      const fill = domainColor(domain);
+      bubbles += `<circle class="globe-fd-cluster" cx="${mx.toFixed(1)}" cy="${my.toFixed(1)}" r="${radius.toFixed(1)}" fill="${fill}"/>`;
+    });
+    svgInner += `<g class="globe-fd-clusters" aria-hidden="true">${bubbles}</g>`;
+
     // ---- Arêtes : courbes de Bézier quadratiques pour un rendu organique ----
+    // Les longues arêtes (cross-cluster) sont davantage incurvées vers
+    // l'extérieur pour éviter de saturer le centre de la carte.
+    const edgeCenterX = cx, edgeCenterY = cy;
     edges.forEach(e => {
       const a = nodeById[e.from], b = nodeById[e.to];
-      const opacity = Math.min(0.55, 0.18 + (e.weight || 1) * 0.12);
-      const width = 1 + Math.min(2.5, (e.weight || 1) * 0.6);
-      // Point de contrôle : médiatrice de AB décalée perpendiculairement
+      // Arêtes très discrètes au repos — c'est le focus qui les fait ressortir
+      const opacity = Math.min(0.32, 0.08 + (e.weight || 1) * 0.07);
+      const width = 0.8 + Math.min(2.2, (e.weight || 1) * 0.5);
       const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
       const dx = b.x - a.x, dy = b.y - a.y;
       const len = Math.sqrt(dx * dx + dy * dy) || 1;
-      const off = Math.min(22, len * 0.10);
-      const cx = (mx + (-dy / len) * off).toFixed(1);
-      const cy = (my + (dx / len) * off).toFixed(1);
-      const d = `M ${a.x.toFixed(1)} ${a.y.toFixed(1)} Q ${cx} ${cy} ${b.x.toFixed(1)} ${b.y.toFixed(1)}`;
-      svgInner += `<path class="globe-fd-edge" data-from="${attrEscape(e.from)}" data-to="${attrEscape(e.to)}" d="${d}" stroke-width="${width}" opacity="${opacity}" fill="none"/>`;
+      // Décalage perpendiculaire, plus prononcé pour les longues arêtes
+      const off = Math.min(70, len * 0.18);
+      // Orientation : on courbe vers l'extérieur (opposé au centre de la carte)
+      // pour que les arêtes longues "contournent" le cœur du graphe.
+      let nx = -dy / len, ny = dx / len; // normale perpendiculaire
+      const outward = (mx - edgeCenterX) * nx + (my - edgeCenterY) * ny;
+      if (outward < 0) { nx = -nx; ny = -ny; }
+      const ccx = (mx + nx * off).toFixed(1);
+      const ccy = (my + ny * off).toFixed(1);
+      const d = `M ${a.x.toFixed(1)} ${a.y.toFixed(1)} Q ${ccx} ${ccy} ${b.x.toFixed(1)} ${b.y.toFixed(1)}`;
+      const weakClass = (e.weight || 1) <= 1 ? ' is-weak' : '';
+      svgInner += `<path class="globe-fd-edge${weakClass}" data-from="${attrEscape(e.from)}" data-to="${attrEscape(e.to)}" d="${d}" stroke-width="${width}" opacity="${opacity}" fill="none"/>`;
     });
 
     // ---- Nœuds : halo + cercle + label ----
@@ -3037,7 +3102,7 @@
                : n.lblBX;
       const ty = n.lblBY + 4.5;
       svgInner += `<g class="globe-fd-node${isIsolated ? ' is-isolated' : ''}" data-id="${attrEscape(n.id)}" data-domain="${attrEscape(n.domain)}" style="color: ${color}">
-        <circle class="globe-fd-halo" cx="${n.x.toFixed(1)}" cy="${n.y.toFixed(1)}" r="${(r * 2.6).toFixed(1)}" fill="${color}"/>
+        <circle class="globe-fd-halo" cx="${n.x.toFixed(1)}" cy="${n.y.toFixed(1)}" r="${(r * 1.9).toFixed(1)}" fill="${color}"/>
         <a href="#/sujet/${encodeURIComponent(n.id)}">
           <circle class="globe-fd-dot" cx="${n.x.toFixed(1)}" cy="${n.y.toFixed(1)}" r="${r.toFixed(1)}" fill="${color}" stroke="${color}"/>
           <text x="${tx.toFixed(1)}" y="${ty.toFixed(1)}" text-anchor="${n.lblAnchor}" class="globe-fd-label">${attrEscape(n.shortLabel)}</text>
@@ -3046,7 +3111,9 @@
     });
 
     const wrap = el('div', { class: 'globe-fd-wrap' });
-    wrap.innerHTML = `<svg class="globe-fd-svg" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">${svgInner}</svg>`;
+    // Mode "weak-hidden" actif par défaut : les arêtes de poids 1 sont
+    // masquées pour réduire le bruit visuel.
+    wrap.innerHTML = `<svg class="globe-fd-svg weak-hidden" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">${svgInner}</svg>`;
     main.appendChild(wrap);
 
     // ---- Panneau d'info "ce qui relie ces sujets" ----
@@ -3290,6 +3357,11 @@
     search.addEventListener('input', applyFilters);
     domSel.addEventListener('change', applyFilters);
     cb.addEventListener('change', applyFilters);
+    // Logique inverse : coché = on retire "weak-hidden" pour afficher les
+    // arêtes de poids 1 (un seul tag partagé, généralement du bruit).
+    cbWeakEdges.addEventListener('change', () => {
+      svgEl.classList.toggle('weak-hidden', !cbWeakEdges.checked);
+    });
   }
 
   // =================================================================

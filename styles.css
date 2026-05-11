@@ -1573,6 +1573,21 @@ input[type="range"].w-range::-moz-range-thumb {
   pointer-events: none;
 }
 
+/* Bulles de cluster par domaine : aura floue, en arrière-plan */
+.globe-fd-clusters {
+  pointer-events: none;
+  filter: blur(28px);
+}
+.globe-fd-cluster {
+  opacity: 0.08;
+}
+
+/* Masquage des arêtes "faibles" (poids = 1, un seul tag partagé)
+   quand la classe weak-hidden est active sur le SVG. */
+.globe-fd-svg.weak-hidden .globe-fd-edge.is-weak {
+  display: none;
+}
+
 .globe-fd-edge {
   stroke: var(--text-faint);
   fill: none;
@@ -1720,6 +1735,19 @@ input[type="range"].w-range::-moz-range-thumb {
 }
 .globe-fd-node.is-isolated .globe-fd-halo {
   opacity: 0.05;
+}
+
+/* Mode "labels au survol seulement" — vue carte stellaire ultra-aérée.
+   Tous les labels disparaissent, ils réapparaissent uniquement quand
+   on survole un nœud (le nœud focalisé + ses voisins). */
+.globe-fd-svg.labels-minimal .globe-fd-label {
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+.globe-fd-svg.labels-minimal .globe-fd-node:hover .globe-fd-label,
+.globe-fd-svg.labels-minimal .globe-fd-node.is-focus .globe-fd-label,
+.globe-fd-svg.labels-minimal .globe-fd-node.is-neighbor .globe-fd-label {
+  opacity: 1;
 }
 
 /* Visibilité (filtre) */
