@@ -15,7 +15,7 @@ window.CarnetDeSavoirs.register({
     difficulte: 2,
     duree_estimee_min: 30,
     prerequis: [],
-    lie_a: ['monnaies-numeriques'],
+    lie_a: ['monnaies-numeriques', 'capitalisme', 'consumerisme'],
     date_creation: '2026-05-12',
     date_maj: '2026-05-12'
   },
@@ -97,7 +97,7 @@ L\'IPC est ensuite calculé comme le rapport entre le coût du panier aujourd\'h
     {
       type: 'encadre',
       label: 'Inflation perçue vs mesurée',
-      contenu_md: 'L\'IPC mesure une **moyenne pondérée**. Mais le quotidien d\'un ménage n\'est pas une moyenne : si la baguette, l\'essence et le café — les achats les plus visibles — flambent, tout le monde a l\'impression d\'une forte inflation, même si d\'autres postes (électronique, télécoms) baissent. C\'est l\'écart entre [inflation perçue]{accent} et [inflation mesurée]{accent}, source classique de défiance envers les statistiques officielles.'
+      contenu_md: 'L\'IPC mesure une **moyenne pondérée**. Mais le quotidien d\'un ménage n\'est pas une moyenne : si la baguette, l\'essence et le café — les achats les plus visibles — flambent, tout le monde a l\'impression d\'une forte inflation, même si d\'autres postes (électronique, télécoms) baissent. C\'est l\'écart entre [inflation perçue]{accent} et [inflation mesurée]{accent}, source classique de défiance envers les statistiques officielles — et reflet de la place qu\'occupe désormais le [[consumerisme]] dans la structure même de nos repères économiques.'
     },
 
     {
@@ -121,7 +121,7 @@ Une **spirale** peut s\'enclencher : les salariés, voyant leur pouvoir d\'achat
 
 Son argument repose sur une équation très ancienne (Irving Fisher, 1911), connue sous le nom d\'**équation quantitative de la monnaie** : la masse de monnaie en circulation, multipliée par sa vitesse de rotation, est égale au volume des transactions multiplié par les prix. Si l\'on suppose la vitesse et le volume relativement stables, alors une augmentation de la masse monétaire se traduit **mécaniquement** par une hausse des prix.
 
-Pour Friedman, les inflations résultent toujours, en dernière analyse, d\'une **création monétaire excessive** par les banques centrales. La solution : une règle stricte de croissance modérée et stable de la masse monétaire. Cette pensée inspirera profondément les politiques anti-inflationnistes des années 1980.`
+Pour Friedman, les inflations résultent toujours, en dernière analyse, d\'une **création monétaire excessive** par les banques centrales. La solution : une règle stricte de croissance modérée et stable de la masse monétaire. Cette pensée inspirera profondément les politiques anti-inflationnistes des années 1980 — et redéfinira durablement la doctrine monétaire du [[capitalisme]] contemporain.`
     },
 
     {

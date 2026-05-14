@@ -15,7 +15,7 @@ window.CarnetDeSavoirs.register({
     difficulte: 2,
     duree_estimee_min: 35,
     prerequis: [],
-    lie_a: ['rome-antique', 'paris-geographie'],
+    lie_a: ['rome-antique', 'paris-geographie', 'napoleon', 'capitalisme'],
     date_creation: '2026-05-11',
     date_maj: '2026-05-11'
   },
@@ -116,7 +116,7 @@ C\'est dans ce contexte que Louis XVI prend une décision lourde de conséquence
 
 Le **14 juillet**, à Paris, la situation tourne à l\'insurrection. Le peuple, craignant un coup de force royal — les troupes étrangères mercenaires s\'amassent autour de la capitale —, prend d\'assaut la **Bastille**, forteresse-prison symbole de l\'arbitraire. Sept prisonniers y sont libérés (quatre faussaires, deux fous, un noble), mais l\'événement est immédiatement érigé en mythe : il prouve que le peuple peut **désarmer le roi** physiquement, dans la rue.
 
-Dans la nuit du **4 août**, dans une atmosphère mi-enthousiaste mi-paniquée, l\'Assemblée vote l\'**abolition des privilèges féodaux**. Un nobles ou ecclésiastique après l\'autre, par contagion, se lève et renonce à ses droits héréditaires — dîme, corvées, justice seigneuriale, droits de chasse. **Mille ans** d\'organisation sociale sont rayés en quelques heures.
+Dans la nuit du **4 août**, dans une atmosphère mi-enthousiaste mi-paniquée, l\'Assemblée vote l\'**abolition des privilèges féodaux**. Un nobles ou ecclésiastique après l\'autre, par contagion, se lève et renonce à ses droits héréditaires — dîme, corvées, justice seigneuriale, droits de chasse. **Mille ans** d\'organisation sociale sont rayés en quelques heures — déblayant aussi, sans qu\'on le dise, le terrain juridique sur lequel s\'épanouira le [[capitalisme]] bourgeois du XIXᵉ siècle.
 
 Le **26 août**, l\'Assemblée vote la **Déclaration des droits de l\'homme et du citoyen** — 17 articles, en quelques pages, qui établissent que tous les hommes naissent libres et égaux en droits, que la souveraineté réside dans la nation, que la loi est l\'expression de la volonté générale, que la séparation des pouvoirs est un principe constitutionnel. Le texte deviendra, par sa traduction immédiate dans toute l\'Europe, l\'**acte fondateur de la modernité politique mondiale**.`
     },
@@ -199,7 +199,7 @@ La Constitution de **1795** instaure le **Directoire** : pouvoir exécutif parta
 
 Pendant ce temps, les **armées de la République** triomphent à l\'extérieur. Un jeune général corse, **Napoléon Bonaparte** (1769-1821), s\'illustre en Italie (1796-1797) puis en Égypte (1798-1799). À son retour d\'Égypte en octobre 1799, le pouvoir lui semble à portée de main : le Directoire est discrédité, l\'opinion réclame un homme à poigne.
 
-Le **18 brumaire an VIII** (9 novembre 1799), avec la complicité de son frère **Lucien** (président du Conseil des Cinq-Cents) et de l\'abbé **Sieyès** (l\'un des directeurs), Bonaparte renverse le régime. Le lendemain, à Saint-Cloud, il se heurte à la résistance des députés ; Lucien fait évacuer la salle par les grenadiers. Le coup réussit. La Constitution de l\'an VIII institue un **Consulat** dominé par un **Premier Consul** — Bonaparte. La Révolution, au sens strict, est terminée. Pour beaucoup, soulagement ; pour d\'autres, défaite définitive.`
+Le **18 brumaire an VIII** (9 novembre 1799), avec la complicité de son frère **Lucien** (président du Conseil des Cinq-Cents) et de l\'abbé **Sieyès** (l\'un des directeurs), Bonaparte renverse le régime. Le lendemain, à Saint-Cloud, il se heurte à la résistance des députés ; Lucien fait évacuer la salle par les grenadiers. Le coup réussit. La Constitution de l\'an VIII institue un **Consulat** dominé par un **Premier Consul** — [[napoleon]]. La Révolution, au sens strict, est terminée. Pour beaucoup, soulagement ; pour d\'autres, défaite définitive.`
     },
 
     {

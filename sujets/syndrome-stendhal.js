@@ -15,7 +15,7 @@ window.CarnetDeSavoirs.register({
     difficulte: 2,
     duree_estimee_min: 25,
     prerequis: [],
-    lie_a: ['cerveau-humain', 'effet-placebo', 'paris-geographie', 'renaissance-italienne', 'gastronomie'],
+    lie_a: ['cerveau-humain', 'effet-placebo', 'paris-geographie', 'renaissance-italienne', 'gastronomie', 'les-animes'],
     date_creation: '2026-05-11',
     date_maj: '2026-05-11'
   },
@@ -152,7 +152,7 @@ Enfin, il y a la **fatigue du voyage**. Le touriste type des cas de Magherini d�
 
 Sur le plan **neurologique**, plusieurs hypothèses coexistent. L'imagerie a montré que la contemplation esthétique active des réseaux cérébraux complexes — récompense, mémoire émotionnelle (amygdale), évaluation symbolique (cortex préfrontal). Quand l'intensité dépasse les capacités de régulation neurovégétative, le système bascule : tachycardie, hyperventilation, sensation d'étranger à soi-même. C'est une **crise de saturation perceptive** plutôt qu'une maladie au sens strict.
 
-Le rôle des **attentes** est crucial — et fait écho au mécanisme de [[effet-placebo]] (ou plutôt son envers, l'effet nocebo). Quand on s'attend à une expérience esthétique transcendante, le [[cerveau-humain]] mobilise des ressources émotionnelles avant même la rencontre. Si la rencontre les déborde, le système se cabre.`
+Le rôle des **attentes** est crucial — et fait écho au mécanisme de [[effet-placebo]] (ou plutôt son envers, l'effet nocebo). Quand on s'attend à une expérience esthétique transcendante, le [[cerveau-humain]] mobilise des ressources émotionnelles avant même la rencontre. Si la rencontre les déborde, le système se cabre. Le phénomène se rejoue, sous d'autres formes, dans le **tourisme de pèlerinage culturel** contemporain : les fans qui visitent les lieux réels de leurs séries préférées — l'*otaku tourism* japonais des fans de [[les-animes]] en est l'exemple le plus documenté — décrivent parfois une submersion émotionnelle proche de celle des patients de Magherini.`
     },
 
     {

@@ -673,8 +673,10 @@
       }),
       // Titre
       el('h3', { class: 'sujet-card-title', html: htmlEscapeButKeepEm(meta.titre) }),
-      // Résumé
-      el('p', { class: 'sujet-card-summary' }, sujet.resume || ''),
+      // Résumé — passé par md() pour rendre **gras**, [terme]{accent},
+      // [[slug]] etc. md() entoure d'un <p> qu'on supprime (le <p> wrapper
+      // est déjà fourni par el()).
+      el('p', { class: 'sujet-card-summary', html: md(sujet.resume || '').replace(/^<p>|<\/p>$/g, '') }),
       // Méta
       el('div', { class: 'sujet-card-meta' },
         el('span', { class: 'difficulty' },
@@ -773,7 +775,7 @@
         })
       ),
       el('h1', { class: 'sujet-title', html: htmlEscapeButKeepEm(meta.titre) }),
-      el('p', { class: 'page-subtitle', style: { marginBottom: '0' } }, sujet.resume || ''),
+      el('p', { class: 'page-subtitle', style: { marginBottom: '0' }, html: md(sujet.resume || '').replace(/^<p>|<\/p>$/g, '') }),
       el('div', { class: 'sujet-meta-row' },
         el('span', { class: 'difficulty' },
           ...[1, 2, 3].map(i => el('span', { class: 'diff-dot' + (i <= (meta.difficulte || 1) ? ' on' : '') }))
@@ -1553,7 +1555,7 @@
   // =================================================================
 
   function renderTabResume(container, sujet) {
-    container.appendChild(el('p', { class: 'lead' }, sujet.resume || ''));
+    container.appendChild(el('p', { class: 'lead', html: md(sujet.resume || '').replace(/^<p>|<\/p>$/g, '') }));
 
     if (sujet.points_cles && sujet.points_cles.length > 0) {
       container.appendChild(el('h3', null, 'Points-clés'));
@@ -2085,6 +2087,13 @@
     // Debounce par bloc : un coup d'œil ne compte pas, il faut être resté
     // au moins DWELL_MS sur le bloc (visible >50% / >95% si petit). Évite
     // qu'un scroll rapide ou un repaint initial coche tous les blocs d'un coup.
+    //
+    // Cas spécial des blocs PLUS HAUTS QUE LE VIEWPORT (typiquement certains
+    // widgets : Frise longue, GrilleCartes touffue, SchemaAnnote grand, carte
+    // mentale en zoom élevé) : leur intersectionRatio plafonne mécaniquement
+    // sous 0.5 (on ne peut jamais voir plus que le viewport / hauteur-bloc).
+    // Pour ces blocs, on bascule sur un critère "viewport-relatif" :
+    // visible dès que le bloc remplit au moins 60 % du viewport vertical.
     const DWELL_MS = 600;
     const dwellTimers = new Map();
 
@@ -2094,9 +2103,18 @@
         const idx = parseInt(block.dataset.blockIdx, 10);
         if (seen.has(idx)) return;
 
-        const small = block.offsetHeight < window.innerHeight * 0.5;
-        const visibleEnough = entry.isIntersecting &&
-          (small ? entry.intersectionRatio >= 0.95 : entry.intersectionRatio >= 0.5);
+        const vh = (entry.rootBounds && entry.rootBounds.height) || window.innerHeight;
+        const small = block.offsetHeight < vh * 0.5;
+        const tall  = block.offsetHeight > vh; // ne pourra jamais atteindre 0.5 d'intersectionRatio
+        // Ratio "à quel point le bloc remplit-il l'écran" — utile pour les
+        // grands widgets (en complément du ratio bloc-relatif standard).
+        const viewportFill = entry.intersectionRect ? (entry.intersectionRect.height / vh) : 0;
+
+        const visibleEnough = entry.isIntersecting && (
+          small ? entry.intersectionRatio >= 0.95 :
+          tall  ? viewportFill >= 0.6 :
+                  entry.intersectionRatio >= 0.5
+        );
 
         if (visibleEnough) {
           if (!dwellTimers.has(idx)) {
@@ -2117,7 +2135,10 @@
           if (t) { clearTimeout(t); dwellTimers.delete(idx); }
         }
       });
-    }, { threshold: [0.5, 0.95] });
+    // Seuils granulaires : les blocs très hauts ne déclenchent jamais 0.5,
+    // il faut donc observer aussi des ratios plus bas (0.1, 0.25, 0.4) pour
+    // que la callback se déclenche pendant que l'utilisateur scrolle.
+    }, { threshold: [0.1, 0.25, 0.4, 0.5, 0.75, 0.95] });
 
     blockNodes.forEach(n => observer.observe(n));
   }
@@ -2949,10 +2970,11 @@
 
     // ---- DOM scaffold ----
     container.appendChild(el('p', { class: 'lead' },
-      'Architecture mentale du sujet. Survole un nœud pour voir sa description, clique sur un nœud avec des enfants pour zoomer dedans.'));
+      'Architecture mentale du sujet. Survole un nœud pour voir sa description, clique sur un nœud avec des enfants pour zoomer dedans. Molette pour zoomer librement, glisser-déposer pour déplacer.'));
 
     const wrap = el('div', { class: 'mindmap-wrap' });
     const breadcrumb = el('div', { class: 'mm-breadcrumb' });
+    const toolbar = el('div', { class: 'mm-toolbar' });
     const svgHost = el('div', { class: 'mm-svg-host' });
     const card = el('div', { class: 'mm-card' });
     const cardLabel = el('h4', { class: 'mm-card-label' });
@@ -2960,14 +2982,87 @@
     card.appendChild(cardLabel);
     card.appendChild(cardDesc);
     wrap.appendChild(breadcrumb);
+    wrap.appendChild(toolbar);
     wrap.appendChild(svgHost);
     wrap.appendChild(card);
     container.appendChild(wrap);
 
     // ---- Constantes layout ----
+    // viewBox élargi (W×H réels = 960×720) + 80 px de padding sur chaque côté
+    // pour que les nœuds des niveaux 3-4 placés à r=530 du centre rentrent
+    // sans déborder. Le centre logique reste (480, 360) ; on décale juste le
+    // min-x / min-y du viewBox.
     const W = 960, H = 720;
+    const VB_PAD_X = 100, VB_PAD_Y = 80;
     const cx = W / 2, cy = H / 2;
     const levelRadii = [0, 230, 400, 480, 530];
+
+    // ---- État pan/zoom (persistant entre renderMap d'une même vue focus) ----
+    let panX = 0, panY = 0, scale = 1;
+    const MIN_SCALE = 0.4, MAX_SCALE = 4;
+    let isPanning = false, panLastX = 0, panLastY = 0, panMoved = false;
+    // AbortController pour nettoyer les listeners window au démontage / re-render
+    let mmCtrl = null;
+
+    function applyTransform() {
+      const g = svgHost.querySelector('.mm-viewport');
+      if (g) g.setAttribute('transform', `translate(${panX} ${panY}) scale(${scale})`);
+    }
+    function resetView() {
+      panX = 0; panY = 0; scale = 1;
+      applyTransform();
+    }
+    function zoomBy(factor, ax, ay) {
+      // ax, ay : point d'ancrage en coordonnées SVG (le point qui doit rester
+      // sous le curseur après zoom). Si null, on zoome vers le centre du viewBox.
+      const newScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, scale * factor));
+      if (Math.abs(newScale - scale) < 0.001) return;
+      if (ax === null || ay === null) { ax = cx; ay = cy; }
+      // Le point monde sous (ax,ay) doit rester sous (ax,ay) après mise à
+      // jour de scale : on inverse la transformation.
+      panX = ax - (ax - panX) * (newScale / scale);
+      panY = ay - (ay - panY) * (newScale / scale);
+      scale = newScale;
+      applyTransform();
+    }
+
+    // Toolbar — boutons zoom/dézoom/recentrer.
+    function makeToolBtn(label, title, onclick) {
+      return el('button', { class: 'mm-tool-btn', title, onclick }, label);
+    }
+    toolbar.appendChild(makeToolBtn('+', 'Zoomer (ou molette ↑)', (e) => { e.stopPropagation(); zoomBy(1.25, null, null); }));
+    toolbar.appendChild(makeToolBtn('−', 'Dézoomer (ou molette ↓)', (e) => { e.stopPropagation(); zoomBy(1 / 1.25, null, null); }));
+    toolbar.appendChild(makeToolBtn('⟲', 'Recentrer la vue', (e) => { e.stopPropagation(); resetView(); }));
+    const fsBtn = makeToolBtn('⛶', 'Plein écran (Echap pour sortir)', (e) => { e.stopPropagation(); toggleFullscreen(); });
+    toolbar.appendChild(fsBtn);
+
+    // ---- Plein écran ----
+    // Calqué sur la carte globale : la classe is-fullscreen sur wrap fixe le
+    // wrapper en position fixed inset:0, et la classe body masque
+    // sidebar/topbar pour que la carte occupe tout l'écran.
+    function toggleFullscreen(on) {
+      const enable = on != null ? on : !wrap.classList.contains('is-fullscreen');
+      wrap.classList.toggle('is-fullscreen', enable);
+      document.body.classList.toggle('mindmap-fullscreen-active', enable);
+      fsBtn.title = enable ? 'Quitter le plein écran (Echap)' : 'Plein écran (Echap pour sortir)';
+      fsBtn.textContent = enable ? '⤫' : '⛶';
+    }
+    function onMindmapEscape(e) {
+      if (e.key !== 'Escape') return;
+      if (wrap.classList.contains('is-fullscreen')) {
+        toggleFullscreen(false);
+      }
+    }
+    document.addEventListener('keydown', onMindmapEscape);
+    // Cleanup : à la navigation, on s'assure que la classe body est retirée
+    // pour ne pas laisser sidebar/topbar masquées si on quitte la vue.
+    window.addEventListener('hashchange', function cleanupMmFs() {
+      if (document.body.classList.contains('mindmap-fullscreen-active')) {
+        document.body.classList.remove('mindmap-fullscreen-active');
+      }
+      window.removeEventListener('hashchange', cleanupMmFs);
+      document.removeEventListener('keydown', onMindmapEscape);
+    });
 
     // ---- État ----
     let focusedId = root.id;
@@ -3115,9 +3210,21 @@
       }
       walkNodes(focused);
 
-      // Insère le SVG dans son host (remplace le précédent)
-      svgHost.innerHTML = `<svg class="mindmap-svg" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">${svgInner}</svg>`;
+      // Insère le SVG dans son host (remplace le précédent).
+      // Tout le contenu (arêtes + nœuds) est wrappé dans un <g class="mm-viewport">
+      // qui porte la transformation de pan/zoom. ViewBox élargi avec padding
+      // pour que les nœuds des niveaux profonds (r=480-530) rentrent à scale=1.
+      const vbX = -VB_PAD_X, vbY = -VB_PAD_Y;
+      const vbW = W + 2 * VB_PAD_X, vbH = H + 2 * VB_PAD_Y;
+      svgHost.innerHTML =
+        `<svg class="mindmap-svg" viewBox="${vbX} ${vbY} ${vbW} ${vbH}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">` +
+        `<g class="mm-viewport">${svgInner}</g>` +
+        `</svg>`;
       const svgEl = svgHost.querySelector('.mindmap-svg');
+
+      // Réinitialise pan/zoom à chaque rerender (changement de focus,
+      // breadcrumb) ; applique la transform du coup pour state cohérent.
+      panX = 0; panY = 0; scale = 1; applyTransform();
 
       // ---- Breadcrumb (seulement quand on n'est pas sur le root) ----
       clear(breadcrumb);
@@ -3211,6 +3318,10 @@
         });
         g.addEventListener('click', (e) => {
           e.stopPropagation();
+          // Si l'utilisateur vient de paner (drag), on n'interprète pas
+          // comme un clic — sinon un mouvement de souris déclencherait un
+          // zoom-in non voulu sur un nœud survolé.
+          if (panMoved) return;
           // Clic sur le focused (central de la vue) : zoom OUT d'un cran si possible
           if (id === focusedId) {
             const p = pathToRoot[focusedId];
@@ -3243,6 +3354,10 @@
     wrap.addEventListener('click', (e) => {
       if (e.target.closest('.mm-node')) return;
       if (e.target.closest('.mm-breadcrumb-seg')) return;
+      if (e.target.closest('.mm-tool-btn')) return;
+      // Si on vient de paner, le mouseup déclenche un click sur le wrap :
+      // on l'ignore, sinon ça désépingle systématiquement après un drag.
+      if (panMoved) return;
       if (!pinnedId) return;
       pinnedId = null;
       card.classList.remove('is-visible');
@@ -3250,6 +3365,165 @@
       if (svgEl) {
         svgEl.classList.remove('is-hovering');
         svgEl.querySelectorAll('.is-active').forEach(elem => elem.classList.remove('is-active'));
+      }
+    });
+
+    // ---- Pan/zoom interaction ----
+    // Wheel : zoom centré sur la position du curseur (en coordonnées viewBox).
+    // zoomBy() reçoit le point d'ancrage dans le repère viewBox — c'est le
+    // même repère que pan{X,Y} (la transform mm-viewport s'applique APRÈS).
+    svgHost.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const svgEl = svgHost.querySelector('.mindmap-svg');
+      if (!svgEl) return;
+      let ax = cx, ay = cy;
+      try {
+        const ctm = svgEl.getScreenCTM();
+        if (ctm) {
+          const pt = svgEl.createSVGPoint();
+          pt.x = e.clientX; pt.y = e.clientY;
+          const sp = pt.matrixTransform(ctm.inverse());
+          ax = sp.x; ay = sp.y;
+        }
+      } catch (_) { /* fallback : centre */ }
+      const factor = e.deltaY < 0 ? 1.15 : (1 / 1.15);
+      zoomBy(factor, ax, ay);
+    }, { passive: false });
+
+    // Mousedown : démarre un pan. On l'autorise même quand le mousedown
+    // tombe sur un nœud — c'est seulement au mouseup, si on a bougé, qu'on
+    // empêche le clic (via panMoved). Comme ça, glisser-déposer depuis
+    // n'importe où dans la carte fonctionne.
+    svgHost.addEventListener('mousedown', (e) => {
+      // ignore clics sur la toolbar / breadcrumb / fullscreen — pas concernés
+      if (e.button !== 0) return;
+      isPanning = true;
+      panLastX = e.clientX; panLastY = e.clientY;
+      panMoved = false;
+      svgHost.classList.add('is-panning');
+      // Nettoie un éventuel ancien controller, puis enregistre les listeners
+      // window le temps du drag (un seul drag à la fois).
+      if (mmCtrl) mmCtrl.abort();
+      mmCtrl = new AbortController();
+      const sig = mmCtrl.signal;
+      window.addEventListener('mousemove', (ev) => {
+        if (!isPanning) return;
+        const dx = ev.clientX - panLastX;
+        const dy = ev.clientY - panLastY;
+        if (!panMoved && (Math.abs(dx) > 2 || Math.abs(dy) > 2)) panMoved = true;
+        panLastX = ev.clientX; panLastY = ev.clientY;
+        const svgEl = svgHost.querySelector('.mindmap-svg');
+        if (!svgEl) return;
+        const ctm = svgEl.getScreenCTM();
+        if (!ctm || !ctm.a) return;
+        // Conversion px-écran → unités viewBox (la transform mm-viewport
+        // s'applique APRÈS, donc pan{X,Y} est en coordonnées viewBox).
+        panX += dx / ctm.a;
+        panY += dy / ctm.d;
+        applyTransform();
+      }, { signal: sig });
+      window.addEventListener('mouseup', () => {
+        if (!isPanning) return;
+        isPanning = false;
+        svgHost.classList.remove('is-panning');
+        // Garde panMoved=true le temps que le click event remonte (très court
+        // après le mouseup), puis reset pour la prochaine interaction.
+        setTimeout(() => { panMoved = false; }, 0);
+        if (mmCtrl) { mmCtrl.abort(); mmCtrl = null; }
+      }, { signal: sig });
+    });
+
+    // ---- Touch (tactile) : 1 doigt = pan, 2 doigts = pinch-zoom ----
+    // Le repère viewBox est obtenu via getScreenCTM().inverse() comme pour
+    // la souris. On reuse zoomBy() qui prend un point d'ancrage en viewBox.
+    let touchMode = null;     // 'pan' | 'pinch' | null
+    let touchLast = null;     // { x, y } pour pan, { dist, midX, midY } pour pinch
+
+    function touchVB(t, svgEl) {
+      const ctm = svgEl.getScreenCTM();
+      if (!ctm) return null;
+      const pt = svgEl.createSVGPoint();
+      pt.x = t.clientX; pt.y = t.clientY;
+      return pt.matrixTransform(ctm.inverse());
+    }
+
+    svgHost.addEventListener('touchstart', (e) => {
+      const svgEl = svgHost.querySelector('.mindmap-svg');
+      if (!svgEl) return;
+      if (e.touches.length === 1) {
+        // Pan tactile à un doigt
+        e.preventDefault();
+        touchMode = 'pan';
+        panMoved = false;
+        touchLast = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        svgHost.classList.add('is-panning');
+      } else if (e.touches.length === 2) {
+        // Pinch-zoom à deux doigts : on capture la distance initiale et le
+        // milieu des deux doigts (en repère viewBox) comme point d'ancrage.
+        e.preventDefault();
+        touchMode = 'pinch';
+        const t0 = e.touches[0], t1 = e.touches[1];
+        const dx = t1.clientX - t0.clientX, dy = t1.clientY - t0.clientY;
+        const dist = Math.hypot(dx, dy);
+        const midPt = svgEl.createSVGPoint();
+        midPt.x = (t0.clientX + t1.clientX) / 2;
+        midPt.y = (t0.clientY + t1.clientY) / 2;
+        const ctm = svgEl.getScreenCTM();
+        const mid = ctm ? midPt.matrixTransform(ctm.inverse()) : { x: cx, y: cy };
+        touchLast = { dist, midX: mid.x, midY: mid.y };
+        panMoved = true;  // un pinch n'est jamais un "clic" de nœud
+      }
+    }, { passive: false });
+
+    svgHost.addEventListener('touchmove', (e) => {
+      const svgEl = svgHost.querySelector('.mindmap-svg');
+      if (!svgEl) return;
+      if (touchMode === 'pan' && e.touches.length === 1 && touchLast) {
+        e.preventDefault();
+        const dx = e.touches[0].clientX - touchLast.x;
+        const dy = e.touches[0].clientY - touchLast.y;
+        if (!panMoved && (Math.abs(dx) > 2 || Math.abs(dy) > 2)) panMoved = true;
+        touchLast.x = e.touches[0].clientX;
+        touchLast.y = e.touches[0].clientY;
+        const ctm = svgEl.getScreenCTM();
+        if (!ctm || !ctm.a) return;
+        panX += dx / ctm.a;
+        panY += dy / ctm.d;
+        applyTransform();
+      } else if (touchMode === 'pinch' && e.touches.length === 2 && touchLast) {
+        e.preventDefault();
+        const t0 = e.touches[0], t1 = e.touches[1];
+        const ddx = t1.clientX - t0.clientX, ddy = t1.clientY - t0.clientY;
+        const dist = Math.hypot(ddx, ddy);
+        if (touchLast.dist > 0) {
+          const factor = dist / touchLast.dist;
+          zoomBy(factor, touchLast.midX, touchLast.midY);
+        }
+        // Met à jour la distance et le centre pour le frame suivant (pan
+        // pendant le pinch quand les doigts glissent ensemble).
+        const midPt = svgEl.createSVGPoint();
+        midPt.x = (t0.clientX + t1.clientX) / 2;
+        midPt.y = (t0.clientY + t1.clientY) / 2;
+        const ctm = svgEl.getScreenCTM();
+        const mid = ctm ? midPt.matrixTransform(ctm.inverse()) : { x: touchLast.midX, y: touchLast.midY };
+        touchLast.dist = dist;
+        touchLast.midX = mid.x;
+        touchLast.midY = mid.y;
+      }
+    }, { passive: false });
+
+    svgHost.addEventListener('touchend', (e) => {
+      if (e.touches.length === 0) {
+        if (touchMode === 'pan') svgHost.classList.remove('is-panning');
+        touchMode = null;
+        touchLast = null;
+        // panMoved reste true le temps que d'éventuels click compensatoires
+        // soient ignorés, puis reset au tick suivant.
+        setTimeout(() => { panMoved = false; }, 0);
+      } else if (e.touches.length === 1 && touchMode === 'pinch') {
+        // Bascule pinch → pan quand un doigt se lève
+        touchMode = 'pan';
+        touchLast = { x: e.touches[0].clientX, y: e.touches[0].clientY };
       }
     });
 

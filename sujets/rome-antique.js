@@ -15,7 +15,7 @@ window.CarnetDeSavoirs.register({
     difficulte: 2,
     duree_estimee_min: 35,
     prerequis: [],
-    lie_a: ['empire-byzantin', 'paris-geographie', 'pyramides-egypte'],
+    lie_a: ['empire-byzantin', 'paris-geographie', 'pyramides-egypte', 'napoleon'],
     date_creation: '2026-05-11',
     date_maj: '2026-05-11'
   },
@@ -193,7 +193,7 @@ Rome elle-même, au IIᵉ siècle, dépasse **un million d\'habitants** — chif
           },
           {
             titre: 'Le vocabulaire politique',
-            description: `Sénat, République, consul, dictateur, candidat (du blanc *candidus* des toges), tribunal, comité, magistrat, vote, suffrage : presque tout le vocabulaire politique moderne vient du latin républicain. Rome a légué un modèle institutionnel — pour le meilleur (constitutions modernes) et le pire (mythologie autoritaire).`
+            description: `Sénat, République, consul, dictateur, candidat (du blanc *candidus* des toges), tribunal, comité, magistrat, vote, suffrage : presque tout le vocabulaire politique moderne vient du latin républicain. Rome a légué un modèle institutionnel — pour le meilleur (constitutions modernes) et le pire (mythologie autoritaire). [[napoleon]] s\'en emparera explicitement : Consulat, Sénat conservateur, aigles des légions reprises sur ses étendards, sacre selon une mise en scène quasi césarienne.`
           },
           {
             titre: 'Le christianisme',

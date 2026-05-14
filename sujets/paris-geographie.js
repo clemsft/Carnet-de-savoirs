@@ -15,7 +15,7 @@ window.CarnetDeSavoirs.register({
     difficulte: 2,
     duree_estimee_min: 35,
     prerequis: [],
-    lie_a: ['ecriture-cuneiforme', 'jazz', 'cathedrales-gothiques', 'gastronomie'],
+    lie_a: ['ecriture-cuneiforme', 'jazz', 'cathedrales-gothiques', 'gastronomie', 'napoleon', 'le-rap'],
     date_creation: '2026-05-10',
     date_maj: '2026-05-10'
   },
@@ -95,7 +95,7 @@ Vingt siècles plus tard, la ville a explosé du périmètre de l\'île de la Ci
       type: 'texte',
       titre: 'La <em>révolution</em> haussmannienne',
       contenu_md:
-`Paris à 1850 est encore largement médiéval : ruelles tortueuses, immeubles vétustes, hygiène déplorable, choléra récurrent (l\'épidémie de 1832 a tué 19 000 personnes en quelques mois). Le réseau de circulation est dérisoire pour une ville d\'**un million d\'habitants**. Quand l\'empereur **Napoléon III** prend le pouvoir en 1852, il a en tête un projet précis : transformer Paris à l\'image de Londres, qu\'il connaît bien pour y avoir vécu en exil.
+`Paris à 1850 est encore largement médiéval : ruelles tortueuses, immeubles vétustes, hygiène déplorable, choléra récurrent (l\'épidémie de 1832 a tué 19 000 personnes en quelques mois). Le réseau de circulation est dérisoire pour une ville d\'**un million d\'habitants**. Beaucoup des cadres administratifs qui rendront le chantier possible — préfecture de la Seine, Conseil d\'État, numérotation rationnelle des rues — avaient pourtant été posés un demi-siècle plus tôt sous [[napoleon]]. Quand l\'empereur **Napoléon III** prend le pouvoir en 1852, il a en tête un projet précis : transformer Paris à l\'image de Londres, qu\'il connaît bien pour y avoir vécu en exil.
 
 Pour mener cette transformation, il choisit **Georges-Eugène Haussmann**, préfet de la Seine de **1853 à 1870**. Pendant dix-sept ans, Haussmann va mener un chantier d\'une ampleur sans équivalent en Europe : **percée de 80 km de boulevards** rectilignes, démolition d\'environ **20 000 immeubles**, construction de **40 000 nouveaux**, expropriation de quartiers entiers.
 
@@ -163,7 +163,7 @@ L\'ingénieur **Fulgence Bienvenüe** dirige les travaux pendant trois décennie
 
 Le réseau se densifie ligne après ligne jusque dans les années 1930. Il compte aujourd\'hui **16 lignes** numérotées (en réalité 14 + lignes bis 3bis et 7bis), **308 stations**, environ **225 km de voies**. Sa densité est sans équivalent : à Paris intra-muros, aucun point n\'est à plus de **500 m d\'une station de métro**. La fréquentation annuelle dépasse **1,5 milliard de voyages**.
 
-Le **Grand Paris Express**, en cours de construction depuis 2016, ajoutera **200 km** supplémentaires en métro automatique pour desservir la banlieue, avec des lignes circulaires qui ne passent plus par le centre. C\'est le plus grand chantier de transports en cours en Europe. Les premières mises en service partielles ont commencé en 2024 ; le projet complet devrait s\'étaler jusque vers 2035.`
+Le **Grand Paris Express**, en cours de construction depuis 2016, ajoutera **200 km** supplémentaires en métro automatique pour desservir la banlieue, avec des lignes circulaires qui ne passent plus par le centre. C\'est le plus grand chantier de transports en cours en Europe. Les premières mises en service partielles ont commencé en 2024 ; le projet complet devrait s\'étaler jusque vers 2035. En reliant enfin Saint-Denis, Aubervilliers, Bobigny au cœur de la capitale, il redessine aussi la géographie des cultures urbaines contemporaines — celle, notamment, du [[le-rap]] français, né dans ces banlieues longtemps tenues à l\'écart du réseau central.`
     },
 
     {

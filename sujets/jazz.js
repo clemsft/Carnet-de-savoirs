@@ -16,7 +16,7 @@ window.CarnetDeSavoirs.register({
     difficulte: 2,
     duree_estimee_min: 35,
     prerequis: [],
-    lie_a: ['paris-geographie'],
+    lie_a: ['paris-geographie', 'le-rap'],
     date_creation: '2026-05-12',
     date_maj: '2026-05-12'
   },
@@ -220,7 +220,7 @@ Le **free jazz** précisément, autre rupture, naît avec **Ornette Coleman** (l
 
 Ce qui demeure, par-dessus la diversité des styles, c'est un **rapport singulier au temps**. Le musicien de jazz ne reproduit pas une pièce écrite : il **fait advenir une œuvre unique** dans le moment même où elle est jouée. Le solo qu'il vient de jouer ne reviendra jamais. Le public n'écoute pas l'interprétation d'une partition ; il assiste à une **création en direct**, fragile, irréversible. Cette expérience — qu'on retrouve dans certaines traditions classiques (l'Inde du Nord, le flamenco) mais avec une telle intensité institutionnelle nulle part ailleurs — est peut-être la **contribution philosophique** la plus profonde du jazz à l'art.
 
-Aujourd'hui le jazz n'est plus la pop music — il l'a été un bref instant historique, dans les années 1930-1940. Il est devenu une **musique savante**, enseignée dans des conservatoires (Berklee, Manhattan School), étudiée à l'université, discutée par des critiques exigeants. Quelque chose s'est perdu — la familiarité du grand public — et quelque chose a été gagné : la reconnaissance pleine d'un patrimoine que les États-Unis revendiquent désormais comme leur **musique classique nationale**. Restent les disques, et le miracle reproductible chaque soir, dans un club, quand cinq musiciens posent un standard et inventent ensemble quelque chose qui n'existait pas la veille.`
+Aujourd'hui le jazz n'est plus la pop music — il l'a été un bref instant historique, dans les années 1930-1940. Il est devenu une **musique savante**, enseignée dans des conservatoires (Berklee, Manhattan School), étudiée à l'université, discutée par des critiques exigeants. Quelque chose s'est perdu — la familiarité du grand public — et quelque chose a été gagné : la reconnaissance pleine d'un patrimoine que les États-Unis revendiquent désormais comme leur **musique classique nationale**. Sa filiation afro-américaine, elle, n'a pas cessé : les standards et les solos de Davis, Hancock ou Coltrane irriguent abondamment, par le sample, la matière sonore du [[le-rap]] depuis les années 1980. Restent les disques, et le miracle reproductible chaque soir, dans un club, quand cinq musiciens posent un standard et inventent ensemble quelque chose qui n'existait pas la veille.`
     }
 
   ],

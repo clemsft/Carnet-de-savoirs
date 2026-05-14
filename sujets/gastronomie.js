@@ -16,7 +16,7 @@ window.CarnetDeSavoirs.register({
     difficulte: 2,
     duree_estimee_min: 30,
     prerequis: [],
-    lie_a: ['paris-geographie', 'renaissance-italienne', 'syndrome-stendhal'],
+    lie_a: ['paris-geographie', 'renaissance-italienne', 'syndrome-stendhal', 'consumerisme', 'les-animes'],
     date_creation: '2026-05-12',
     date_maj: '2026-05-12'
   },
@@ -178,7 +178,7 @@ Les **étoiles** apparaissent en **1926** — une seule au début, puis deux dè
 
 L\'effet sur les chefs est connu — et redoutable. Une **première étoile** triple le chiffre d\'affaires. Une **troisième** transforme un restaurant en pèlerinage international. La **perte** d\'une étoile, à l\'inverse, peut être dévastatrice. En **2003**, le chef **Bernard Loiseau** se suicide à 52 ans, dans son restaurant de Saulieu, après des rumeurs (infondées) de rétrogradation imminente. Cette mort a marqué la profession entière. Certains chefs, depuis, *demandent* à être retirés du guide — Sébastien Bras à Laguiole en 2017, Marc Veyrat plus brièvement — pour se libérer de cette pression. *"Je rends mes étoiles pour retrouver le plaisir de cuisiner"*, disait Bras.
 
-Au-delà du Michelin, la liste **World\'s 50 Best Restaurants**, lancée en 2002, joue depuis vingt ans un rôle complémentaire — plus mondialisée, plus tournée vers l\'avant-garde. C\'est elle qui a couronné quatre fois Noma, propulsé Adrià, mis l\'Amérique du Sud sur la carte mondiale (Gastón Acurio, Virgilio Martínez).`
+Au-delà du Michelin, la liste **World\'s 50 Best Restaurants**, lancée en 2002, joue depuis vingt ans un rôle complémentaire — plus mondialisée, plus tournée vers l\'avant-garde. C\'est elle qui a couronné quatre fois Noma, propulsé Adrià, mis l\'Amérique du Sud sur la carte mondiale (Gastón Acurio, Virgilio Martínez). Ces classements transforment aussi la gastronomie en marché d\'attention, où le [[consumerisme]] de l\'expérience — réservations à un an, listes d\'attente, voyages dédiés — devient une composante du dispositif.`
     },
 
     {
@@ -191,7 +191,7 @@ Au-delà du Michelin, la liste **World\'s 50 Best Restaurants**, lancée en 2002
 
 Le mouvement est, en réalité, une **réaction**. Contre quoi ? Contre les sauces lourdes héritées d\'Escoffier — beurre, crème, farine, longues réductions. Contre les présentations massives. Contre la **codification** elle-même. La nouvelle cuisine veut : des **cuissons courtes** qui respectent le produit ; des **assiettes dressées** par le chef plutôt que des plats apportés à découper en salle ; des **sauces légères** à base de jus et d\'émulsions plutôt que de roux ; une **inventivité** assumée, le droit pour le chef d\'être *auteur* de ses plats.
 
-L\'influence est mondiale. Les **Japonais** s\'y reconnaissent — leur cuisine pratiquait depuis toujours la légèreté, le produit, la saisonnalité ; un échange Bocuse-Tokyo s\'installe durablement. Les **Américains** de Californie (Alice Waters à Chez Panisse) en tirent leur *farm-to-table*. Toute la cuisine d\'auteur des cinquante années suivantes s\'inscrit dans son sillage.`
+L\'influence est mondiale. Les **Japonais** s\'y reconnaissent — leur cuisine pratiquait depuis toujours la légèreté, le produit, la saisonnalité ; un échange Bocuse-Tokyo s\'installe durablement, et le **soft power** culinaire japonais (umami, dashi, esthétique du dressage) accompagnera, dans les décennies suivantes, la diffusion mondiale d\'autres pans de la culture nippone — voir [[les-animes]]. Les **Américains** de Californie (Alice Waters à Chez Panisse) en tirent leur *farm-to-table*. Toute la cuisine d\'auteur des cinquante années suivantes s\'inscrit dans son sillage.`
     },
 
     {

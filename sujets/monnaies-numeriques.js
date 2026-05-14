@@ -15,7 +15,7 @@ window.CarnetDeSavoirs.register({
     difficulte: 2,
     duree_estimee_min: 30,
     prerequis: [],
-    lie_a: ['ia-generative', 'nombres-premiers', 'histoire-internet', 'inflation'],
+    lie_a: ['ia-generative', 'nombres-premiers', 'histoire-internet', 'inflation', 'capitalisme'],
     date_creation: '2026-05-10',
     date_maj: '2026-05-10'
   },
@@ -61,7 +61,7 @@ window.CarnetDeSavoirs.register({
       contenu_md:
 `Le **31 octobre 2008**, en pleine crise financière mondiale, un texte de neuf pages est publié sur une liste de discussion cryptographique. Son titre : *« Bitcoin: A Peer-to-Peer Electronic Cash System »*. Son auteur signe **Satoshi Nakamoto** — un pseudonyme dont l\'identité réelle reste, à ce jour, **inconnue**.
 
-L\'idée, simple à formuler, paraît techniquement folle : créer une monnaie électronique qui n\'aurait besoin d\'**aucune banque** pour garantir les transactions. Pas d\'État derrière. Pas d\'institution centrale. Juste un réseau d\'ordinateurs anonymes qui valident, ensemble, qui possède quoi.
+L\'idée, simple à formuler, paraît techniquement folle : créer une monnaie électronique qui n\'aurait besoin d\'**aucune banque** pour garantir les transactions. Pas d\'État derrière. Pas d\'institution centrale. Juste un réseau d\'ordinateurs anonymes qui valident, ensemble, qui possède quoi. C\'est, en filigrane, une remise en cause radicale de l\'architecture financière du [[capitalisme]] contemporain.
 
 Le 3 janvier 2009, Nakamoto démarre le réseau Bitcoin. Le premier bloc contient une référence à un titre du *Times* du jour : *« Chancellor on brink of second bailout for banks »*. Le message politique est clair.`
     },

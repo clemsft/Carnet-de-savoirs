@@ -15,7 +15,7 @@ window.CarnetDeSavoirs.register({
     difficulte: 2,
     duree_estimee_min: 30,
     prerequis: [],
-    lie_a: ['empire-mongol', 'empire-byzantin', 'empire-ottoman', 'ecriture-cuneiforme'],
+    lie_a: ['empire-mongol', 'empire-byzantin', 'empire-ottoman', 'ecriture-cuneiforme', 'capitalisme'],
     date_creation: '2026-05-11',
     date_maj: '2026-05-11'
   },
@@ -74,7 +74,7 @@ window.CarnetDeSavoirs.register({
 
 Et ce n\'est pas **une** route, mais un **réseau** complexe et mouvant. Une dizaine de grands corridors, mille pistes, des relais d\'**oasis** dans les déserts, des cols dans les montagnes, des ports sur les mers. La géographie commande tout : pour aller de la Chine à la Perse, il faut contourner — par le nord ou par le sud — le **désert du Taklamakan**, plus aride que le Sahara ; franchir les passes du **Pamir**, à 4 000 mètres d\'altitude ; traverser les steppes contrôlées par des peuples nomades.
 
-Aucune caravane ne fait jamais le trajet complet de **Xi\'an à Antioche** — soit près de **8 000 km**. Les marchandises sont **transportées par étapes**, achetées et revendues à chaque grand carrefour — Samarcande, Boukhara, Merv, Bagdad —, prenant de la valeur à chaque escale. Une étoffe de soie qui vaut quelques pièces en Chine peut valoir son poids d\'or à Rome. Pline l\'Ancien s\'inquiétait déjà, au Iᵉʳ siècle, du **déficit commercial** de l\'Empire romain avec l\'Orient — chaque année, écrivait-il, **100 millions de sesterces** partent en Inde et en Chine.`
+Aucune caravane ne fait jamais le trajet complet de **Xi\'an à Antioche** — soit près de **8 000 km**. Les marchandises sont **transportées par étapes**, achetées et revendues à chaque grand carrefour — Samarcande, Boukhara, Merv, Bagdad —, prenant de la valeur à chaque escale. Une étoffe de soie qui vaut quelques pièces en Chine peut valoir son poids d\'or à Rome. Pline l\'Ancien s\'inquiétait déjà, au Iᵉʳ siècle, du **déficit commercial** de l\'Empire romain avec l\'Orient — chaque année, écrivait-il, **100 millions de sesterces** partent en Inde et en Chine. Ces circuits de plus-value entre comptoirs préfigurent, à plusieurs siècles de distance, les mécanismes du [[capitalisme]] marchand qui s\'épanouira à Venise et à Gênes.`
     },
 
     {
