@@ -126,7 +126,18 @@ a { color: inherit; }
   height: 100vh;
   display: flex;
   flex-direction: column;
+  /* Scroll vertical interne quand le contenu dépasse la hauteur du viewport
+     (par ex. nombreuses entrées de nav, écrans courts, barre de tâches). */
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
 }
+.sidebar::-webkit-scrollbar { width: 6px; }
+.sidebar::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: 3px;
+}
+.sidebar::-webkit-scrollbar-track { background: transparent; }
 
 @media (max-width: 760px) {
   .sidebar {
@@ -3738,3 +3749,589 @@ body.overlay-active { overflow: hidden; }
   a { color: black !important; text-decoration: underline; }
   .quiz-card, .stat-card { display: none !important; }
 }
+
+/* ===================================================================
+   PALETTE DE RECHERCHE (Ctrl+K)
+   =================================================================== */
+
+.search-palette-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 8, 14, 0.65);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  z-index: 1500;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 12vh;
+  animation: fadeIn 0.18s ease;
+}
+.search-palette {
+  width: min(720px, 92vw);
+  max-height: 70vh;
+  background: var(--bg-card);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-lg);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.search-palette-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--line-strong);
+  padding: 1.1rem 1.3rem;
+  color: var(--text);
+  font: inherit;
+  font-size: 1.05rem;
+  outline: none;
+}
+.search-palette-input::placeholder { color: var(--text-faint); font-style: italic; }
+.search-palette-results {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 0.35rem;
+}
+.search-palette-empty {
+  padding: 1.3rem 1rem;
+  color: var(--text-faint);
+  font-style: italic;
+  text-align: center;
+  font-size: 0.92rem;
+}
+.search-palette-item {
+  padding: 0.7rem 0.85rem;
+  border-radius: var(--r);
+  cursor: pointer;
+  transition: background 0.12s;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.search-palette-item.is-active { background: var(--bg-card-hover); }
+.search-palette-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 0.85rem;
+}
+.search-palette-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.search-palette-sujet {
+  color: var(--text);
+  font-style: italic;
+  font-family: var(--f-display);
+}
+.search-palette-kind {
+  margin-left: auto;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  font-style: italic;
+}
+.search-palette-snippet {
+  color: var(--text-soft);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+.search-palette-snippet mark {
+  background: color-mix(in oklab, var(--accent, #ff6b35) 30%, transparent);
+  color: var(--text);
+  padding: 0 0.1em;
+  border-radius: 2px;
+}
+.search-palette-hint {
+  padding: 0.55rem 0.95rem;
+  font-size: 0.78rem;
+  color: var(--text-faint);
+  font-style: italic;
+  border-top: 1px solid var(--line);
+  text-align: center;
+}
+
+/* Bouton "Rechercher" dans la sidebar */
+.nav-search-btn { gap: 0.6rem; }
+.nav-kbd {
+  margin-left: auto;
+  font-size: 0.7rem;
+  color: var(--text-faint);
+  border: 1px solid var(--line-strong);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  font-family: var(--f-display);
+  letter-spacing: 0.02em;
+}
+
+/* ===================================================================
+   BOUTONS — variantes manquantes
+   =================================================================== */
+
+.btn.primary {
+  background: var(--accent);
+  color: var(--bg-deep);
+  border-color: var(--accent);
+}
+.btn.primary:hover {
+  background: color-mix(in oklab, var(--accent) 85%, white);
+  border-color: color-mix(in oklab, var(--accent) 85%, white);
+  color: var(--bg-deep);
+}
+.btn-ghost {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-faint);
+  font-family: inherit;
+  font-size: 0.85rem;
+  padding: 0.55rem 0.95rem;
+  cursor: pointer;
+  border-radius: var(--r);
+  font-style: italic;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  transition: color 0.18s;
+}
+.btn-ghost:hover { color: var(--text); }
+
+/* ===================================================================
+   PARCOURS THÉMATIQUES
+   =================================================================== */
+
+.parcours-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-top: 1.4rem;
+}
+.parcours-card {
+  position: relative;
+  background: var(--bg-card);
+  border: 1px solid var(--line-strong);
+  border-left: 3px solid var(--card-accent, var(--accent));
+  border-radius: var(--r-lg);
+  padding: 1.2rem 1.3rem;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s, border-color 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.parcours-card:hover {
+  background: var(--bg-card-hover);
+  transform: translateY(-2px);
+}
+.parcours-card.is-active-parcours {
+  border-color: var(--card-accent, var(--accent));
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--card-accent, var(--accent)) 30%, transparent);
+}
+.parcours-card-eyebrow {
+  font-family: var(--f-body);
+  font-style: italic;
+  font-size: 0.78rem;
+  color: var(--text-faint);
+  letter-spacing: 0.06em;
+}
+.parcours-card-title {
+  font-family: var(--f-display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1.25rem;
+  color: var(--text);
+  line-height: 1.25;
+}
+.parcours-card-title em { color: var(--card-accent, var(--accent)); font-style: italic; }
+.parcours-card-desc {
+  color: var(--text-soft);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+.parcours-card-badge {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--card-accent, var(--accent));
+  font-style: italic;
+  margin-top: 0.4rem;
+}
+
+.parcours-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin: 1.4rem 0 1.8rem;
+}
+
+.parcours-etapes {
+  list-style: none;
+  padding-left: 0;
+  counter-reset: parcours-etape;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+.parcours-etape {
+  display: flex;
+  gap: 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 1rem 1.2rem;
+  transition: border-color 0.2s, background 0.2s;
+}
+.parcours-etape:hover { background: var(--bg-card-hover); border-color: var(--accent); }
+.parcours-etape-num {
+  width: 32px; height: 32px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-family: var(--f-display);
+  font-style: italic;
+  font-weight: 500;
+}
+.parcours-etape-body { flex: 1; display: flex; flex-direction: column; gap: 0.35rem; }
+.parcours-etape-title {
+  font-family: var(--f-display);
+  font-style: italic;
+  font-size: 1.1rem;
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px dashed currentColor;
+  align-self: flex-start;
+  padding-bottom: 0.1em;
+}
+.parcours-etape-title em { font-style: italic; }
+.parcours-etape-title:hover { opacity: 0.78; }
+.parcours-etape-missing {
+  color: var(--text-faint);
+  border-bottom: none;
+  font-style: italic;
+}
+.parcours-etape-resume {
+  color: var(--text-soft);
+  font-size: 0.93rem;
+  line-height: 1.55;
+}
+.parcours-etape-note {
+  font-style: italic;
+  font-size: 0.88rem;
+  color: var(--text-faint);
+  background: color-mix(in oklab, var(--accent) 5%, transparent);
+  padding: 0.45rem 0.7rem;
+  border-radius: var(--r-sm);
+  border-left: 2px solid color-mix(in oklab, var(--accent) 35%, transparent);
+}
+
+/* Bandeau de parcours actif au-dessus de la fiche sujet */
+.parcours-banner {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  background: color-mix(in oklab, var(--accent) 8%, var(--bg-card));
+  border: 1px solid color-mix(in oklab, var(--accent) 30%, transparent);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--r);
+  padding: 0.9rem 1.1rem 1.1rem;
+  margin-bottom: 1.6rem;
+}
+.parcours-banner-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  flex: 1 1 220px;
+}
+.parcours-banner-eyebrow {
+  font-family: var(--f-display);
+  font-style: italic;
+  font-size: 0.74rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.parcours-banner-title {
+  font-family: var(--f-display);
+  font-style: italic;
+  font-size: 1.05rem;
+  color: var(--text);
+  text-decoration: none;
+}
+.parcours-banner-title:hover { color: var(--accent); }
+.parcours-banner-progress {
+  font-size: 0.85rem;
+  color: var(--text-faint);
+  font-style: italic;
+}
+.parcours-banner-nav {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.parcours-banner-nav .btn { padding: 0.5rem 1rem; font-size: 0.85rem; }
+.parcours-banner-end {
+  font-size: 0.85rem;
+  color: var(--text-faint);
+  font-style: italic;
+  padding: 0.5rem 0.8rem;
+}
+.parcours-banner-bar {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 0 0 var(--r) var(--r);
+  overflow: hidden;
+}
+.parcours-banner-bar-fill {
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.4s ease;
+}
+
+/* ===================================================================
+   TIMELINE GLOBALE
+   =================================================================== */
+
+.timeline-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 1rem 0 1.4rem;
+}
+.timeline-domain-select {
+  background: var(--bg-input);
+  border: 1px solid var(--line-strong);
+  color: var(--text);
+  padding: 0.55rem 0.9rem;
+  border-radius: var(--r);
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.timeline-domain-select:focus { outline: 1px solid var(--accent); }
+
+.timeline-wrap {
+  position: relative;
+  background: var(--bg-card);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-lg);
+  padding: 1.2rem;
+  overflow: hidden;
+  cursor: grab;
+  user-select: none;
+}
+.timeline-wrap.is-panning { cursor: grabbing; }
+.timeline-svg-wrap {
+  width: 100%;
+  overflow: hidden;       /* le pan/zoom interne gère la navigation horizontale */
+}
+.timeline-hint {
+  font-size: 0.78rem;
+  color: var(--text-faint);
+  font-style: italic;
+  margin-left: auto;
+}
+.timeline-svg {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  display: block;
+  font-family: var(--f-body);
+  /* Le SVG remplit le conteneur ; preserveAspectRatio + viewBox 1900×620
+     gèrent la mise à l'échelle. Le zoom interactif se fait via JS (xFor
+     recalcule les coordonnées) — pas de scrollbar horizontal. */
+}
+
+.timeline-axis {
+  stroke: var(--line-strong);
+  stroke-width: 1.4;
+}
+.timeline-tick {
+  stroke: var(--text-faint);
+  stroke-width: 1;
+}
+.timeline-tick-label {
+  fill: var(--text-faint);
+  font-size: 11px;
+  font-style: italic;
+  font-family: var(--f-display);
+}
+
+.timeline-stem {
+  stroke-width: 1;
+  opacity: 0.35;
+}
+.timeline-evt {
+  cursor: pointer;
+}
+/* Halo invisible élargi pour faciliter le survol — utile maintenant que
+   les dots sont petits (r=3.5). */
+.timeline-hit {
+  fill: transparent;
+  pointer-events: all;
+}
+.timeline-evt .timeline-dot {
+  fill: var(--evt-color, var(--accent));
+  stroke: var(--bg-card);
+  stroke-width: 1.5;
+  transition: r 0.15s, stroke-width 0.15s;
+  pointer-events: none;
+}
+.timeline-evt:hover .timeline-dot {
+  r: 6;
+  stroke-width: 2.5;
+}
+.timeline-evt-label {
+  fill: var(--text-soft);
+  font-size: 10px;
+  font-family: var(--f-display);
+  font-style: italic;
+  pointer-events: none;
+  opacity: 0.85;
+}
+.timeline-evt:hover .timeline-evt-label {
+  fill: var(--text);
+  opacity: 1;
+  font-weight: 500;
+}
+/* Compteur au centre des dots cluster (>=2 événements) */
+.timeline-evt-count {
+  fill: var(--bg-deep);
+  font-size: 9px;
+  font-family: var(--f-display);
+  font-weight: 600;
+  pointer-events: none;
+}
+
+/* Liste d'événements dans le tooltip épinglé (clusters multi-événements) */
+.timeline-tooltip.is-pinned {
+  pointer-events: auto;
+  width: 340px;
+}
+.timeline-tt-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0.4rem 0;
+  max-height: 280px;
+  overflow-y: auto;
+}
+.timeline-tt-item {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  padding: 0.45rem 0.55rem;
+  border-radius: var(--r-sm);
+  background: rgba(255, 255, 255, 0.02);
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+.timeline-tt-item:hover { background: rgba(255, 255, 255, 0.06); }
+.timeline-tt-item-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 0.4rem;
+  background: var(--evt-color, var(--accent));
+}
+.timeline-tt-item-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+.timeline-tt-item-text strong {
+  font-weight: 500;
+  color: var(--text);
+  font-family: var(--f-display);
+  font-style: italic;
+}
+.timeline-tt-item-sub {
+  font-size: 0.72rem;
+  color: var(--text-faint);
+  font-style: italic;
+}
+.timeline-tt-more {
+  font-size: 0.78rem;
+  color: var(--text-faint);
+  font-style: italic;
+  text-align: center;
+  padding-top: 0.3rem;
+}
+
+.timeline-tooltip {
+  position: absolute;
+  background: color-mix(in oklab, var(--bg-card) 95%, transparent);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--line-strong);
+  border-left: 3px solid var(--tt-color, var(--accent));
+  border-radius: var(--r);
+  padding: 0.7rem 0.85rem;
+  width: 300px;
+  max-width: 92vw;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  box-shadow: var(--shadow-soft);
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+  /* Scroll interne si le contenu dépasse la max-height calculée en JS,
+     pour ne jamais sortir du cadre. */
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+.timeline-tooltip.is-visible { opacity: 1; }
+.timeline-tt-date {
+  font-family: var(--f-display);
+  font-style: italic;
+  font-size: 0.78rem;
+  color: var(--tt-color, var(--accent));
+  letter-spacing: 0.06em;
+  margin-bottom: 0.2rem;
+}
+.timeline-tt-title {
+  font-family: var(--f-display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1rem;
+  color: var(--text);
+  margin-bottom: 0.35rem;
+}
+.timeline-tt-desc {
+  color: var(--text-soft);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  margin-bottom: 0.5rem;
+}
+.timeline-tt-source {
+  color: var(--text-faint);
+  font-size: 0.78rem;
+  font-style: italic;
+}
+.timeline-tt-cta {
+  margin-top: 0.45rem;
+  font-size: 0.78rem;
+  font-style: italic;
+  color: var(--tt-color, var(--accent));
+}
+
+/* En plein écran sidebar / topbar masqués — on garde la cohérence si jamais
+   l'utilisateur passe la timeline en fullscreen via la barre globale du
+   navigateur (F11) */

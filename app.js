@@ -18,6 +18,8 @@
   const state = {
     sujets: {},                   // id -> sujet data
     sujetsOrder: [],              // ordre d'enregistrement
+    parcours: {},                 // id -> parcours data (chemin thématique)
+    parcoursOrder: [],            // ordre d'enregistrement des parcours
     user: null,                   // chargé depuis localStorage
     quizSession: null             // état temporaire du quiz en cours
   };
@@ -65,7 +67,10 @@
     arrowLeft: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>',
     glossaire: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',
     quiz: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
-    notes: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>'
+    notes: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>',
+    search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
+    parcours: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 9 6 12 12 15 18 21 18"/><circle cx="3" cy="6" r="1.5" fill="currentColor"/><circle cx="9" cy="6" r="1.5" fill="currentColor"/><circle cx="15" cy="18" r="1.5" fill="currentColor"/><circle cx="21" cy="18" r="1.5" fill="currentColor"/></svg>',
+    timeline: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><circle cx="6" cy="12" r="2" fill="currentColor"/><circle cx="12" cy="12" r="2" fill="currentColor"/><circle cx="18" cy="12" r="2" fill="currentColor"/></svg>'
   };
 
   // =================================================================
@@ -158,6 +163,7 @@
       spacedRep: {},     // sujetId -> { nextReview, interval, easeFactor, repetitions, lastReview }
       readingMode: false,// vrai = sidebar masquée + colonne élargie sur l'onglet Cours
       dailyActivity: {}, // 'YYYY-MM-DD' -> { visits, blocs, quiz } pour la heatmap
+      activeParcours: null, // { slug, etape } | null — parcours thématique en cours
       lastView: '/'
     };
   }
@@ -333,6 +339,11 @@
     if (parts[0] === 'glossaire') return { view: 'glossaire' };
     if (parts[0] === 'quiz-mixte') return { view: 'quiz-mixte' };
     if (parts[0] === 'notes') return { view: 'notes' };
+    if (parts[0] === 'parcours') {
+      if (parts[1]) return { view: 'parcours-detail', id: decodeURIComponent(parts[1]) };
+      return { view: 'parcours-liste' };
+    }
+    if (parts[0] === 'timeline') return { view: 'timeline' };
     return { view: 'bibliotheque' };
   }
 
@@ -433,8 +444,20 @@
         el('span', { class: 'brand-name', html: 'Carnet de <em>Savoirs</em>' })
       ),
       el('nav', { class: 'nav' },
+        // Bouton recherche en tête : ouvre la palette Ctrl+K
+        el('button', {
+          class: 'nav-item nav-search-btn',
+          title: 'Rechercher dans tout le carnet (Ctrl+K)',
+          onclick: openSearchPalette
+        },
+          el('span', { class: 'nav-icon', html: ICONS.search }),
+          el('span', null, 'Rechercher'),
+          el('span', { class: 'nav-kbd' }, 'Ctrl+K')
+        ),
         navLink('bibliotheque', activeView, 'Bibliothèque', ICONS.library, '/'),
         navLink('carte', activeView, 'Carte globale', ICONS.map, '/carte'),
+        navLink('timeline', activeView, 'Timeline', ICONS.timeline, '/timeline'),
+        navLink('parcours-liste', activeView, 'Parcours', ICONS.parcours, '/parcours'),
         navLink('glossaire', activeView, 'Glossaire', ICONS.glossaire, '/glossaire'),
         navLink('quiz-mixte', activeView, 'Quiz mixte', ICONS.quiz, '/quiz-mixte'),
         navLink('notes', activeView, 'Mes notes', ICONS.notes, '/notes'),
@@ -454,7 +477,9 @@
   }
 
   function navLink(viewId, activeView, label, iconHtml, path) {
-    const isActive = (viewId === 'sujet' && activeView === 'sujet') || viewId === activeView;
+    const isActive = (viewId === 'sujet' && activeView === 'sujet')
+      || (viewId === 'parcours-liste' && (activeView === 'parcours-liste' || activeView === 'parcours-detail'))
+      || viewId === activeView;
     return el('button', {
       class: 'nav-item' + (isActive ? ' active' : ''),
       onclick: () => navigate(path)
@@ -737,6 +762,10 @@
     const meta = sujet.meta;
     const primaryDomain = (meta.domaines || [])[0];
     setAccent(primaryDomain);
+
+    // Bandeau de parcours actif — affiché si l'utilisateur a un parcours
+    // en cours dont l'une des étapes correspond à ce sujet.
+    renderParcoursBanner(main, id);
 
     // Mémorise progression
     const _prevProg = state.user.progress[meta.id];
@@ -5480,6 +5509,12 @@
     } else if (route.view === 'notes') {
       setAccent(null);
       renderNotesGlobales(main);
+    } else if (route.view === 'parcours-liste') {
+      renderParcoursListe(main);
+    } else if (route.view === 'parcours-detail') {
+      renderParcoursDetail(main, route.id);
+    } else if (route.view === 'timeline') {
+      renderTimelineGlobale(main);
     } else {
       setAccent(null);
       renderBibliotheque(main);
@@ -5512,6 +5547,1173 @@
     }
     window.addEventListener('scroll', update, { passive: true });
     update();
+  }
+
+  // =================================================================
+  // RECHERCHE FULL-TEXT — palette Ctrl+K
+  // =================================================================
+  // Indexation : on parcourt tous les sujets et on émet une liste plate
+  // d'entrées { sujetId, sujetTitle, domain, kind, text, blockIdx?, weight }
+  // que la recherche scanne en substring (insensible casse + accent).
+  // Build paresseux : on construit au 1er appel après chargement des sujets.
+
+  const SEARCH_INDEX = { built: false, entries: [] };
+
+  function searchStripMarkdown(s) {
+    return String(s || '')
+      .replace(/\[\[([a-z0-9-]+)\]\]/g, (_, sl) => sl.replace(/-/g, ' '))
+      .replace(/\[([^\]]+)\]\{accent\}/g, '$1')
+      .replace(/\*\*([^*]+)\*\*/g, '$1')
+      .replace(/(?<!\*)\*([^*\n]+)\*(?!\*)/g, '$1')
+      .replace(/`([^`]+)`/g, '$1')
+      .replace(/<[^>]+>/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  function searchNormalize(s) {
+    return String(s || '').toLowerCase()
+      .normalize('NFD').replace(/[̀-ͯ]/g, '');
+  }
+
+  function buildSearchIndex() {
+    if (SEARCH_INDEX.built) return SEARCH_INDEX.entries;
+    const entries = [];
+    state.sujetsOrder.forEach(id => {
+      const s = state.sujets[id];
+      if (!s || !s.meta) return;
+      const cleanTitle = String(s.meta.titre || id).replace(/<[^>]+>/g, '');
+      const domain = (s.meta.domaines || ['Autre'])[0];
+
+      entries.push({ sujetId: id, sujetTitle: cleanTitle, domain, kind: 'title', text: cleanTitle, weight: 12 });
+      (s.meta.tags || []).forEach(t => {
+        entries.push({ sujetId: id, sujetTitle: cleanTitle, domain, kind: 'tag', text: t, weight: 7 });
+      });
+      if (s.resume) {
+        entries.push({ sujetId: id, sujetTitle: cleanTitle, domain, kind: 'resume', text: searchStripMarkdown(s.resume), weight: 6 });
+      }
+      (s.points_cles || []).forEach(p => {
+        entries.push({ sujetId: id, sujetTitle: cleanTitle, domain, kind: 'point', text: searchStripMarkdown(p), weight: 8 });
+      });
+      (s.cours || []).forEach((b, i) => {
+        if (!b) return;
+        if (b.titre) {
+          entries.push({ sujetId: id, sujetTitle: cleanTitle, domain, kind: 'block-title', text: searchStripMarkdown(b.titre), blockIdx: i, weight: 9 });
+        }
+        if (b.contenu_md) {
+          entries.push({ sujetId: id, sujetTitle: cleanTitle, domain, kind: 'block-content', text: searchStripMarkdown(b.contenu_md), blockIdx: i, weight: 5 });
+        }
+        // Widget Frise / GrilleCartes / ListeMethodes : on indexe titres+desc des items
+        const params = b.params || {};
+        if (Array.isArray(params.evenements)) {
+          params.evenements.forEach(ev => {
+            if (!ev) return;
+            const t = [ev.titre, ev.description].filter(Boolean).map(searchStripMarkdown).join(' — ');
+            if (t) entries.push({ sujetId: id, sujetTitle: cleanTitle, domain, kind: 'block-content', text: t, blockIdx: i, weight: 5 });
+          });
+        }
+        if (Array.isArray(params.cartes)) {
+          params.cartes.forEach(c => {
+            if (!c) return;
+            const t = [c.titre, c.description].filter(Boolean).map(searchStripMarkdown).join(' — ');
+            if (t) entries.push({ sujetId: id, sujetTitle: cleanTitle, domain, kind: 'block-content', text: t, blockIdx: i, weight: 5 });
+          });
+        }
+        if (Array.isArray(params.methodes)) {
+          params.methodes.forEach(m => {
+            if (!m) return;
+            const t = [m.titre, m.description].filter(Boolean).map(searchStripMarkdown).join(' — ');
+            if (t) entries.push({ sujetId: id, sujetTitle: cleanTitle, domain, kind: 'block-content', text: t, blockIdx: i, weight: 5 });
+          });
+        }
+      });
+      (s.quiz || []).forEach((q, i) => {
+        if (q && q.q) entries.push({ sujetId: id, sujetTitle: cleanTitle, domain, kind: 'quiz', text: searchStripMarkdown(q.q), quizIdx: i, weight: 4 });
+      });
+      if (s.carte_mentale && Array.isArray(s.carte_mentale.noeuds)) {
+        s.carte_mentale.noeuds.forEach(n => {
+          if (!n) return;
+          if (n.label) entries.push({ sujetId: id, sujetTitle: cleanTitle, domain, kind: 'carte', text: n.label, weight: 6 });
+          if (n.description) entries.push({ sujetId: id, sujetTitle: cleanTitle, domain, kind: 'carte', text: searchStripMarkdown(n.description), weight: 4 });
+        });
+      }
+    });
+    SEARCH_INDEX.entries = entries;
+    SEARCH_INDEX.built = true;
+    return entries;
+  }
+
+  function searchEntries(query, limit) {
+    limit = limit || 30;
+    const q = searchNormalize(query).trim();
+    if (!q) return [];
+    const terms = q.split(/\s+/).filter(Boolean);
+    const entries = buildSearchIndex();
+    const matches = [];
+    entries.forEach(e => {
+      const norm = searchNormalize(e.text);
+      let score = 0, firstHit = Infinity, allMatch = true;
+      for (const t of terms) {
+        const idx = norm.indexOf(t);
+        if (idx < 0) { allMatch = false; break; }
+        score += 1;
+        if (idx === 0 || /\s/.test(norm[idx - 1])) score += 1; // début de mot
+        if (idx < firstHit) firstHit = idx;
+      }
+      if (!allMatch) return;
+      const total = e.weight * 10 + score * 3 - Math.min(firstHit, 200) / 20;
+      matches.push({ entry: e, score: total });
+    });
+    matches.sort((a, b) => b.score - a.score);
+    // Déduplique : un même (sujet, kind, blockIdx) au mieux 1 fois
+    const seen = new Set();
+    const out = [];
+    for (const m of matches) {
+      const k = m.entry.sujetId + '|' + m.entry.kind + '|' + (m.entry.blockIdx ?? '');
+      if (seen.has(k)) continue;
+      seen.add(k);
+      out.push(m);
+      if (out.length >= limit) break;
+    }
+    return out;
+  }
+
+  const SEARCH_KIND_LABEL = {
+    title: 'Sujet', tag: 'Tag', resume: 'Résumé', point: 'Point-clé',
+    'block-title': 'Cours', 'block-content': 'Cours',
+    quiz: 'Quiz', carte: 'Carte mentale'
+  };
+
+  function searchPathFor(entry) {
+    const id = encodeURIComponent(entry.sujetId);
+    switch (entry.kind) {
+      case 'block-title':
+      case 'block-content':
+        return '/sujet/' + id + '/cours/bloc-' + entry.blockIdx;
+      case 'quiz':
+        return '/sujet/' + id + '/quiz';
+      case 'carte':
+        return '/sujet/' + id + '/carte';
+      case 'point':
+      case 'resume':
+      case 'title':
+      case 'tag':
+      default:
+        return '/sujet/' + id + '/resume';
+    }
+  }
+
+  function searchHtmlEscape(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function searchHighlightSnippet(text, query, maxLen) {
+    maxLen = maxLen || 180;
+    const q = searchNormalize(query).trim();
+    if (!q) return searchHtmlEscape(text.slice(0, maxLen));
+    const terms = q.split(/\s+/).filter(Boolean);
+    const norm = searchNormalize(text);
+    const ranges = [];
+    terms.forEach(t => {
+      let pos = 0;
+      while (pos < norm.length) {
+        const idx = norm.indexOf(t, pos);
+        if (idx < 0) break;
+        ranges.push([idx, idx + t.length]);
+        pos = idx + t.length;
+      }
+    });
+    if (ranges.length === 0) return searchHtmlEscape(text.slice(0, maxLen));
+    ranges.sort((a, b) => a[0] - b[0]);
+    const merged = [ranges[0].slice()];
+    for (let i = 1; i < ranges.length; i++) {
+      const last = merged[merged.length - 1];
+      if (ranges[i][0] <= last[1]) last[1] = Math.max(last[1], ranges[i][1]);
+      else merged.push(ranges[i].slice());
+    }
+    // Fenêtre autour du 1er match
+    const first = merged[0];
+    const radius = Math.floor(maxLen / 3);
+    let start = Math.max(0, first[0] - radius);
+    let end = Math.min(text.length, start + maxLen);
+    // Recale aux frontières de mot
+    if (start > 0) {
+      const sp = text.indexOf(' ', start);
+      if (sp >= 0 && sp - start < 20) start = sp + 1;
+    }
+    if (end < text.length) {
+      const sp = text.lastIndexOf(' ', end);
+      if (sp > first[1]) end = sp;
+    }
+    let out = '';
+    if (start > 0) out += '… ';
+    let cursor = start;
+    merged.forEach(r => {
+      if (r[1] <= cursor || r[0] >= end) return;
+      const s = Math.max(cursor, r[0]);
+      const e2 = Math.min(end, r[1]);
+      out += searchHtmlEscape(text.slice(cursor, s));
+      out += '<mark>' + searchHtmlEscape(text.slice(s, e2)) + '</mark>';
+      cursor = e2;
+    });
+    out += searchHtmlEscape(text.slice(cursor, end));
+    if (end < text.length) out += ' …';
+    return out;
+  }
+
+  function openSearchPalette() {
+    if (document.querySelector('.search-palette-backdrop')) return;
+    const backdrop = el('div', { class: 'search-palette-backdrop' });
+    const palette = el('div', { class: 'search-palette' });
+    const input = el('input', {
+      class: 'search-palette-input',
+      type: 'text',
+      placeholder: 'Chercher dans le carnet…',
+      autocomplete: 'off',
+      spellcheck: 'false'
+    });
+    const results = el('div', { class: 'search-palette-results' });
+    const hint = el('div', { class: 'search-palette-hint' }, '↑↓ pour naviguer · Entrée pour ouvrir · Échap pour fermer');
+    palette.appendChild(input);
+    palette.appendChild(results);
+    palette.appendChild(hint);
+    backdrop.appendChild(palette);
+    document.body.appendChild(backdrop);
+
+    let activeIdx = 0;
+    let currentMatches = [];
+
+    function close() {
+      document.removeEventListener('keydown', onKey, true);
+      backdrop.remove();
+    }
+    function goto(m) {
+      if (!m) return;
+      close();
+      navigate(searchPathFor(m.entry));
+    }
+    function renderResults(matches) {
+      clear(results);
+      currentMatches = matches;
+      activeIdx = 0;
+      if (matches.length === 0) {
+        const msg = input.value.trim()
+          ? 'Aucun résultat.'
+          : 'Tape pour chercher : titres, points-clés, cours, quiz, cartes, tags.';
+        results.appendChild(el('div', { class: 'search-palette-empty' }, msg));
+        return;
+      }
+      matches.forEach((m, i) => {
+        const e = m.entry;
+        const dot = el('span', {
+          class: 'search-palette-dot',
+          style: { backgroundColor: domainColor(e.domain) }
+        });
+        const meta = el('div', { class: 'search-palette-meta' },
+          dot,
+          el('span', { class: 'search-palette-sujet' }, e.sujetTitle),
+          el('span', { class: 'search-palette-kind' }, SEARCH_KIND_LABEL[e.kind] || e.kind)
+        );
+        const snippet = el('div', {
+          class: 'search-palette-snippet',
+          html: searchHighlightSnippet(e.text, input.value)
+        });
+        const item = el('div', {
+          class: 'search-palette-item' + (i === 0 ? ' is-active' : ''),
+          onclick: () => goto(m),
+          onmouseenter: () => setActive(i)
+        }, meta, snippet);
+        results.appendChild(item);
+      });
+    }
+    function setActive(idx) {
+      activeIdx = Math.max(0, Math.min(currentMatches.length - 1, idx));
+      const nodes = results.querySelectorAll('.search-palette-item');
+      nodes.forEach((n, i) => n.classList.toggle('is-active', i === activeIdx));
+      const a = nodes[activeIdx];
+      if (a) a.scrollIntoView({ block: 'nearest' });
+    }
+    function onKey(e) {
+      if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(); return; }
+      if (e.key === 'ArrowDown') { e.preventDefault(); setActive(activeIdx + 1); return; }
+      if (e.key === 'ArrowUp')   { e.preventDefault(); setActive(activeIdx - 1); return; }
+      if (e.key === 'Enter')     { e.preventDefault(); goto(currentMatches[activeIdx]); return; }
+    }
+
+    let debounce = null;
+    input.addEventListener('input', () => {
+      if (debounce) clearTimeout(debounce);
+      debounce = setTimeout(() => renderResults(searchEntries(input.value, 30)), 60);
+    });
+    backdrop.addEventListener('click', (e) => { if (e.target === backdrop) close(); });
+    document.addEventListener('keydown', onKey, true);
+    renderResults([]);
+    setTimeout(() => input.focus(), 10);
+  }
+
+  // =================================================================
+  // PARCOURS THÉMATIQUES — chemins guidés à travers plusieurs sujets
+  // =================================================================
+  // Un parcours est un fichier `parcours/{slug}.js` qui s'auto-enregistre
+  // via window.CarnetDeSavoirs.registerParcours({...}).
+  //
+  // Schéma :
+  //   { meta: { id, titre, domaine?, description, duree_estimee_min? },
+  //     etapes: [ { slug, note? }, ... ] }
+  //
+  // L'utilisateur "active" un parcours en cliquant un bouton "Commencer".
+  // L'état { slug, etape } est stocké dans state.user.activeParcours et
+  // un bandeau apparaît au-dessus de la fiche sujet correspondante avec
+  // navigation suivant/précédent et progression.
+
+  function validateParcours(p) {
+    const w = [];
+    const m = p && p.meta;
+    if (!m || typeof m.id !== 'string' || !m.id) { w.push('meta.id manquant'); return w; }
+    if (!/^[a-z0-9-]+$/.test(m.id)) w.push(`meta.id="${m.id}" doit être en kebab-case [a-z0-9-]+`);
+    if (typeof m.titre !== 'string' || !m.titre.trim()) w.push('meta.titre vide');
+    if (!Array.isArray(p.etapes) || p.etapes.length < 2) w.push('etapes : tableau d\'au moins 2 entrées requis');
+    else p.etapes.forEach((e, i) => {
+      if (!e || typeof e.slug !== 'string') w.push(`etapes[${i}].slug manquant`);
+    });
+    return w;
+  }
+
+  CDS.registerParcours = function (data) {
+    if (!data || !data.meta || !data.meta.id) {
+      console.warn('[CarnetDeSavoirs] registerParcours : meta.id manquant', data);
+      return;
+    }
+    const id = data.meta.id;
+    if (state.parcours[id]) {
+      console.warn(`[CarnetDeSavoirs] Doublon de parcours "${id}" — l'ancien sera écrasé.`);
+    }
+    const warnings = validateParcours(data);
+    if (warnings.length) {
+      console.group(`[CarnetDeSavoirs] Parcours "${id}" — ${warnings.length} avertissement(s)`);
+      warnings.forEach(w => console.warn(w));
+      console.groupEnd();
+    }
+    state.parcours[id] = data;
+    if (!state.parcoursOrder.includes(id)) state.parcoursOrder.push(id);
+  };
+
+  function getActiveParcours() {
+    const ap = state.user && state.user.activeParcours;
+    if (!ap || !ap.slug) return null;
+    const p = state.parcours[ap.slug];
+    if (!p) return null;
+    const etape = Math.max(0, Math.min((p.etapes || []).length - 1, ap.etape || 0));
+    return { parcours: p, etape };
+  }
+  function setActiveParcours(slug, etape) {
+    if (!state.user) return;
+    if (slug == null) state.user.activeParcours = null;
+    else state.user.activeParcours = { slug, etape: etape || 0 };
+    saveUserState();
+  }
+
+  // ---- Vue liste des parcours ----
+  function renderParcoursListe(main) {
+    setAccent(null);
+    main.appendChild(el('span', { class: 'eyebrow' }, 'Chemins guidés'));
+    main.appendChild(el('h1', { class: 'page-title', html: 'Parcours <em>thématiques</em>' }));
+    main.appendChild(el('p', { class: 'page-subtitle' },
+      'Plutôt qu\'un sujet isolé, suis un fil — une suite ordonnée de fiches qui se répondent. Tu peux activer un parcours et naviguer dedans avec les boutons suivant / précédent, sans perdre ton accès libre au reste du carnet.'));
+
+    if (state.parcoursOrder.length === 0) {
+      main.appendChild(el('div', { class: 'empty-state' },
+        el('div', { class: 'empty-state-icon' }, '⤳'),
+        el('p', null, 'Pas encore de parcours disponibles.')));
+      return;
+    }
+    const active = getActiveParcours();
+    const grid = el('div', { class: 'parcours-grid' });
+    state.parcoursOrder.forEach(id => {
+      const p = state.parcours[id];
+      if (!p) return;
+      const titreClean = String(p.meta.titre).replace(/<[^>]+>/g, '');
+      const dom = p.meta.domaine || 'Atelier';
+      const color = domainColor(dom);
+      const isActive = active && active.parcours.meta.id === id;
+      const card = el('div', {
+        class: 'parcours-card' + (isActive ? ' is-active-parcours' : ''),
+        style: { '--card-accent': color },
+        onclick: () => navigate('/parcours/' + encodeURIComponent(id))
+      });
+      card.appendChild(el('div', { class: 'parcours-card-eyebrow' }, dom + ' · ' + (p.etapes || []).length + ' étapes'));
+      card.appendChild(el('h3', { class: 'parcours-card-title', html: titreClean }));
+      if (p.meta.description) {
+        card.appendChild(el('p', { class: 'parcours-card-desc', html: md(p.meta.description).replace(/^<p>|<\/p>$/g, '') }));
+      }
+      if (isActive) {
+        card.appendChild(el('div', { class: 'parcours-card-badge' }, 'Parcours en cours · étape ' + (active.etape + 1)));
+      }
+      grid.appendChild(card);
+    });
+    main.appendChild(grid);
+  }
+
+  // ---- Vue détail d'un parcours ----
+  function renderParcoursDetail(main, slug) {
+    const p = state.parcours[slug];
+    if (!p) {
+      main.appendChild(el('p', { class: 'lead' }, 'Parcours introuvable.'));
+      return;
+    }
+    const dom = p.meta.domaine || 'Atelier';
+    setAccent(dom);
+    main.appendChild(el('button', {
+      class: 'back-link',
+      onclick: () => navigate('/parcours')
+    }, el('span', { class: 'nav-icon', html: ICONS.arrowLeft }), el('span', null, 'Tous les parcours')));
+    main.appendChild(el('span', { class: 'eyebrow' }, dom + ' · ' + (p.etapes || []).length + ' étapes'));
+    main.appendChild(el('h1', { class: 'page-title', html: htmlEscapeButKeepEm(p.meta.titre) }));
+    if (p.meta.description) {
+      main.appendChild(el('p', { class: 'page-subtitle', html: md(p.meta.description).replace(/^<p>|<\/p>$/g, '') }));
+    }
+    const active = getActiveParcours();
+    const isThisActive = active && active.parcours.meta.id === slug;
+    const ctaRow = el('div', { class: 'parcours-cta-row' });
+    if (isThisActive) {
+      ctaRow.appendChild(el('button', {
+        class: 'btn primary',
+        onclick: () => {
+          const tgt = p.etapes[active.etape];
+          if (tgt && tgt.slug) navigate('/sujet/' + encodeURIComponent(tgt.slug));
+        }
+      }, 'Reprendre à l\'étape ' + (active.etape + 1)));
+      ctaRow.appendChild(el('button', {
+        class: 'btn',
+        onclick: () => { setActiveParcours(null); navigate('/parcours/' + encodeURIComponent(slug)); }
+      }, 'Quitter ce parcours'));
+    } else {
+      ctaRow.appendChild(el('button', {
+        class: 'btn primary',
+        onclick: () => {
+          setActiveParcours(slug, 0);
+          const first = p.etapes[0];
+          if (first && first.slug) navigate('/sujet/' + encodeURIComponent(first.slug));
+        }
+      }, 'Commencer le parcours'));
+    }
+    main.appendChild(ctaRow);
+
+    const list = el('ol', { class: 'parcours-etapes' });
+    (p.etapes || []).forEach((etape, i) => {
+      const sujet = state.sujets[etape.slug];
+      const li = el('li', { class: 'parcours-etape' });
+      const num = el('span', { class: 'parcours-etape-num' }, String(i + 1));
+      const body = el('div', { class: 'parcours-etape-body' });
+      if (sujet) {
+        const titreClean = String(sujet.meta.titre).replace(/<[^>]+>/g, '');
+        body.appendChild(el('a', {
+          class: 'parcours-etape-title',
+          href: '#/sujet/' + encodeURIComponent(etape.slug),
+          onclick: (e) => {
+            e.preventDefault();
+            if (isThisActive) setActiveParcours(slug, i);
+            else setActiveParcours(slug, i); // active aussi si on entre depuis une étape précise
+            navigate('/sujet/' + encodeURIComponent(etape.slug));
+          },
+          html: htmlEscapeButKeepEm(sujet.meta.titre)
+        }));
+        if (sujet.resume) {
+          body.appendChild(el('p', { class: 'parcours-etape-resume', html: md(sujet.resume).replace(/^<p>|<\/p>$/g, '') }));
+        }
+      } else {
+        body.appendChild(el('span', { class: 'parcours-etape-title parcours-etape-missing' },
+          'Sujet « ' + etape.slug + ' » manquant'));
+      }
+      if (etape.note) {
+        body.appendChild(el('div', { class: 'parcours-etape-note', html: md(etape.note).replace(/^<p>|<\/p>$/g, '') }));
+      }
+      li.appendChild(num);
+      li.appendChild(body);
+      list.appendChild(li);
+    });
+    main.appendChild(list);
+  }
+
+  // ---- Bandeau de parcours actif (au-dessus de la fiche sujet) ----
+  function renderParcoursBanner(container, sujetId) {
+    const active = getActiveParcours();
+    if (!active) return;
+    // Le sujet courant correspond-il à une étape ?
+    const etapes = active.parcours.etapes || [];
+    const idx = etapes.findIndex(e => e && e.slug === sujetId);
+    if (idx < 0) return; // sujet hors parcours : on n'affiche rien (on garde l'état actif intact)
+
+    // Met à jour l'étape courante pour persistance
+    if (idx !== active.etape) setActiveParcours(active.parcours.meta.id, idx);
+
+    const titreClean = String(active.parcours.meta.titre).replace(/<[^>]+>/g, '');
+    const banner = el('div', { class: 'parcours-banner' });
+    const info = el('div', { class: 'parcours-banner-info' },
+      el('span', { class: 'parcours-banner-eyebrow' }, 'Parcours en cours'),
+      el('a', {
+        class: 'parcours-banner-title',
+        href: '#/parcours/' + encodeURIComponent(active.parcours.meta.id),
+        onclick: (e) => { e.preventDefault(); navigate('/parcours/' + encodeURIComponent(active.parcours.meta.id)); }
+      }, titreClean),
+      el('span', { class: 'parcours-banner-progress' }, 'Étape ' + (idx + 1) + ' sur ' + etapes.length)
+    );
+    const nav = el('div', { class: 'parcours-banner-nav' });
+    if (idx > 0) {
+      nav.appendChild(el('button', {
+        class: 'btn',
+        title: 'Étape précédente',
+        onclick: () => navigate('/sujet/' + encodeURIComponent(etapes[idx - 1].slug))
+      }, '← Précédent'));
+    }
+    if (idx < etapes.length - 1) {
+      nav.appendChild(el('button', {
+        class: 'btn primary',
+        title: 'Étape suivante',
+        onclick: () => navigate('/sujet/' + encodeURIComponent(etapes[idx + 1].slug))
+      }, 'Suivant →'));
+    } else {
+      nav.appendChild(el('span', { class: 'parcours-banner-end' }, 'Dernière étape'));
+    }
+    nav.appendChild(el('button', {
+      class: 'btn-ghost',
+      title: 'Quitter ce parcours (garde la fiche ouverte)',
+      onclick: () => { setActiveParcours(null); rerender(); }
+    }, 'Quitter'));
+    banner.appendChild(info);
+    banner.appendChild(nav);
+    // Barre de progression visuelle
+    const bar = el('div', { class: 'parcours-banner-bar' },
+      el('div', { class: 'parcours-banner-bar-fill', style: { width: ((idx + 1) / etapes.length * 100) + '%' } })
+    );
+    banner.appendChild(bar);
+    // Insère en tête du conteneur
+    container.insertBefore(banner, container.firstChild);
+  }
+
+  // =================================================================
+  // TIMELINE GLOBALE — agrégat des Frises de tous les sujets
+  // =================================================================
+  // On parcourt tous les blocs `cours[].composant === 'Frise'` et on
+  // récolte chaque événement avec sa date textuelle. Une heuristique
+  // parseHistoricalDate() convertit ces dates très variées ("1789",
+  // "-301", "Vers -2500", "13,8 Ga", "Janv. 2009", "1900-1917") en une
+  // année numérique. On affiche le tout sur une **échelle logarithmique
+  // de temps écoulé** depuis aujourd'hui, ce qui donne sa place à la
+  // préhistoire cosmique sans écraser l'histoire récente.
+
+  function parseHistoricalDate(s) {
+    if (s == null) return null;
+    const str = String(s).trim();
+    if (!str) return null;
+    // Frontières de mot strictes sur les unités Ga / Ma / ka — sinon
+    // "Ma" matche dans "mars", "Ga" dans "Gaulle", "ka" dans "Kafka".
+    // 13,8 Ga / Gyr / milliards d'années
+    let m = str.match(/(\d+[,.]?\d*)\s*(Ga\b|Gyr\b|G\.\s*a\.|milliards?\s+d['’]ann[ée]es?)/);
+    if (m) return -parseFloat(m[1].replace(',', '.')) * 1e9;
+    // Ma / millions d'années (Ma majuscule strict, ou millions complet)
+    m = str.match(/(\d+[,.]?\d*)\s*Ma\b/);
+    if (m) return -parseFloat(m[1].replace(',', '.')) * 1e6;
+    m = str.match(/(\d+[,.]?\d*)\s*millions?\s+d['’]ann[ée]es?/i);
+    if (m) return -parseFloat(m[1].replace(',', '.')) * 1e6;
+    // ka / milliers d'années
+    m = str.match(/(\d+[,.]?\d*)\s*ka\b/);
+    if (m) return -parseFloat(m[1].replace(',', '.')) * 1e3;
+    m = str.match(/(\d+[,.]?\d*)\s*milliers?\s+d['’]ann[ée]es?/i);
+    if (m) return -parseFloat(m[1].replace(',', '.')) * 1e3;
+    // Plage : "1900-1917" -> milieu
+    m = str.match(/^[~≈\s]*(-?\d{1,5})\s*[–\-]\s*(-?\d{1,5})\s*$/);
+    if (m) return (parseInt(m[1], 10) + parseInt(m[2], 10)) / 2;
+    // Plage "av. J.-C." : "300-200 av. J.-C." -> milieu négatif
+    m = str.match(/^(\d{1,5})\s*[–\-]\s*(\d{1,5})\s*av/i);
+    if (m) return -((parseInt(m[1], 10) + parseInt(m[2], 10)) / 2);
+    // Année négative directe : "-301" / "Vers -2500"
+    m = str.match(/-\s*(\d{1,8})\b/);
+    if (m && !/après|ap\./i.test(str)) return -parseInt(m[1], 10);
+    // "300 av. J.-C." / "av JC"
+    m = str.match(/(\d{1,5})\s*av\.?\s*J?\.?-?C?\.?/i);
+    if (m) return -parseInt(m[1], 10);
+    // Siècle : "XIIe siècle", "Xe siècle av. J.-C."
+    m = str.match(/([IVXLCM]+)\s*[èe]?\s*si[èe]cle(?:\s+av\.?\s*J?\.?-?C?\.?)?/i);
+    if (m) {
+      const roman = m[1].toUpperCase();
+      const map = { I:1, V:5, X:10, L:50, C:100, D:500, M:1000 };
+      let val = 0, prev = 0;
+      for (let i = roman.length - 1; i >= 0; i--) {
+        const v = map[roman[i]] || 0;
+        if (v < prev) val -= v; else { val += v; prev = v; }
+      }
+      const isBC = /av\.?\s*J/i.test(str);
+      // siècle N → milieu = (N-1)*100 + 50, ex. XIIe → 1150
+      const mid = (val - 1) * 100 + 50;
+      return isBC ? -mid : mid;
+    }
+    // Année 1 à 4 chiffres simple : "1789", "1963" (4 chiffres en priorité)
+    m = str.match(/\b(\d{4})\b/);
+    if (m) return parseInt(m[1], 10);
+    m = str.match(/\b(\d{3})\b/);
+    if (m) return parseInt(m[1], 10);
+    return null;
+  }
+
+  function collectTimelineEvents() {
+    const events = [];
+    state.sujetsOrder.forEach(id => {
+      const s = state.sujets[id];
+      if (!s || !Array.isArray(s.cours)) return;
+      const sujetTitle = String(s.meta.titre || id).replace(/<[^>]+>/g, '');
+      const dom = (s.meta.domaines || ['Autre'])[0];
+      s.cours.forEach((b, bi) => {
+        if (!b || b.type !== 'widget' || b.composant !== 'Frise') return;
+        const evs = (b.params && b.params.evenements) || [];
+        evs.forEach(ev => {
+          if (!ev || !ev.titre) return;
+          const yr = parseHistoricalDate(ev.date);
+          if (yr == null) return;
+          events.push({
+            year: yr,
+            dateLabel: String(ev.date || '').trim(),
+            title: searchStripMarkdown(ev.titre),
+            desc: ev.description ? searchStripMarkdown(ev.description) : '',
+            sujetId: id,
+            sujetTitle,
+            domain: dom,
+            blockIdx: bi
+          });
+        });
+      });
+    });
+    return events;
+  }
+
+  // Conversion année → position sur l'axe log [0..1]. On utilise log(1 + |years_ago|)
+  // pour aplatir uniformément depuis aujourd'hui jusqu'à -13.8 Ga.
+  function timelineLogPos(year, refYear, maxLog) {
+    const yearsAgo = refYear - year;
+    if (yearsAgo <= 0) return 1;
+    return 1 - Math.log10(1 + yearsAgo) / maxLog;
+  }
+
+  function renderTimelineGlobale(main) {
+    setAccent(null);
+    main.appendChild(el('span', { class: 'eyebrow' }, 'Tout le savoir, à l\'échelle du temps'));
+    main.appendChild(el('h1', { class: 'page-title', html: 'Timeline <em>globale</em>' }));
+    main.appendChild(el('p', { class: 'page-subtitle' },
+      'Tous les événements datés extraits des frises de tous les sujets, projetés sur une échelle logarithmique du temps écoulé. Du Big Bang à aujourd\'hui, chaque point est cliquable et te ramène à sa fiche d\'origine.'));
+
+    const events = collectTimelineEvents();
+    if (events.length === 0) {
+      main.appendChild(el('div', { class: 'empty-state' },
+        el('div', { class: 'empty-state-icon' }, '⌛'),
+        el('p', null, 'Aucun événement daté pour le moment (les frises des sujets sont vides ou non datées).')));
+      return;
+    }
+
+    // ---- Toolbar : filtre par domaine + sélecteur de période ----
+    const domains = Array.from(new Set(events.map(e => e.domain))).sort();
+    const toolbar = el('div', { class: 'timeline-toolbar' });
+
+    // Sélecteur de période : adapte le range temporel ET l'échelle (log/lin).
+    // "Cosmique" affiche l'intégralité (log) — du Big Bang à aujourd'hui.
+    // Les autres sont des zooms linéaires sur les dernières fenêtres.
+    const NOW = new Date().getFullYear();
+    const PERIODS = [
+      { key: 'cosmique',    label: 'Cosmique (toute l\'histoire)',     scale: 'log',    minY: null,         maxY: NOW },
+      { key: 'humanite',    label: 'Humanité (50 000 ans)',            scale: 'log',    minY: NOW - 50000,  maxY: NOW },
+      { key: 'civilisation',label: 'Civilisations (5000 ans)',         scale: 'linear', minY: NOW - 5000,   maxY: NOW },
+      { key: 'moderne',     label: 'Moderne (1500 → aujourd\'hui)',    scale: 'linear', minY: 1500,         maxY: NOW },
+      { key: 'contemporain',label: 'Contemporain (1900 → aujourd\'hui)', scale: 'linear', minY: 1900,       maxY: NOW }
+    ];
+    const periodSel = el('select', { class: 'timeline-domain-select' });
+    PERIODS.forEach(p => periodSel.appendChild(el('option', { value: p.key }, p.label)));
+    toolbar.appendChild(periodSel);
+
+    const domSel = el('select', { class: 'timeline-domain-select' });
+    domSel.appendChild(el('option', { value: '' }, 'Tous les domaines (' + events.length + ')'));
+    domains.forEach(d => {
+      const count = events.filter(e => e.domain === d).length;
+      domSel.appendChild(el('option', { value: d }, d + ' (' + count + ')'));
+    });
+    toolbar.appendChild(domSel);
+
+    // Hint discret sur l'interaction
+    toolbar.appendChild(el('span', { class: 'timeline-hint' },
+      'Molette pour zoomer · glisser pour panner · clic sur un cluster pour lister'));
+    main.appendChild(toolbar);
+
+    // ---- Construction SVG + tooltip persistant ----
+    const wrap = el('div', { class: 'timeline-wrap' });
+    main.appendChild(wrap);
+    const tooltip = el('div', { class: 'timeline-tooltip' });
+    wrap.appendChild(tooltip);
+
+    // État pan/zoom (panX en unités viewBox, scale 1..N)
+    let panX = 0, scale = 1, pinnedKey = null;
+    let isDragging = false, dragStartScreenX = 0, dragViewBoxScale = 1, dragLiveDx = 0;
+
+    // Constantes layout (utilisées aussi par les handlers de pan/zoom)
+    const W = 1900, H = 620, padX = 70, padY = 30;
+    const axisY = H - 50;
+
+    function render(period, filterDomain) {
+      const P = PERIODS.find(p => p.key === period) || PERIODS[0];
+      // Filtre événements selon période et domaine
+      let filtered = events;
+      if (P.minY != null) filtered = filtered.filter(e => e.year >= P.minY);
+      if (P.maxY != null) filtered = filtered.filter(e => e.year <= P.maxY);
+      if (filterDomain) filtered = filtered.filter(e => e.domain === filterDomain);
+
+      // Bornes effectives pour le calcul d'axe (cosmique = bornes data)
+      const effMin = P.minY != null ? P.minY : (filtered.length ? Math.min(...filtered.map(e => e.year)) : NOW - 1);
+      const effMax = P.maxY != null ? P.maxY : NOW;
+      const maxLog = Math.log10(1 + Math.max(1, (effMax - effMin)));
+
+      // xLogical : position dans le repère NON zoomé [padX, W-padX]
+      function xLogical(year) {
+        if (P.scale === 'log') {
+          const yearsAgo = effMax - year;
+          if (yearsAgo <= 0) return W - padX;
+          const t = Math.log10(1 + yearsAgo) / maxLog;
+          return padX + (1 - t) * (W - 2 * padX);
+        } else {
+          const t = (year - effMin) / Math.max(1, (effMax - effMin));
+          return padX + t * (W - 2 * padX);
+        }
+      }
+      // xFor : position après application du pan/zoom — calculée EN AMONT
+      // au rendu, pas via une transform SVG (sinon les glyphes et dots
+      // deviennent ovales et illisibles aux forts zooms).
+      function xFor(year) {
+        return padX + (xLogical(year) - padX) * scale + panX;
+      }
+
+      // ---- Bornes visibles à l'écran (en années) ----
+      // Permet de générer des graduations adaptatives au zoom courant.
+      function yearAtXDisplay(xd) {
+        const xLog = (xd - panX - padX) / scale + padX;
+        if (P.scale === 'log') {
+          const tNorm = (xLog - padX) / (W - 2 * padX);
+          const yearsAgo = Math.pow(10, maxLog * (1 - tNorm)) - 1;
+          return effMax - yearsAgo;
+        } else {
+          const t = (xLog - padX) / (W - 2 * padX);
+          return effMin + t * (effMax - effMin);
+        }
+      }
+      const visMinYear = Math.max(effMin, yearAtXDisplay(padX));
+      const visMaxYear = Math.min(effMax, yearAtXDisplay(W - padX));
+
+      // ---- Graduations adaptatives au zoom ----
+      let ticks = [];
+      if (P.scale === 'log') {
+        // Génère des ticks à des "puissances de 1, 2, 5" pour l'écart en
+        // années depuis aujourd'hui. Ne garde que ceux dans le range visible.
+        const candidates = [
+          [0, 'Aujourd\'hui'],
+          [1, 'Il y a 1 an'], [2, '2 ans'], [5, '5 ans'],
+          [10, '10 ans'], [20, '20 ans'], [50, '50 ans'],
+          [100, 'Il y a un siècle'], [200, '200 ans'], [500, '500 ans'],
+          [1000, '1000 ans'], [2000, '2000 ans'], [5000, '5000 ans'],
+          [10000, '10 000 ans'], [20000, '20 ka'], [50000, '50 ka'],
+          [100000, '100 ka'], [200000, '200 ka'], [500000, '500 ka'],
+          [1e6, '1 Ma'], [2e6, '2 Ma'], [5e6, '5 Ma'],
+          [1e7, '10 Ma'], [2e7, '20 Ma'], [5e7, '50 Ma'],
+          [1e8, '100 Ma'], [2e8, '200 Ma'], [5e8, '500 Ma'],
+          [1e9, '1 Ga'], [2e9, '2 Ga'], [5e9, '5 Ga'], [1e10, '10 Ga']
+        ];
+        candidates.forEach(([yearsAgo, label]) => {
+          const y = NOW - yearsAgo;
+          if (y >= visMinYear && y <= visMaxYear) ticks.push({ year: y, label });
+        });
+        // Si on a vraiment trop de ticks à fort zoom (range étroit log), on filtre
+        if (ticks.length > 14) ticks = ticks.filter((_, i) => i % 2 === 0);
+      } else {
+        // Linéaire : pas adaptatif sur le SPAN VISIBLE (pas le span total)
+        const visibleSpan = Math.max(1, visMaxYear - visMinYear);
+        let step;
+        if (visibleSpan <= 4)      step = 1;
+        else if (visibleSpan <= 12)   step = 2;
+        else if (visibleSpan <= 30)   step = 5;
+        else if (visibleSpan <= 80)   step = 10;
+        else if (visibleSpan <= 200)  step = 25;
+        else if (visibleSpan <= 600)  step = 100;
+        else if (visibleSpan <= 2000) step = 250;
+        else if (visibleSpan <= 6000) step = 1000;
+        else step = 2500;
+        const start = Math.ceil(visMinYear / step) * step;
+        for (let y = start; y <= visMaxYear; y += step) {
+          const label = y < 0 ? Math.abs(y) + ' av. J.-C.' : (y === NOW ? 'Aujourd\'hui' : String(y));
+          ticks.push({ year: y, label });
+        }
+      }
+
+      // ---- Filtre "visible à l'écran" — gain de perf MASSIF au zoom ----
+      // Au scale=20 on ne dessine que ~5% des événements ; on évite
+      // d'écrire ~10 000 lignes de SVG inutiles.
+      const visMargin = 40;
+      const visFiltered = filtered.filter(e => {
+        const xd = xFor(e.year);
+        return xd >= padX - visMargin && xd <= W - padX + visMargin;
+      });
+
+      // ---- Clustering en COORDONNÉES DISPLAY (pas logiques) ----
+      // Comme ça, plus on zoome, plus les clusters se séparent naturellement.
+      // QUANTUM constant en pixels (display) = 6.
+      const sortedByX = visFiltered.map(e => ({ ev: e, x: xFor(e.year) }))
+        .sort((a, b) => a.x - b.x);
+      const QUANTUM = 6;
+      const clusters = [];
+      let cur = null;
+      sortedByX.forEach(item => {
+        if (cur && (item.x - cur.lastX) < QUANTUM) {
+          cur.events.push(item.ev);
+          cur.sumX += item.x;
+          cur.lastX = item.x;
+        } else {
+          cur = { events: [item.ev], sumX: item.x, lastX: item.x };
+          clusters.push(cur);
+        }
+      });
+      clusters.forEach(c => { c.x = c.sumX / c.events.length; });
+
+      // Couleur du cluster : majoritaire dans le cluster (sinon accent)
+      function clusterColor(c) {
+        const counts = {};
+        c.events.forEach(e => { counts[e.domain] = (counts[e.domain] || 0) + 1; });
+        let best = null, bestN = 0;
+        Object.keys(counts).forEach(d => { if (counts[d] > bestN) { bestN = counts[d]; best = d; } });
+        return domainColor(best || 'Autre');
+      }
+
+      // ---- Facteur d'agrandissement visuel selon le zoom ----
+      // Plus on zoome, plus on a la place d'agrandir dots, labels et écart
+      // vertical pour mieux lire. Log-scaling, capé à 3× la base.
+      const visualScale = Math.min(3, 1 + Math.log10(Math.max(1, scale)) * 0.55);
+      const labelFontPx = Math.min(24, Math.round(10 * visualScale));
+      const countFontPx = Math.min(20, Math.round(9 * visualScale));
+      const labelMaxChars = Math.round(Math.min(60, 26 * Math.min(2.5, visualScale * 1.1)));
+
+      // ---- Placement vertical des clusters ----
+      const placed = [];
+      const minDX = Math.round(22 * Math.min(2, visualScale));     // distance horizontale aussi un peu plus large au zoom
+      const rowH = Math.round(24 * visualScale);
+      const maxRows = Math.max(3, Math.floor((axisY - padY) / rowH));
+      clusters.forEach(c => {
+        let row = 0;
+        while (row < maxRows) {
+          const conflict = placed.some(p => p.row === row && Math.abs(p.x - c.x) < minDX);
+          if (!conflict) break;
+          row++;
+        }
+        if (row >= maxRows) row = placed.length % maxRows;
+        placed.push({ c, x: c.x, row });
+      });
+
+      // Labels : seulement si l'événement a assez de libre sur le rang
+      const LABEL_CLEAR_DX = Math.round(100 * Math.min(2, visualScale));
+      placed.forEach(p => {
+        let clearLeft = true, clearRight = true;
+        for (const o of placed) {
+          if (o === p || o.row !== p.row) continue;
+          if (o.x < p.x && (p.x - o.x) < LABEL_CLEAR_DX) clearLeft = false;
+          if (o.x > p.x && (o.x - p.x) < LABEL_CLEAR_DX) clearRight = false;
+          if (!clearLeft && !clearRight) break;
+        }
+        p.showLabel = clearLeft && clearRight;
+      });
+
+      // ---- Émet le SVG ----
+      function attrEsc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+      let svgInner = '';
+      // Axe + ticks
+      svgInner += `<line class="timeline-axis" x1="${padX}" y1="${axisY}" x2="${W - padX}" y2="${axisY}"/>`;
+      ticks.forEach(t => {
+        const x = xFor(t.year);
+        if (x < padX - 1 || x > W - padX + 1) return;
+        svgInner += `<line class="timeline-tick" x1="${x.toFixed(1)}" y1="${axisY - 6}" x2="${x.toFixed(1)}" y2="${axisY + 6}"/>`;
+        svgInner += `<text class="timeline-tick-label" x="${x.toFixed(1)}" y="${axisY + 24}" text-anchor="middle">${attrEsc(t.label)}</text>`;
+      });
+
+      // Clusters
+      placed.forEach((p, i) => {
+        const c = p.c;
+        const col = clusterColor(c);
+        const y = axisY - 10 - p.row * rowH;
+        const n = c.events.length;
+        // Dot radius : base 3.5 × visualScale, augmenté par count
+        const r = Math.min(18, 3.5 * visualScale + Math.log2(1 + n) * 1.8);
+        svgInner += `<line class="timeline-stem" x1="${p.x.toFixed(1)}" y1="${axisY}" x2="${p.x.toFixed(1)}" y2="${(y + r).toFixed(1)}" style="stroke:${col}"/>`;
+        svgInner += `<g class="timeline-evt" data-idx="${i}" style="--evt-color:${col}">`;
+        svgInner += `<circle class="timeline-hit" cx="${p.x.toFixed(1)}" cy="${(y + r).toFixed(1)}" r="${(r + 6).toFixed(1)}"/>`;
+        svgInner += `<circle class="timeline-dot" cx="${p.x.toFixed(1)}" cy="${(y + r).toFixed(1)}" r="${r.toFixed(1)}"/>`;
+        if (n > 1) {
+          svgInner += `<text class="timeline-evt-count" x="${p.x.toFixed(1)}" y="${(y + r + 1).toFixed(1)}" text-anchor="middle" dominant-baseline="middle" style="font-size:${countFontPx}px">${n}</text>`;
+        }
+        if (p.showLabel) {
+          const headline = n === 1 ? c.events[0].title : (n + ' événements');
+          let labelTxt = headline.length > labelMaxChars ? headline.slice(0, labelMaxChars - 1) + '…' : headline;
+          const anchor = p.x < padX + 60 ? 'start' : (p.x > W - padX - 60 ? 'end' : 'middle');
+          // Le label monte un peu plus haut quand il est gros pour ne pas
+          // se coller au dot agrandi.
+          const labelY = y - 4 - Math.max(0, (visualScale - 1) * 4);
+          svgInner += `<text class="timeline-evt-label" x="${p.x.toFixed(1)}" y="${labelY.toFixed(1)}" text-anchor="${anchor}" style="font-size:${labelFontPx}px">${attrEsc(labelTxt)}</text>`;
+        }
+        svgInner += `</g>`;
+      });
+
+      // Le <g class="timeline-viewport"> est conservé pour le pan en vol :
+      // pendant un drag on lui applique translate(dx,0) en pixels display
+      // (pas de scale, donc pas d'étirement de glyphes).
+      let svg = `<svg class="timeline-svg" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">`;
+      svg += `<g class="timeline-viewport" transform="translate(0,0)">${svgInner}</g>`;
+      svg += `</svg>`;
+
+      wrap.innerHTML = '';
+      wrap.appendChild(tooltip);
+      const svgWrap = document.createElement('div');
+      svgWrap.className = 'timeline-svg-wrap';
+      svgWrap.innerHTML = svg;
+      wrap.appendChild(svgWrap);
+
+      // ---- Interactivité clusters ----
+      function renderTooltipFor(cluster, pos, pin) {
+        const evs = cluster.events;
+        const col = clusterColor(cluster);
+        let html = '';
+        if (evs.length === 1) {
+          const e = evs[0];
+          html =
+            `<div class="timeline-tt-date">${searchHtmlEscape(e.dateLabel)}</div>` +
+            `<div class="timeline-tt-title">${searchHtmlEscape(e.title)}</div>` +
+            (e.desc ? `<div class="timeline-tt-desc">${searchHtmlEscape(e.desc)}</div>` : '') +
+            `<div class="timeline-tt-source">${searchHtmlEscape(e.sujetTitle)} · ${searchHtmlEscape(e.domain)}</div>` +
+            `<div class="timeline-tt-cta">Cliquer pour ouvrir la fiche →</div>`;
+        } else {
+          // Plusieurs événements : liste cliquable
+          const dates = Array.from(new Set(evs.map(e => e.dateLabel))).join(' · ');
+          html =
+            `<div class="timeline-tt-date">${searchHtmlEscape(dates)} · ${evs.length} événements</div>` +
+            `<div class="timeline-tt-list">` +
+            evs.slice(0, 12).map((e, k) =>
+              `<a class="timeline-tt-item" data-evt-idx="${k}" style="--evt-color:${domainColor(e.domain)}">` +
+                `<span class="timeline-tt-item-dot"></span>` +
+                `<span class="timeline-tt-item-text"><strong>${searchHtmlEscape(e.title)}</strong>` +
+                `<span class="timeline-tt-item-sub">${searchHtmlEscape(e.sujetTitle)} · ${searchHtmlEscape(e.domain)}</span></span>` +
+              `</a>`
+            ).join('') +
+            (evs.length > 12 ? `<div class="timeline-tt-more">+ ${evs.length - 12} autres</div>` : '') +
+            `</div>` +
+            `<div class="timeline-tt-cta">Cliquer un événement pour ouvrir sa fiche</div>`;
+        }
+        tooltip.innerHTML = html;
+        tooltip.style.setProperty('--tt-color', col);
+        tooltip.classList.add('is-visible');
+        tooltip.classList.toggle('is-pinned', !!pin);
+
+        // Positionnement : centré horizontalement sous le cluster, et
+        // clampé pour rester intégralement dans le wrap visible (max 92%
+        // de la hauteur dispo, scroll interne si plus long).
+        const TTW = pin && evs.length > 1 ? 340 : 300;
+        const margin = 10;
+        // Ajuste la max-height pour rester dans le cadre, peu importe la
+        // position du cluster verticalement.
+        const maxH = Math.max(120, pos.wRect.height - 2 * margin);
+        tooltip.style.maxHeight = maxH + 'px';
+
+        // Ouverture vers le bas si le cluster est en haut du wrap, sinon
+        // vers le haut. Ça évite que le tooltip dépasse le cadre.
+        const ttHeightEstimate = Math.min(maxH, tooltip.scrollHeight || 200);
+        let top;
+        if (pos.cy < ttHeightEstimate + margin + 20) {
+          // pas la place au-dessus → ouvre en dessous
+          top = pos.cy + 24;
+        } else {
+          // assez de place au-dessus
+          top = pos.cy - ttHeightEstimate - 12;
+        }
+        top = Math.max(margin, Math.min(pos.wRect.height - ttHeightEstimate - margin, top));
+        let left = pos.cx - TTW / 2;
+        left = Math.max(margin, Math.min(pos.wRect.width - TTW - margin, left));
+        tooltip.style.left = left + 'px';
+        tooltip.style.top = top + 'px';
+
+        // Wire les liens des événements (mode multi)
+        if (evs.length > 1) {
+          tooltip.querySelectorAll('.timeline-tt-item').forEach((a) => {
+            const k = parseInt(a.getAttribute('data-evt-idx'), 10);
+            a.addEventListener('click', (e) => {
+              e.preventDefault(); e.stopPropagation();
+              const ev = evs[k];
+              if (!ev) return;
+              navigate('/sujet/' + encodeURIComponent(ev.sujetId) + '/cours/bloc-' + ev.blockIdx);
+            });
+          });
+        }
+      }
+
+      svgWrap.querySelectorAll('.timeline-evt').forEach(g => {
+        const idx = parseInt(g.getAttribute('data-idx'), 10);
+        const p = placed[idx];
+        if (!p) return;
+        g.addEventListener('mouseenter', () => {
+          if (pinnedKey) return;       // ne pas overrider un tooltip épinglé
+          const rect = g.getBoundingClientRect();
+          const wRect = wrap.getBoundingClientRect();
+          renderTooltipFor(p.c, {
+            cx: rect.left + rect.width / 2 - wRect.left,
+            cy: rect.top - wRect.top,
+            wRect
+          }, false);
+        });
+        g.addEventListener('mouseleave', () => {
+          if (pinnedKey) return;
+          tooltip.classList.remove('is-visible');
+        });
+        g.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (p.c.events.length === 1) {
+            const ev = p.c.events[0];
+            navigate('/sujet/' + encodeURIComponent(ev.sujetId) + '/cours/bloc-' + ev.blockIdx);
+            return;
+          }
+          // Cluster : épingle le tooltip
+          const rect = g.getBoundingClientRect();
+          const wRect = wrap.getBoundingClientRect();
+          pinnedKey = idx;
+          renderTooltipFor(p.c, {
+            cx: rect.left + rect.width / 2 - wRect.left,
+            cy: rect.top - wRect.top,
+            wRect
+          }, true);
+        });
+      });
+    }
+
+    // Click ailleurs dans le wrap : retire épingle
+    wrap.addEventListener('click', (e) => {
+      if (e.target.closest('.timeline-evt')) return;
+      if (e.target.closest('.timeline-tooltip')) return;
+      pinnedKey = null;
+      tooltip.classList.remove('is-visible');
+      tooltip.classList.remove('is-pinned');
+    });
+
+    // ---- PAN/ZOOM ----
+    // Stratégie :
+    // - WHEEL = zoom : recalcule scale + panX (pour ancrer le curseur),
+    //   puis full re-render. Le scale n'est PAS appliqué via transform SVG
+    //   (sinon glyphes/dots se déformeraient).
+    // - DRAG = pan : pendant le drag on déplace le groupe via translate(dx,0)
+    //   en PIXELS DISPLAY (pas de scale), donc pas d'étirement et c'est
+    //   très fluide. Au mouseup, on commit dx dans panX et on re-render
+    //   pour recalculer le clustering au nouveau pan.
+    // - On utilise requestAnimationFrame pour throttler les renders au wheel,
+    //   sinon on rebuild le SVG 60 fois/sec pour rien.
+    let wheelRafId = null;
+    let pendingWheel = null;
+
+    function applyWheelZoom() {
+      wheelRafId = null;
+      if (!pendingWheel) return;
+      const { clientX, deltaY } = pendingWheel;
+      pendingWheel = null;
+      const svgEl = wrap.querySelector('.timeline-svg');
+      if (!svgEl) return;
+      const ctm = svgEl.getScreenCTM();
+      if (!ctm) return;
+      const pt = svgEl.createSVGPoint();
+      pt.x = clientX; pt.y = 0;
+      const local = pt.matrixTransform(ctm.inverse()).x;  // x du curseur en repère viewBox
+      const factor = deltaY < 0 ? 1.2 : (1 / 1.2);
+      // Zoom jusqu'à 500× : sur Moderne (~526 ans) ça équivaut à ~1 année
+      // visible plein écran, suffisant pour isoler n'importe quelle date.
+      const newScale = Math.max(1, Math.min(500, scale * factor));
+      if (Math.abs(newScale - scale) < 0.005) return;
+      // Garde le point sous le curseur stable : on veut xFor_new(year_at_cursor) = local
+      // Comme xFor = padX + (xLogical - padX) * scale + panX,
+      // year_at_cursor a xLogical = (local - panX - padX) / scale + padX
+      // → newPanX = local - padX - ((local - panX - padX) / scale) * newScale
+      const xLogCursor = (local - panX - padX) / scale + padX;
+      panX = local - padX - (xLogCursor - padX) * newScale;
+      scale = newScale;
+      // Clamp pan
+      const minPan = (W - 2 * padX) * (1 - scale);
+      panX = Math.max(minPan, Math.min(0, panX));
+      pinnedKey = null;
+      tooltip.classList.remove('is-visible');
+      render(periodSel.value, domSel.value);
+    }
+
+    wrap.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      pendingWheel = { clientX: e.clientX, deltaY: e.deltaY };
+      if (wheelRafId == null) wheelRafId = requestAnimationFrame(applyWheelZoom);
+    }, { passive: false });
+
+    let dragActuallyMoved = false;
+    wrap.addEventListener('mousedown', (e) => {
+      if (e.button !== 0) return;
+      if (e.target.closest('.timeline-tooltip')) return;
+      if (e.target.closest('select')) return;
+      const svgEl = wrap.querySelector('.timeline-svg');
+      if (!svgEl) return;
+      const ctm = svgEl.getScreenCTM();
+      if (!ctm || !ctm.a) return;
+      isDragging = true;
+      dragStartScreenX = e.clientX;
+      dragViewBoxScale = 1 / ctm.a;
+      dragLiveDx = 0;
+      dragActuallyMoved = false;
+      // On NE change rien visuellement tant que la souris n'a pas bougé d'au
+      // moins quelques pixels. Comme ça un simple clic sur un dot ne
+      // déclenche pas un re-render qui détruirait son DOM avant que le
+      // click handler ne fire.
+    });
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      const screenDx = e.clientX - dragStartScreenX;
+      if (!dragActuallyMoved) {
+        if (Math.abs(screenDx) < 3) return;     // tolérance click vs drag
+        dragActuallyMoved = true;
+        wrap.classList.add('is-panning');
+        pinnedKey = null;
+        tooltip.classList.remove('is-visible');
+      }
+      dragLiveDx = screenDx * dragViewBoxScale;
+      const g = wrap.querySelector('.timeline-viewport');
+      if (g) g.setAttribute('transform', `translate(${dragLiveDx},0)`);
+    });
+    window.addEventListener('mouseup', () => {
+      if (!isDragging) return;
+      isDragging = false;
+      if (!dragActuallyMoved) {
+        // Pas de drag réel — c'était un click, on laisse le click handler
+        // du dot s'exécuter sans re-render.
+        return;
+      }
+      wrap.classList.remove('is-panning');
+      panX += dragLiveDx;
+      const minPan = (W - 2 * padX) * (1 - scale);
+      panX = Math.max(minPan, Math.min(0, panX));
+      dragLiveDx = 0;
+      dragActuallyMoved = false;
+      render(periodSel.value, domSel.value);
+    });
+
+    // Init : période par défaut = moderne (la plus utile vu la densité)
+    periodSel.value = 'moderne';
+    render('moderne', '');
+    periodSel.addEventListener('change', () => {
+      panX = 0; scale = 1;
+      pinnedKey = null;
+      tooltip.classList.remove('is-visible');
+      render(periodSel.value, domSel.value);
+    });
+    domSel.addEventListener('change', () => {
+      pinnedKey = null;
+      tooltip.classList.remove('is-visible');
+      render(periodSel.value, domSel.value);
+    });
   }
 
   // =================================================================
@@ -5662,10 +6864,18 @@
         return;
       }
 
+      // Raccourci global Ctrl/Cmd + K : ouvre la palette de recherche.
+      // Doit fonctionner aussi depuis un champ de saisie (UX standard).
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
+        e.preventDefault();
+        openSearchPalette();
+        return;
+      }
+
       // Les autres raccourcis sont désactivés quand on tape dans un champ
       if (isFormField) return;
 
-      // Modificateurs : on n'intercepte pas les Ctrl/Cmd/Alt
+      // Modificateurs : on n'intercepte pas les autres Ctrl/Cmd/Alt
       if (e.ctrlKey || e.metaKey || e.altKey) return;
 
       const route = parseHash();
