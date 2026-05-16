@@ -227,7 +227,7 @@
     });
 
     // ---- cours ----
-    const VALID_BLOCK_TYPES = ['texte', 'encadre', 'widget', 'html_libre'];
+    const VALID_BLOCK_TYPES = ['texte', 'encadre', 'widget', 'html_libre', 'mini-quiz'];
     const VALID_WIDGETS = Object.keys(WIDGETS);
     if (s.cours != null) {
       if (!Array.isArray(s.cours)) {
@@ -493,6 +493,78 @@
   // VIEW: BIBLIOTHÈQUE
   // =================================================================
 
+  // ---- Découverte du jour : pioche pondérée par "jamais ouvert" + "cité
+  //      par des sujets que tu as ouverts". Excluding le pick précédent
+  //      pour que "Une autre" donne effectivement quelque chose de nouveau.
+  let _lastDiscoveryPick = null;
+  function pickDiscoverySujet() {
+    if (state.sujetsOrder.length < 5) return null;
+    const opened = new Set();
+    state.sujetsOrder.forEach(id => {
+      const p = state.user.progress[id];
+      if (p && p.visited) opened.add(id);
+    });
+    const scores = [];
+    state.sujetsOrder.forEach(id => {
+      const s = state.sujets[id];
+      if (!s) return;
+      if (id === _lastDiscoveryPick) return; // évite de re-piocher le même
+      let score = 1;
+      if (!opened.has(id)) score += 10;
+      opened.forEach(openedId => {
+        const o = state.sujets[openedId];
+        if (!o) return;
+        if (Array.isArray(o.meta.lie_a) && o.meta.lie_a.includes(id)) score += 3;
+      });
+      // Jitter pour briser les égalités sans en faire un tirage trop chaotique
+      score += Math.random() * 1.5;
+      scores.push({ id, score });
+    });
+    if (scores.length === 0) return null;
+    scores.sort((a, b) => b.score - a.score);
+    const top = scores.slice(0, Math.min(5, scores.length));
+    const picked = top[Math.floor(Math.random() * top.length)];
+    _lastDiscoveryPick = picked.id;
+    return picked.id;
+  }
+
+  function renderDiscoveryWidget(main, sujets) {
+    if (sujets.length < 5) return;
+    const pickedId = pickDiscoverySujet();
+    if (!pickedId) return;
+    const s = state.sujets[pickedId];
+    if (!s) return;
+    const dom = (s.meta.domaines || ['Autre'])[0];
+    const c = domainColor(dom);
+    const opened = !!(state.user.progress[pickedId] && state.user.progress[pickedId].visited);
+    const wrap = el('div', { class: 'discovery-widget', style: { '--card-accent': c } });
+    wrap.appendChild(el('span', { class: 'discovery-eyebrow' },
+      (opened ? 'Replonger dans · ' : 'Sujet à découvrir · ') + dom));
+    wrap.appendChild(el('a', {
+      class: 'discovery-title',
+      href: '#/sujet/' + encodeURIComponent(pickedId),
+      html: htmlEscapeButKeepEm(s.meta.titre)
+    }));
+    if (s.resume) {
+      wrap.appendChild(el('p', {
+        class: 'discovery-resume',
+        html: md(s.resume).replace(/^<p>|<\/p>$/g, '')
+      }));
+    }
+    const btnRow = el('div', { class: 'discovery-btn-row' });
+    btnRow.appendChild(el('a', {
+      class: 'btn primary',
+      href: '#/sujet/' + encodeURIComponent(pickedId)
+    }, 'Ouvrir cette fiche →'));
+    btnRow.appendChild(el('button', {
+      class: 'btn-ghost',
+      title: 'Pioche un autre sujet',
+      onclick: () => { rerender(); }
+    }, 'Surprends-moi encore'));
+    wrap.appendChild(btnRow);
+    main.appendChild(wrap);
+  }
+
   function renderBibliotheque(main) {
     const sujets = state.sujetsOrder.map(id => state.sujets[id]);
 
@@ -535,6 +607,11 @@
       }
       main.appendChild(banner);
     }
+
+    // ---- Découverte du jour ----
+    // N'apparaît que si on a au moins 5 sujets et que l'utilisateur a ouvert
+    // au moins 1 fiche (sinon, pas grand-chose à exploiter pour pondérer).
+    renderDiscoveryWidget(main, sujets);
 
     // Recherche
     const searchInput = el('input', {
@@ -811,7 +888,14 @@
         ),
         el('span', null, '· ' + (meta.difficulte === 1 ? 'Niveau initiation' : meta.difficulte === 2 ? 'Niveau intermédiaire' : 'Niveau avancé')),
         meta.duree_estimee_min && el('span', null, '· ' + meta.duree_estimee_min + ' min'),
-        meta.date_maj && el('span', null, '· maj ' + formatDate(meta.date_maj))
+        meta.date_maj && el('span', null, '· maj ' + formatDate(meta.date_maj)),
+        // Bouton imprimer / exporter PDF : déclenche la dialogue native du
+        // navigateur. Le rendu papier est piloté par la feuille @media print.
+        el('button', {
+          class: 'print-btn',
+          title: 'Imprimer ou exporter ce sujet en PDF (Ctrl+P)',
+          onclick: () => { window.print(); }
+        }, '⎙ Imprimer / PDF')
       )
     );
     // Tags cliquables (filtrent la bibliothèque par ce tag)
@@ -2187,10 +2271,48 @@
         return renderWidget(block);
       case 'html_libre':
         return renderHtmlLibre(block);
+      case 'mini-quiz':
+        return renderMiniQuizBlock(block);
       default:
         console.warn('Type de bloc inconnu:', block.type);
         return null;
     }
+  }
+
+  // Mini-quiz inline : une question simple en plein milieu du cours, sans
+  // tracking ni score. L'utilisateur clique pour révéler la réponse. Idéal
+  // pour ponctuer un passage dense d'une vérif rapide de compréhension.
+  // Schéma : { type:'mini-quiz', q, reponse, indice? }
+  function renderMiniQuizBlock(block) {
+    const wrap = el('div', { class: 'mini-quiz course-block' });
+    wrap.appendChild(el('span', { class: 'mini-quiz-label' }, 'Vérification'));
+    if (block.q) {
+      wrap.appendChild(el('div', { class: 'mini-quiz-q', html: md(block.q).replace(/^<p>|<\/p>$/g, '') }));
+    }
+    if (block.indice) {
+      const indiceWrap = el('div', { class: 'mini-quiz-indice', html: '<em>Indice :</em> ' + md(block.indice).replace(/^<p>|<\/p>$/g, '') });
+      wrap.appendChild(indiceWrap);
+    }
+    const answerWrap = el('div', { class: 'mini-quiz-answer' });
+    if (block.reponse) {
+      answerWrap.innerHTML = md(block.reponse).replace(/^<p>|<\/p>$/g, '');
+    }
+    answerWrap.style.display = 'none';
+    const revealBtn = el('button', {
+      class: 'mini-quiz-reveal',
+      onclick: () => {
+        if (answerWrap.style.display === 'none') {
+          answerWrap.style.display = '';
+          revealBtn.textContent = 'Masquer la réponse';
+        } else {
+          answerWrap.style.display = 'none';
+          revealBtn.textContent = 'Révéler la réponse';
+        }
+      }
+    }, 'Révéler la réponse');
+    wrap.appendChild(revealBtn);
+    wrap.appendChild(answerWrap);
+    return wrap;
   }
 
   function renderTexteBlock(block) {
@@ -4551,6 +4673,43 @@
     return true;
   }
 
+  // Construit un pool de questions limité aux sujets d'un parcours donné.
+  function buildQuestionPoolForParcours(parcoursId) {
+    const p = state.parcours[parcoursId];
+    if (!p) return [];
+    const all = [];
+    (p.etapes || []).forEach(etape => {
+      if (!etape || !etape.slug) return;
+      const sujet = state.sujets[etape.slug];
+      if (!sujet || !Array.isArray(sujet.quiz)) return;
+      sujet.quiz.forEach((q, qIdx) => {
+        all.push(Object.assign({}, q, {
+          _sujet: { id: sujet.meta.id, titre: sujet.meta.titre },
+          _qIdx: qIdx
+        }));
+      });
+    });
+    return all;
+  }
+
+  // Lance un quiz mixte limité aux sujets d'un parcours.
+  function startParcoursQuiz(parcoursId, count) {
+    const all = buildQuestionPoolForParcours(parcoursId);
+    if (all.length === 0) return false;
+    shuffleArray(all);
+    const picked = all.slice(0, Math.min(count || 10, all.length));
+    state.quizSession = {
+      sujetId: '__parcours_' + parcoursId + '__',
+      currentQ: 0,
+      score: 0,
+      questions: picked,
+      isMixed: true,
+      mode: 'parcours',
+      _parcoursId: parcoursId
+    };
+    return true;
+  }
+
   // Mode Défi : 10 questions, chacune avec timer 30s.
   // Le timer est porté par session ; renderQuizQuestion détecte le mode défi.
   function startChallengeQuiz(count) {
@@ -4584,6 +4743,10 @@
     const eyebrowText = sess.mode === 'revision' ? 'Mode révision'
       : sess.mode === 'quotidien' ? 'Quiz du jour'
       : sess.mode === 'defi' ? 'Mode défi'
+      : sess.mode === 'parcours' ? (
+          (state.parcours[sess._parcoursId] && String(state.parcours[sess._parcoursId].meta.titre).replace(/<[^>]+>/g, ''))
+          ? 'Quiz · ' + String(state.parcours[sess._parcoursId].meta.titre).replace(/<[^>]+>/g, '')
+          : 'Quiz par parcours')
       : 'Quiz mixte en cours';
     main.appendChild(el('span', { class: 'eyebrow' }, eyebrowText));
 
@@ -4684,6 +4847,45 @@
       onclick: () => { startChallengeQuiz(10); rerender(); }
     }, 'Lancer le défi →'));
     grid.appendChild(cardDefi);
+
+    // 5. Quiz par parcours (n'apparaît que si au moins un parcours existe)
+    if (state.parcoursOrder.length > 0) {
+      const cardParcours = el('div', { class: 'quiz-mode-card quiz-mode-parcours' });
+      cardParcours.appendChild(el('div', { class: 'quiz-mode-eyebrow' }, '🧭 Parcours'));
+      cardParcours.appendChild(el('h3', { class: 'quiz-mode-title' }, 'Quiz d\'un parcours'));
+      cardParcours.appendChild(el('p', { class: 'quiz-mode-desc' },
+        'Pioche les questions des sujets d\'un parcours thématique — pour t\'auto-évaluer sur le fil que tu suis.'));
+
+      const parcoursSel = el('select', { class: 'quiz-parcours-select' });
+      const active = getActiveParcours();
+      state.parcoursOrder.forEach(pid => {
+        const p = state.parcours[pid];
+        if (!p) return;
+        const titreClean = String(p.meta.titre).replace(/<[^>]+>/g, '');
+        const pool = buildQuestionPoolForParcours(pid);
+        parcoursSel.appendChild(el('option',
+          { value: pid },
+          titreClean + ' (' + pool.length + ' Q.)'));
+      });
+      if (active && active.parcours && state.parcours[active.parcours.meta.id]) {
+        parcoursSel.value = active.parcours.meta.id;
+      }
+      cardParcours.appendChild(parcoursSel);
+
+      const parcoursBtnRow = el('div', { class: 'quiz-mode-btn-row' });
+      const launchBtn = el('button', {
+        class: 'btn',
+        onclick: () => {
+          const pid = parcoursSel.value;
+          const pool = buildQuestionPoolForParcours(pid);
+          if (pool.length === 0) return;
+          if (startParcoursQuiz(pid, Math.min(10, pool.length))) rerender();
+        }
+      }, 'Lancer →');
+      parcoursBtnRow.appendChild(launchBtn);
+      cardParcours.appendChild(parcoursBtnRow);
+      grid.appendChild(cardParcours);
+    }
 
     main.appendChild(grid);
 
