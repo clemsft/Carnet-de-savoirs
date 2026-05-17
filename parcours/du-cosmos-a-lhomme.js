@@ -10,8 +10,8 @@ window.CarnetDeSavoirs.registerParcours({
     id: 'du-cosmos-a-lhomme',
     titre: 'Du <em>cosmos</em> à la conscience',
     domaine: 'Astrophysique',
-    description: `La plus longue histoire qu'on puisse raconter. 13,8 milliards d'années en six étapes : l'**univers primordial** se déploie, certaines régions s'effondrent en **trous noirs**, l'**espace-temps** se laisse modeler par la gravité, la **photosynthèse** allume la biosphère, l'**évolution** produit le vivant complexe, et finit par fabriquer un **cerveau** capable de tout reconstituer en pensée.`,
-    duree_estimee_min: 200
+    description: `La plus longue histoire qu'on puisse raconter. 13,8 milliards d'années en huit étapes : l'**univers primordial** se déploie, certaines régions s'effondrent en **trous noirs**, l'**espace-temps** se laisse modeler par la gravité, la matière s'organise en **atomes** qui apprennent à se lier, la **photosynthèse** allume la biosphère, l'**évolution** produit le vivant complexe, finit par fabriquer un **cerveau** capable de tout reconstituer en pensée, et celui-ci se met à **planter du blé** pour fonder la civilisation.`,
+    duree_estimee_min: 270
   },
   etapes: [
     {
@@ -27,6 +27,10 @@ window.CarnetDeSavoirs.registerParcours({
       note: `Pour comprendre ces extrêmes, il faut **Einstein**. La relativité restreinte (1905) détruit le temps absolu ; la relativité générale (1915) transforme la gravité en géométrie. C'est ce cadre qui explique aussi bien les trous noirs que les GPS de ton téléphone.`
     },
     {
+      slug: 'chimie-atomes',
+      note: `Entre la cosmologie et le vivant, il faut une **matière** qui se laisse arranger. Les **atomes** se forment dans les étoiles, se classent dans le tableau de **Mendeleïev** (1869), et apprennent à se lier par **partage ou transfert d'électrons**. C'est cette grammaire chimique qui rend tout ce qui suit possible — y compris la cellule.`
+    },
+    {
       slug: 'photosynthese',
       note: `Tournant terrestre : la vie complexe nécessite de l'énergie continue. La **photosynthèse**, inventée par les cyanobactéries il y a ~3 milliards d'années, capte la lumière du Soleil et fabrique l'oxygène — sans lequel rien de ce qui suit ne se passe.`
     },
@@ -36,7 +40,11 @@ window.CarnetDeSavoirs.registerParcours({
     },
     {
       slug: 'cerveau-humain',
-      note: `Dernier acte (pour l'instant) : un primate développe un **cerveau** capable de modéliser l'univers qui l'a produit. 86 milliards de neurones plus tard, ce même cerveau écrit des équations qui décrivent le Big Bang d'où il sort.`
+      note: `Un primate développe un **cerveau** capable de modéliser l'univers qui l'a produit. 86 milliards de neurones plus tard, ce même cerveau écrit des équations qui décrivent le Big Bang d'où il sort.`
+    },
+    {
+      slug: 'sapiens-neolithique',
+      note: `Dernier acte (pour l'instant) : ce cerveau habite un corps, ***Homo sapiens***, qui apparaît en Afrique il y a **300 000 ans**, peuple la planète, et — vers **-10 000** — cesse de chasser pour **planter du blé**. De ce geste découle la cité, l'écriture, l'État. Toute l'histoire que l'humanité raconte d'elle-même tient dans les 12 000 dernières années.`
     }
   ]
 });
