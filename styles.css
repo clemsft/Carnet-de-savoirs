@@ -2041,15 +2041,6 @@ body.globe-fullscreen-active { overflow: hidden; }
   pointer-events: none;
 }
 
-/* Bulles de cluster par domaine : aura floue, en arrière-plan */
-.globe-fd-clusters {
-  pointer-events: none;
-  filter: blur(28px);
-}
-.globe-fd-cluster {
-  opacity: 0.08;
-}
-
 /* Masquage des arêtes "faibles" (poids = 1, un seul tag partagé)
    quand la classe weak-hidden est active sur le SVG. */
 .globe-fd-svg.weak-hidden .globe-fd-edge.is-weak {
@@ -2231,26 +2222,6 @@ body.globe-fullscreen-active { overflow: hidden; }
 }
 
 /* ---- Étiquettes des clusters de domaine ----
-   Un texte discret au-dessus de chaque bulle floue : permet d'identifier
-   d'un coup d'œil "ici la Physique, là l'Histoire". On utilise la couleur
-   du domaine, en majuscules espacées, opacité atténuée. */
-.globe-fd-cluster-label {
-  font-family: var(--f-display);
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  opacity: 0.55;
-  pointer-events: none;
-  paint-order: stroke fill;
-  stroke: var(--bg-card);
-  stroke-width: 4px;
-  stroke-linejoin: round;
-}
-/* En mode focus, les labels de cluster s'estompent pour ne pas concurrencer
-   les labels de nœuds. */
-.globe-fd-svg.has-focus .globe-fd-cluster-label { opacity: 0.18; }
-
 /* ---- Mode épinglé : visuel du sujet sélectionné ----
    On souligne le sujet épinglé avec un anneau et un curseur, pour bien
    distinguer "j'ai cliqué ici, ça reste là" du simple survol. */
@@ -2487,7 +2458,6 @@ body.globe-fullscreen-active { overflow: hidden; }
   font-style: italic;
   letter-spacing: 0.02em;
 }
-.globe-info-citation-arrow,
 .globe-info-citation-icon {
   color: var(--text-faint);
   display: inline-block;
@@ -2594,77 +2564,6 @@ body.globe-fullscreen-active { overflow: hidden; }
 .month-cal-cell:hover { cursor: default; }
 .month-cal-day {
   font-family: var(--f-body);
-}
-
-/* (Conserve l'ancienne classe globe-wrap au cas où on rebascule) */
-.globe-wrap {
-  background: var(--bg-card);
-  border: 1px solid var(--line-strong);
-  border-radius: var(--r-lg);
-  padding: 2rem;
-  min-height: 500px;
-}
-
-.globe-domain {
-  margin-bottom: 2.5rem;
-}
-.globe-domain:last-child { margin-bottom: 0; }
-
-.globe-domain-header {
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
-  margin-bottom: 1rem;
-}
-.globe-domain-dot {
-  width: 10px; height: 10px;
-  border-radius: 50%;
-  background: var(--dom-color, var(--d-default));
-}
-.globe-domain-name {
-  font-family: var(--f-display);
-  font-style: italic;
-  font-size: 1.05rem;
-  color: var(--text);
-  letter-spacing: 0.04em;
-}
-.globe-domain-count {
-  font-size: 0.8rem;
-  color: var(--text-faint);
-  margin-left: auto;
-}
-
-.globe-nodes {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  padding-left: 1.3rem;
-  border-left: 1px dashed var(--line-strong);
-  margin-left: 4px;
-}
-
-.globe-node {
-  background: var(--bg-deep);
-  border: 1px solid var(--line-strong);
-  color: var(--text);
-  padding: 0.5rem 0.95rem;
-  border-radius: 999px;
-  font-size: 0.92rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-.globe-node:hover {
-  border-color: var(--dom-color, var(--text));
-  transform: translateY(-2px);
-}
-.globe-node-dot {
-  width: 5px; height: 5px;
-  border-radius: 50%;
-  background: var(--dom-color, var(--d-default));
 }
 
 /* ===================================================================

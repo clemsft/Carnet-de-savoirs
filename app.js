@@ -4051,15 +4051,6 @@
     const DAMPING = 0.82;
     const MIN_DIST = 95;
 
-    // On garde l'index par domaine pour compat avec le rendu ultérieur,
-    // même si la simulation n'en a plus besoin pour la cohésion globale.
-    const nodesByDomain = {};
-    nodes.forEach(n => {
-      if (!nodesByDomain[n.domain]) nodesByDomain[n.domain] = [];
-      nodesByDomain[n.domain].push(n);
-    });
-    const clusterDomains = Object.keys(nodesByDomain).filter(d => nodesByDomain[d].length >= 2);
-
     for (let it = 0; it < ITER; it++) {
       nodes.forEach(n => { n.fx = 0; n.fy = 0; });
       // Répulsion LOCALE : seulement entre voisins proches
@@ -7495,6 +7486,11 @@
     }, { passive: false });
 
     let dragActuallyMoved = false;
+    // AbortController : on attache les listeners pan globaux (mousemove,
+    // mouseup) à window seulement le temps d'un drag, et on les retire
+    // proprement au mouseup. Sans ça, chaque entrée dans la Timeline
+    // ajouterait des listeners permanents — fuite mineure mais évitable.
+    let dragCtrl = null;
     wrap.addEventListener('mousedown', (e) => {
       if (e.button !== 0) return;
       if (e.target.closest('.timeline-tooltip')) return;
@@ -7508,41 +7504,45 @@
       dragViewBoxScale = 1 / ctm.a;
       dragLiveDx = 0;
       dragActuallyMoved = false;
+      if (dragCtrl) dragCtrl.abort();
+      dragCtrl = new AbortController();
+      const sig = dragCtrl.signal;
       // On NE change rien visuellement tant que la souris n'a pas bougé d'au
       // moins quelques pixels. Comme ça un simple clic sur un dot ne
       // déclenche pas un re-render qui détruirait son DOM avant que le
       // click handler ne fire.
-    });
-    window.addEventListener('mousemove', (e) => {
-      if (!isDragging) return;
-      const screenDx = e.clientX - dragStartScreenX;
-      if (!dragActuallyMoved) {
-        if (Math.abs(screenDx) < 3) return;     // tolérance click vs drag
-        dragActuallyMoved = true;
-        wrap.classList.add('is-panning');
-        pinnedKey = null;
-        tooltip.classList.remove('is-visible');
-      }
-      dragLiveDx = screenDx * dragViewBoxScale;
-      const g = wrap.querySelector('.timeline-viewport');
-      if (g) g.setAttribute('transform', `translate(${dragLiveDx},0)`);
-    });
-    window.addEventListener('mouseup', () => {
-      if (!isDragging) return;
-      isDragging = false;
-      if (!dragActuallyMoved) {
-        // Pas de drag réel — c'était un click, on laisse le click handler
-        // du dot s'exécuter sans re-render.
-        return;
-      }
-      wrap.classList.remove('is-panning');
-      panX += dragLiveDx;
-      const minPan = (W - 2 * padX) * (1 - scale);
-      panX = Math.max(minPan, Math.min(0, panX));
-      dragLiveDx = 0;
-      dragActuallyMoved = false;
-      render(currentMode, domSel.value);
-      renderMiniMap();
+      window.addEventListener('mousemove', (ev) => {
+        if (!isDragging) return;
+        const screenDx = ev.clientX - dragStartScreenX;
+        if (!dragActuallyMoved) {
+          if (Math.abs(screenDx) < 3) return;     // tolérance click vs drag
+          dragActuallyMoved = true;
+          wrap.classList.add('is-panning');
+          pinnedKey = null;
+          tooltip.classList.remove('is-visible');
+        }
+        dragLiveDx = screenDx * dragViewBoxScale;
+        const g = wrap.querySelector('.timeline-viewport');
+        if (g) g.setAttribute('transform', `translate(${dragLiveDx},0)`);
+      }, { signal: sig });
+      window.addEventListener('mouseup', () => {
+        if (!isDragging) return;
+        isDragging = false;
+        if (dragCtrl) { dragCtrl.abort(); dragCtrl = null; }
+        if (!dragActuallyMoved) {
+          // Pas de drag réel — c'était un click, on laisse le click handler
+          // du dot s'exécuter sans re-render.
+          return;
+        }
+        wrap.classList.remove('is-panning');
+        panX += dragLiveDx;
+        const minPan = (W - 2 * padX) * (1 - scale);
+        panX = Math.max(minPan, Math.min(0, panX));
+        dragLiveDx = 0;
+        dragActuallyMoved = false;
+        render(currentMode, domSel.value);
+        renderMiniMap();
+      }, { signal: sig });
     });
 
     // ---- Mini-map ----
