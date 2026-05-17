@@ -323,6 +323,3 @@ En quelques millénaires, à partir de communautés humaines qui pendant 290 000
   ]
 
 });
-  ]
-
-});

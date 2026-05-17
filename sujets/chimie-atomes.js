@@ -324,6 +324,3 @@ Troisième stratégie, propre aux métaux : les électrons externes deviennent *
   ]
 
 });
-  ]
-
-});

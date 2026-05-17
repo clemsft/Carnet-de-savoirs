@@ -363,6 +363,3 @@ Et c'est ici qu'intervient le théorème le plus important — et le plus contre
   ]
 
 });
-  ]
-
-});
