@@ -3807,14 +3807,66 @@
     const timeById = {};
     top.forEach(t => { timeById[t.id] = t.timeMs; });
 
-    // Canvas plus généreux maintenant qu'on a 44+ sujets : on a besoin de
+    // Canvas plus généreux maintenant qu'on a 50+ sujets : on a besoin de
     // place pour que les nœuds respirent et que les labels ne se chevauchent
     // pas en permanence. preserveAspectRatio garantit que ça reste lisible
     // sur n'importe quelle largeur de conteneur.
     const W = 1280, H = 920, cx = W / 2, cy = H / 2;
-    const nodes = sujets.map((s, i) => {
-      const angle = (i / sujets.length) * Math.PI * 2;
+
+    // ---- Layout en SECTEURS PAR DOMAINE ----
+    // Au lieu d'un cercle uniforme suivi d'un force-directed qui converge
+    // en hairball, chaque domaine occupe un secteur fixe du canvas. Les
+    // sujets sont pré-placés sur un arc à l'intérieur de leur secteur, puis
+    // une force d'ancrage forte les maintient là pendant la simulation. Les
+    // liens INTER-secteurs deviennent l'information visuelle principale —
+    // les liens intra-secteur sont cachés par défaut (révélés au survol).
+    const domCount = {};
+    sujets.forEach(s => {
+      const d = (s.meta.domaines || ['Autre'])[0];
+      domCount[d] = (domCount[d] || 0) + 1;
+    });
+    const sortedDoms = Object.keys(domCount).sort((a, b) =>
+      a.localeCompare(b, 'fr', { sensitivity: 'base' })
+    );
+    const MIN_SECTOR_DEG = 18;  // pour qu'un domaine à 1 sujet reste lisible
+    // Chaque domaine reçoit un angle proportionnel à son count, mais au moins
+    // MIN_SECTOR_DEG. Si la somme dépasse 360°, on rescale.
+    let provisionalTotal = 0;
+    const provisional = {};
+    sortedDoms.forEach(d => {
+      const propor = (domCount[d] / sujets.length) * 360;
+      provisional[d] = Math.max(MIN_SECTOR_DEG, propor);
+      provisionalTotal += provisional[d];
+    });
+    const sectorDeg = {};
+    if (provisionalTotal > 360) {
+      const k = 360 / provisionalTotal;
+      sortedDoms.forEach(d => sectorDeg[d] = provisional[d] * k);
+    } else {
+      sortedDoms.forEach(d => sectorDeg[d] = provisional[d]);
+    }
+    const sectorStart = {}, sectorEnd = {};
+    let cumDeg = -90;  // début à midi (12h)
+    sortedDoms.forEach(d => {
+      sectorStart[d] = cumDeg * Math.PI / 180;
+      cumDeg += sectorDeg[d];
+      sectorEnd[d] = cumDeg * Math.PI / 180;
+    });
+    const SECTOR_R = Math.min(W, H) * 0.36;  // rayon "central" des sujets dans leur secteur
+    const SECTOR_R_VARY = 70;                // pour briser l'alignement parfait
+    const domIndexCounter = {};
+    const nodes = sujets.map(s => {
       const labelClean = String(s.meta.titre).replace(/<[^>]+>/g, '');
+      const domain = (s.meta.domaines || ['Autre'])[0];
+      const dCount = domCount[domain];
+      const dIdx = (domIndexCounter[domain] = (domIndexCounter[domain] || 0) + 1) - 1;
+      // Position dans le secteur : étalée le long de l'arc, à un rayon légèrement varié
+      const t = (dIdx + 0.5) / dCount;
+      const sw = sectorEnd[domain] - sectorStart[domain];
+      const ang = sectorStart[domain] + t * sw;
+      const r = SECTOR_R + ((dIdx % 3) - 1) * SECTOR_R_VARY * 0.6;
+      const ax = cx + Math.cos(ang) * r;
+      const ay = cy + Math.sin(ang) * r;
       return {
         id: s.meta.id,
         label: labelClean,
@@ -3822,10 +3874,10 @@
         shortLabel: labelClean.length > 28 ? labelClean.slice(0, 27) + '…' : labelClean,
         resume: s.resume || '',
         domains: s.meta.domaines || ['Autre'],
-        domain: (s.meta.domaines || ['Autre'])[0],
+        domain: domain,
         timeMs: timeById[s.meta.id] || 0,
-        x: cx + Math.cos(angle) * 220,
-        y: cy + Math.sin(angle) * 220,
+        x: ax, y: ay,
+        ax: ax, ay: ay,  // position d'ancrage cible dans le secteur
         vx: 0, vy: 0
       };
     });
@@ -3985,67 +4037,59 @@
       citationsByPair[c.target][c.source].push(c);
     });
 
-    // ---- Simulation force-directed ----
-    // Ajout d'une force de cohésion par domaine : les nœuds d'un même
-    // domaine s'attirent vers leur centre de gravité, ce qui crée
-    // visuellement des clusters distincts.
-    const ITER = 380;
-    const REPULSION = 22000;
-    const ATTRACTION = 0.022;
-    const CENTER_FORCE = 0.0014;
-    const DOMAIN_COHESION = 0.020;
-    const DAMPING = 0.86;
-    const MIN_DIST = 130;
+    // ---- Simulation force-directed ANCRÉE AUX SECTEURS ----
+    // La force dominante est désormais l'ancrage : chaque nœud est tiré
+    // vers sa position cible dans son secteur. La répulsion ne joue que
+    // localement (sur les voisins proches) pour éviter le chevauchement.
+    // L'attraction par arête reste, mais à intensité réduite, pour que les
+    // sujets très liés se rapprochent légèrement sans casser la disposition.
+    const ITER = 200;
+    const REPULSION = 12000;
+    const REPULSION_RANGE = 240;   // au-delà, on laisse l'ancrage faire son travail
+    const ATTRACTION = 0.008;
+    const ANCHOR_FORCE = 0.055;    // ressort qui ramène chaque nœud à son ancre
+    const DAMPING = 0.82;
+    const MIN_DIST = 95;
 
-    // Pré-calculer la liste des domaines et l'appartenance des nœuds
+    // On garde l'index par domaine pour compat avec le rendu ultérieur,
+    // même si la simulation n'en a plus besoin pour la cohésion globale.
     const nodesByDomain = {};
     nodes.forEach(n => {
       if (!nodesByDomain[n.domain]) nodesByDomain[n.domain] = [];
       nodesByDomain[n.domain].push(n);
     });
-    // On ne fait du clustering que pour les domaines avec ≥ 2 nœuds
     const clusterDomains = Object.keys(nodesByDomain).filter(d => nodesByDomain[d].length >= 2);
 
     for (let it = 0; it < ITER; it++) {
       nodes.forEach(n => { n.fx = 0; n.fy = 0; });
-      // Répulsion + plancher de distance minimale
+      // Répulsion LOCALE : seulement entre voisins proches
       for (let i = 0; i < nodes.length; i++) {
         for (let j = i + 1; j < nodes.length; j++) {
           const dx = nodes[j].x - nodes[i].x, dy = nodes[j].y - nodes[i].y;
           const d2 = dx * dx + dy * dy + 0.01;
           const d = Math.sqrt(d2);
+          if (d > REPULSION_RANGE) continue;
           let f = REPULSION / d2;
-          if (d < MIN_DIST) f += (MIN_DIST - d) * 0.6;
+          if (d < MIN_DIST) f += (MIN_DIST - d) * 0.5;
           const fx = (dx / d) * f, fy = (dy / d) * f;
           nodes[i].fx -= fx; nodes[i].fy -= fy;
           nodes[j].fx += fx; nodes[j].fy += fy;
         }
       }
-      // Attraction le long des arêtes
+      // Attraction modérée le long des arêtes (poids capé à 2 pour ne pas
+      // écraser l'ancrage)
       edges.forEach(e => {
         const a = nodeById[e.from], b = nodeById[e.to];
         const dx = b.x - a.x, dy = b.y - a.y;
         const d = Math.sqrt(dx * dx + dy * dy + 0.01);
-        const f = ATTRACTION * d * (e.weight || 1);
+        const f = ATTRACTION * d * Math.min(2, (e.weight || 1));
         a.fx += (dx / d) * f; a.fy += (dy / d) * f;
         b.fx -= (dx / d) * f; b.fy -= (dy / d) * f;
       });
-      // Cohésion par domaine : chaque nœud est attiré vers le centre de gravité
-      // de son domaine principal. Effet : les clusters thématiques se forment.
-      clusterDomains.forEach(domain => {
-        const members = nodesByDomain[domain];
-        let mx = 0, my = 0;
-        members.forEach(m => { mx += m.x; my += m.y; });
-        mx /= members.length; my /= members.length;
-        members.forEach(m => {
-          m.fx += (mx - m.x) * DOMAIN_COHESION;
-          m.fy += (my - m.y) * DOMAIN_COHESION;
-        });
-      });
-      // Centrage doux
+      // Force d'ancrage : ressort vers la position cible dans le secteur
       nodes.forEach(n => {
-        n.fx += (cx - n.x) * CENTER_FORCE;
-        n.fy += (cy - n.y) * CENTER_FORCE;
+        n.fx += (n.ax - n.x) * ANCHOR_FORCE;
+        n.fy += (n.ay - n.y) * ANCHOR_FORCE;
       });
       // Intégration + bornes
       nodes.forEach(n => {
@@ -4183,34 +4227,76 @@
     }
     svgInner += `<g class="globe-fd-stars" aria-hidden="true">${stars}</g>`;
 
-    // ---- Bulles de cluster : aura floue colorée derrière chaque domaine
-    // qui regroupe au moins 2 sujets. Donne une lecture immédiate des
-    // "constellations" thématiques sans saturer l'image. ----
-    let bubbles = '';
-    let bubbleLabels = '';
-    clusterDomains.forEach(domain => {
-      const members = nodesByDomain[domain];
-      if (members.length < 2) return;
-      let mx = 0, my = 0;
-      members.forEach(m => { mx += m.x; my += m.y; });
-      mx /= members.length; my /= members.length;
-      let maxR = 0;
-      members.forEach(m => {
-        const dxm = m.x - mx, dym = m.y - my;
-        const dd = Math.sqrt(dxm * dxm + dym * dym);
-        if (dd > maxR) maxR = dd;
-      });
-      const radius = maxR + 60;
-      const fill = domainColor(domain);
-      bubbles += `<circle class="globe-fd-cluster" cx="${mx.toFixed(1)}" cy="${my.toFixed(1)}" r="${radius.toFixed(1)}" fill="${fill}"/>`;
-      // Étiquette du cluster : placée légèrement au-dessus du bord supérieur
-      // de la bulle. On la pousse un peu vers l'intérieur si elle dépasse.
-      let lblY = my - radius - 10;
-      if (lblY < 30) lblY = my + radius + 24;
-      bubbleLabels += `<text class="globe-fd-cluster-label" x="${mx.toFixed(1)}" y="${lblY.toFixed(1)}" text-anchor="middle" fill="${fill}">${attrEscape(domain)}</text>`;
+    // ---- Arcs de secteur : un arc coloré en bord extérieur pour chaque
+    // domaine, avec son label gravé au-dehors. Donne une lecture immédiate
+    // des "régions" thématiques de la carte. ----
+    const ARC_INNER = SECTOR_R - 70;
+    const ARC_OUTER = SECTOR_R + 70;
+    // Table d'abréviations pour les domaines aux libellés longs. Permet aux
+    // labels de tenir dans la largeur angulaire de leur secteur — surtout
+    // crucial pour les domaines à 1 sujet qui ne reçoivent que MIN_SECTOR_DEG
+    // d'arc et où "Sciences cognitives" déborderait sur ses voisins.
+    const DOMAIN_ABBR = {
+      'Sciences cognitives':  'Sci. cognitives',
+      'Sciences de la Terre': 'Sci. Terre',
+      'Mathématiques':        'Maths',
+      'Astrophysique':        'Astrophys.',
+      'Architecture':         'Archi.',
+      'Informatique':         'Info',
+      'Philosophie':          'Philo',
+      'Géopolitique':         'Géopol.',
+      'Environnement':        'Environn.'
+    };
+    function abbrevDomain(d) { return DOMAIN_ABBR[d] || d; }
+    let arcs = '';
+    let arcLabels = '';
+    sortedDoms.forEach(d => {
+      const a0 = sectorStart[d], a1 = sectorEnd[d];
+      const fill = domainColor(d);
+      const x1 = cx + Math.cos(a0) * ARC_INNER;
+      const y1 = cy + Math.sin(a0) * ARC_INNER;
+      const x2 = cx + Math.cos(a1) * ARC_INNER;
+      const y2 = cy + Math.sin(a1) * ARC_INNER;
+      const x3 = cx + Math.cos(a1) * ARC_OUTER;
+      const y3 = cy + Math.sin(a1) * ARC_OUTER;
+      const x4 = cx + Math.cos(a0) * ARC_OUTER;
+      const y4 = cy + Math.sin(a0) * ARC_OUTER;
+      const largeArc = (a1 - a0) > Math.PI ? 1 : 0;
+      const dpath =
+        `M ${x1.toFixed(1)} ${y1.toFixed(1)} ` +
+        `A ${ARC_INNER.toFixed(1)} ${ARC_INNER.toFixed(1)} 0 ${largeArc} 1 ${x2.toFixed(1)} ${y2.toFixed(1)} ` +
+        `L ${x3.toFixed(1)} ${y3.toFixed(1)} ` +
+        `A ${ARC_OUTER.toFixed(1)} ${ARC_OUTER.toFixed(1)} 0 ${largeArc} 0 ${x4.toFixed(1)} ${y4.toFixed(1)} ` +
+        `Z`;
+      arcs += `<path class="globe-fd-sector" data-domain="${attrEscape(d)}" d="${dpath}" fill="${fill}"/>`;
+
+      // Label du domaine : suit la COURBE de l'arc extérieur via <textPath>.
+      // Pour les secteurs de la moitié inférieure (sin(midA) > 0), on inverse
+      // le SENS du sweep (0 au lieu de 1) et le sens du parcours (a1→a0 au
+      // lieu de a0→a1) pour que le texte reste lisible (tête en haut, pas
+      // à l'envers). Important : on n'échange PAS uniquement les points
+      // avec un sweep inchangé — ça ferait passer l'arc par le long chemin.
+      const midA = (a0 + a1) / 2;
+      const labelR = ARC_OUTER + 22;
+      const lx1 = cx + Math.cos(a0) * labelR;
+      const ly1 = cy + Math.sin(a0) * labelR;
+      const lx2 = cx + Math.cos(a1) * labelR;
+      const ly2 = cy + Math.sin(a1) * labelR;
+      const isBottom = (midA > 0 && midA < Math.PI);
+      const arcId = 'sector-arc-' + d.toLowerCase().replace(/[^a-z0-9]/g, '-');
+      let supPath;
+      if (isBottom) {
+        // Sens inversé : a1 → a0, CCW (sweep=0), short arc (largeArc=0)
+        supPath = `M ${lx2.toFixed(1)} ${ly2.toFixed(1)} A ${labelR.toFixed(1)} ${labelR.toFixed(1)} 0 0 0 ${lx1.toFixed(1)} ${ly1.toFixed(1)}`;
+      } else {
+        // Sens normal : a0 → a1, CW (sweep=1), short arc
+        supPath = `M ${lx1.toFixed(1)} ${ly1.toFixed(1)} A ${labelR.toFixed(1)} ${labelR.toFixed(1)} 0 0 1 ${lx2.toFixed(1)} ${ly2.toFixed(1)}`;
+      }
+      arcs += `<path id="${arcId}" d="${supPath}" fill="none" stroke="none"/>`;
+      arcLabels += `<text class="globe-fd-sector-label" fill="${fill}"><textPath href="#${arcId}" startOffset="50%" text-anchor="middle">${attrEscape(abbrevDomain(d))}</textPath></text>`;
     });
-    svgInner += `<g class="globe-fd-clusters" aria-hidden="true">${bubbles}</g>`;
-    svgInner += `<g class="globe-fd-cluster-labels" aria-hidden="true">${bubbleLabels}</g>`;
+    svgInner += `<g class="globe-fd-sectors" aria-hidden="true">${arcs}</g>`;
+    svgInner += `<g class="globe-fd-sector-labels" aria-hidden="true">${arcLabels}</g>`;
 
     // ---- Arêtes : courbes de Bézier quadratiques pour un rendu organique ----
     // Les longues arêtes (cross-cluster) sont davantage incurvées vers
@@ -4218,24 +4304,36 @@
     const edgeCenterX = cx, edgeCenterY = cy;
     edges.forEach(e => {
       const a = nodeById[e.from], b = nodeById[e.to];
-      // Arêtes très discrètes au repos — c'est le focus qui les fait ressortir
-      const opacity = Math.min(0.32, 0.08 + (e.weight || 1) * 0.07);
-      const width = 0.8 + Math.min(2.2, (e.weight || 1) * 0.5);
+      const sameSector = a.domain === b.domain;
+      // Arêtes inter-secteurs : visibles, c'est l'information principale.
+      // Arêtes intra-secteurs : très discrètes au repos, révélées au survol.
+      const opacity = sameSector
+        ? Math.min(0.22, 0.05 + (e.weight || 1) * 0.05)
+        : Math.min(0.42, 0.14 + (e.weight || 1) * 0.08);
+      const width = sameSector
+        ? 0.7 + Math.min(1.6, (e.weight || 1) * 0.35)
+        : 1.1 + Math.min(2.6, (e.weight || 1) * 0.6);
       const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
       const dx = b.x - a.x, dy = b.y - a.y;
       const len = Math.sqrt(dx * dx + dy * dy) || 1;
-      // Décalage perpendiculaire, plus prononcé pour les longues arêtes
-      const off = Math.min(70, len * 0.18);
-      // Orientation : on courbe vers l'extérieur (opposé au centre de la carte)
-      // pour que les arêtes longues "contournent" le cœur du graphe.
-      let nx = -dy / len, ny = dx / len; // normale perpendiculaire
+      // Pour les arêtes inter-secteurs, on courbe plus prononcément pour
+      // dessiner un "pont" qui passe au-dessus du centre. Pour les intra,
+      // un léger décalage suffit.
+      const off = sameSector
+        ? Math.min(30, len * 0.10)
+        : Math.min(110, len * 0.26);
+      let nx = -dy / len, ny = dx / len;
       const outward = (mx - edgeCenterX) * nx + (my - edgeCenterY) * ny;
-      if (outward < 0) { nx = -nx; ny = -ny; }
+      // Inter-secteurs : on courbe VERS l'intérieur (vers cx,cy) pour que
+      // l'arc traverse visuellement le cœur, façon route aérienne.
+      // Intra-secteurs : vers l'extérieur (préserve le pattern d'avant).
+      if (sameSector ? (outward < 0) : (outward > 0)) { nx = -nx; ny = -ny; }
       const ccx = (mx + nx * off).toFixed(1);
       const ccy = (my + ny * off).toFixed(1);
       const d = `M ${a.x.toFixed(1)} ${a.y.toFixed(1)} Q ${ccx} ${ccy} ${b.x.toFixed(1)} ${b.y.toFixed(1)}`;
       const weakClass = (e.weight || 1) <= 1 ? ' is-weak' : '';
-      svgInner += `<path class="globe-fd-edge${weakClass}" data-from="${attrEscape(e.from)}" data-to="${attrEscape(e.to)}" d="${d}" stroke-width="${width}" opacity="${opacity}" fill="none"/>`;
+      const kindClass = sameSector ? ' is-intra' : ' is-inter';
+      svgInner += `<path class="globe-fd-edge${weakClass}${kindClass}" data-from="${attrEscape(e.from)}" data-to="${attrEscape(e.to)}" d="${d}" stroke-width="${width}" opacity="${opacity}" fill="none"/>`;
     });
 
     // ---- Nœuds : halo + cercle + label ----
@@ -6889,24 +6987,31 @@
       return;
     }
 
-    // ---- Toolbar : filtre par domaine + sélecteur de période ----
+    // ---- Toolbar : toggle Long/Court + filtre par domaine ----
     const domains = Array.from(new Set(events.map(e => e.domain))).sort();
     const toolbar = el('div', { class: 'timeline-toolbar' });
 
-    // Sélecteur de période : adapte le range temporel ET l'échelle (log/lin).
-    // "Cosmique" affiche l'intégralité (log) — du Big Bang à aujourd'hui.
-    // Les autres sont des zooms linéaires sur les dernières fenêtres.
+    // Deux modes seulement : Long (log cosmos→aujourd'hui) et Court
+    // (linéaire -10 000 → aujourd'hui). Tout zoom intermédiaire est géré
+    // par le pan/zoom, plus par un sélecteur. Auto-bascule de Long vers
+    // Court quand on zoome assez pour ne plus voir avant -10 000.
     const NOW = new Date().getFullYear();
-    const PERIODS = [
-      { key: 'cosmique',    label: 'Cosmique (toute l\'histoire)',     scale: 'log',    minY: null,         maxY: NOW },
-      { key: 'humanite',    label: 'Humanité (50 000 ans)',            scale: 'log',    minY: NOW - 50000,  maxY: NOW },
-      { key: 'civilisation',label: 'Civilisations (5000 ans)',         scale: 'linear', minY: NOW - 5000,   maxY: NOW },
-      { key: 'moderne',     label: 'Moderne (1500 → aujourd\'hui)',    scale: 'linear', minY: 1500,         maxY: NOW },
-      { key: 'contemporain',label: 'Contemporain (1900 → aujourd\'hui)', scale: 'linear', minY: 1900,       maxY: NOW }
-    ];
-    const periodSel = el('select', { class: 'timeline-domain-select' });
-    PERIODS.forEach(p => periodSel.appendChild(el('option', { value: p.key }, p.label)));
-    toolbar.appendChild(periodSel);
+    const MODES = {
+      long:  { key: 'long',  label: 'Long',  short: 'Cosmos → aujourd\'hui',  scale: 'log',    minY: null,    maxY: NOW },
+      court: { key: 'court', label: 'Court', short: '-10 000 → aujourd\'hui', scale: 'linear', minY: -10000,  maxY: NOW }
+    };
+    let currentMode = 'long';
+
+    const modeToggle = el('div', { class: 'timeline-mode-toggle' });
+    const btnLong  = el('button', { type: 'button', class: 'timeline-mode-btn is-active', 'data-mode': 'long'  },
+      el('span', { class: 'timeline-mode-btn-main' }, MODES.long.label),
+      el('span', { class: 'timeline-mode-btn-sub' }, MODES.long.short));
+    const btnCourt = el('button', { type: 'button', class: 'timeline-mode-btn', 'data-mode': 'court' },
+      el('span', { class: 'timeline-mode-btn-main' }, MODES.court.label),
+      el('span', { class: 'timeline-mode-btn-sub' }, MODES.court.short));
+    modeToggle.appendChild(btnLong);
+    modeToggle.appendChild(btnCourt);
+    toolbar.appendChild(modeToggle);
 
     const domSel = el('select', { class: 'timeline-domain-select' });
     domSel.appendChild(el('option', { value: '' }, 'Tous les domaines (' + events.length + ')'));
@@ -6935,9 +7040,9 @@
     const W = 1900, H = 620, padX = 70, padY = 30;
     const axisY = H - 50;
 
-    function render(period, filterDomain) {
-      const P = PERIODS.find(p => p.key === period) || PERIODS[0];
-      // Filtre événements selon période et domaine
+    function render(mode, filterDomain) {
+      const P = MODES[mode] || MODES.long;
+      // Filtre événements selon mode et domaine
       let filtered = events;
       if (P.minY != null) filtered = filtered.filter(e => e.year >= P.minY);
       if (P.maxY != null) filtered = filtered.filter(e => e.year <= P.maxY);
@@ -7305,12 +7410,14 @@
       pt.x = clientX; pt.y = 0;
       const local = pt.matrixTransform(ctm.inverse()).x;  // x du curseur en repère viewBox
       const factor = deltaY < 0 ? 1.2 : (1 / 1.2);
-      // Zoom jusqu'à 500× : sur Moderne (~526 ans) ça équivaut à ~1 année
-      // visible plein écran, suffisant pour isoler n'importe quelle date.
-      const newScale = Math.max(1, Math.min(500, scale * factor));
+      // Zoom plafonné à 30× : au-delà la timeline ne révèle plus rien d'utile,
+      // chaque événement est déjà bien aéré. Si tu veux zoomer plus, le mode
+      // Court fait déjà le travail. Sur Long, l'auto-bascule prend le relais
+      // dès qu'on entre dans la fenêtre historique (cf. logique ci-dessous).
+      const newScale = Math.max(1, Math.min(30, scale * factor));
       if (Math.abs(newScale - scale) < 0.005) return;
       // Garde le point sous le curseur stable : on veut xFor_new(year_at_cursor) = local
-      // Comme xFor = padX + (xLogical - padX) * scale + panX,
+      // Comme xFor = padX + (xLogical - padX) * scale + padX,
       // year_at_cursor a xLogical = (local - panX - padX) / scale + padX
       // → newPanX = local - padX - ((local - panX - padX) / scale) * newScale
       const xLogCursor = (local - panX - padX) / scale + padX;
@@ -7321,7 +7428,64 @@
       panX = Math.max(minPan, Math.min(0, panX));
       pinnedKey = null;
       tooltip.classList.remove('is-visible');
-      render(periodSel.value, domSel.value);
+
+      // ---- Auto-bascule Long → Court ----
+      // Si on est en mode Long et qu'on a zoomé assez pour que la fenêtre
+      // visible ne contienne plus rien d'antérieur à -10 000, on bascule
+      // automatiquement en Court centré sur la même année que sous le
+      // curseur. L'utilisateur passe de "vue cosmique" à "vue historique"
+      // sans cliquer sur un sélecteur.
+      if (currentMode === 'long' && scale > 1.5) {
+        const visMinYearNow = yearAtXDisplayForMode('long', padX);
+        if (visMinYearNow != null && visMinYearNow > -10000) {
+          const yearAtCursor = yearAtXDisplayForMode('long', local);
+          currentMode = 'court';
+          syncModeButtons();
+          // Recadre Court pour que yearAtCursor soit toujours sous le curseur.
+          // On choisit le scale Court tel que la fenêtre visible ait la
+          // même amplitude que ce qui était visible en Long.
+          const visMaxYearNow = yearAtXDisplayForMode('long', W - padX) || NOW;
+          const visibleSpan = Math.max(50, visMaxYearNow - visMinYearNow);
+          const courtTotalSpan = NOW - (-10000);
+          const newScaleCourt = Math.max(1, Math.min(30, courtTotalSpan / visibleSpan));
+          // Position de yearAtCursor en mode Court à scale=1 :
+          //   xLogicalCourt = padX + ((y - minY) / span) * (W - 2 padX)
+          const tCourt = (yearAtCursor - (-10000)) / courtTotalSpan;
+          const xLogicalCourt = padX + tCourt * (W - 2 * padX);
+          // panX = local - padX - (xLogicalCourt - padX) * newScale
+          panX = local - padX - (xLogicalCourt - padX) * newScaleCourt;
+          scale = newScaleCourt;
+          const minPanCourt = (W - 2 * padX) * (1 - scale);
+          panX = Math.max(minPanCourt, Math.min(0, panX));
+        }
+      }
+
+      render(currentMode, domSel.value);
+      renderMiniMap();
+    }
+
+    // Helper : convertir x display → année, pour un mode donné (utilisé par
+    // l'auto-bascule, qui doit savoir ce que la fenêtre visible représente
+    // dans le mode courant avant de basculer).
+    function yearAtXDisplayForMode(mode, xd) {
+      const P = MODES[mode];
+      const filtered = (P.minY != null || P.maxY != null)
+        ? events.filter(e =>
+            (P.minY == null || e.year >= P.minY) &&
+            (P.maxY == null || e.year <= P.maxY))
+        : events;
+      const effMin = P.minY != null ? P.minY : (filtered.length ? Math.min(...filtered.map(e => e.year)) : NOW - 1);
+      const effMax = P.maxY != null ? P.maxY : NOW;
+      const maxLog = Math.log10(1 + Math.max(1, (effMax - effMin)));
+      const xLog = (xd - panX - padX) / scale + padX;
+      if (P.scale === 'log') {
+        const tNorm = (xLog - padX) / (W - 2 * padX);
+        const yearsAgo = Math.pow(10, maxLog * (1 - tNorm)) - 1;
+        return effMax - yearsAgo;
+      } else {
+        const t = (xLog - padX) / (W - 2 * padX);
+        return effMin + t * (effMax - effMin);
+      }
     }
 
     wrap.addEventListener('wheel', (e) => {
@@ -7377,22 +7541,154 @@
       panX = Math.max(minPan, Math.min(0, panX));
       dragLiveDx = 0;
       dragActuallyMoved = false;
-      render(periodSel.value, domSel.value);
+      render(currentMode, domSel.value);
+      renderMiniMap();
     });
 
-    // Init : période par défaut = moderne (la plus utile vu la densité)
-    periodSel.value = 'moderne';
-    render('moderne', '');
-    periodSel.addEventListener('change', () => {
+    // ---- Mini-map ----
+    // Bande basse, 90px de haut, qui montre l'**intégralité** de la période
+    // du mode courant (pas affectée par le pan/zoom du SVG principal).
+    // Tous les événements y sont en gris clair (sans clustering), et un
+    // rectangle indique la fenêtre actuellement visible dans le SVG principal.
+    // Le clic ou le drag dans la mini-map permet de re-cadrer la grande timeline.
+    const MM_H = 90, MM_PADX = 30, MM_AXIS_Y = MM_H - 22;
+    const miniWrap = el('div', { class: 'timeline-minimap-wrap' });
+    main.appendChild(miniWrap);
+
+    function renderMiniMap() {
+      const P = MODES[currentMode];
+      let filtered = events;
+      if (P.minY != null) filtered = filtered.filter(e => e.year >= P.minY);
+      if (P.maxY != null) filtered = filtered.filter(e => e.year <= P.maxY);
+      if (domSel.value) filtered = filtered.filter(e => e.domain === domSel.value);
+      const effMin = P.minY != null ? P.minY : (filtered.length ? Math.min(...filtered.map(e => e.year)) : NOW - 1);
+      const effMax = P.maxY != null ? P.maxY : NOW;
+      const maxLog = Math.log10(1 + Math.max(1, (effMax - effMin)));
+
+      function mmX(year) {
+        if (P.scale === 'log') {
+          const yearsAgo = effMax - year;
+          if (yearsAgo <= 0) return W - MM_PADX;
+          const t = Math.log10(1 + yearsAgo) / maxLog;
+          return MM_PADX + (1 - t) * (W - 2 * MM_PADX);
+        } else {
+          const t = (year - effMin) / Math.max(1, (effMax - effMin));
+          return MM_PADX + t * (W - 2 * MM_PADX);
+        }
+      }
+      // Fenêtre courante : on convertit padX et W-padX du SVG principal en
+      // années (au scale/panX actuel), puis on les replace dans le repère
+      // mini-map (qui est en scale=1).
+      const yLeft  = yearAtXDisplayForMode(currentMode, padX);
+      const yRight = yearAtXDisplayForMode(currentMode, W - padX);
+      const mmLeft  = mmX(Math.max(effMin, Math.min(effMax, yLeft != null ? yLeft : effMin)));
+      const mmRight = mmX(Math.max(effMin, Math.min(effMax, yRight != null ? yRight : effMax)));
+
+      let inner = '';
+      // Axe
+      inner += `<line class="timeline-mm-axis" x1="${MM_PADX}" y1="${MM_AXIS_Y}" x2="${W - MM_PADX}" y2="${MM_AXIS_Y}"/>`;
+      // Points d'événements (gris clair, taille fixe)
+      filtered.forEach(e => {
+        const x = mmX(e.year);
+        inner += `<circle class="timeline-mm-dot" cx="${x.toFixed(1)}" cy="${MM_AXIS_Y - 6}" r="2" style="fill:${domainColor(e.domain)}"/>`;
+      });
+      // Fenêtre visible
+      const winX = Math.min(mmLeft, mmRight);
+      const winW = Math.max(8, Math.abs(mmRight - mmLeft));
+      inner += `<rect class="timeline-mm-window" x="${winX.toFixed(1)}" y="6" width="${winW.toFixed(1)}" height="${(MM_H - 18).toFixed(1)}" rx="3"/>`;
+      // Labels min / max
+      const fmt = y => y < 0 ? Math.round(Math.abs(y) / (Math.abs(y) > 9999 ? 1e6 : 1)) + (Math.abs(y) > 9999 ? ' Ma' : ' av. J.-C.') : (y === NOW ? 'aujourd\'hui' : String(Math.round(y)));
+      inner += `<text class="timeline-mm-lbl" x="${MM_PADX}" y="${MM_H - 4}" text-anchor="start">${fmt(effMin)}</text>`;
+      inner += `<text class="timeline-mm-lbl" x="${W - MM_PADX}" y="${MM_H - 4}" text-anchor="end">${fmt(effMax)}</text>`;
+
+      miniWrap.innerHTML = `<svg class="timeline-minimap" viewBox="0 0 ${W} ${MM_H}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">${inner}</svg>`;
+      const mmSvg = miniWrap.querySelector('.timeline-minimap');
+      if (mmSvg) wireMiniMapInteraction(mmSvg, mmX, effMin, effMax, P);
+    }
+
+    function wireMiniMapInteraction(mmSvg, mmX, effMin, effMax, P) {
+      // Click dans la mini-map = recadre le SVG principal pour centrer là.
+      // Drag = idem en continu.
+      function pickYearFromEvent(e) {
+        const ctm = mmSvg.getScreenCTM(); if (!ctm) return null;
+        const pt = mmSvg.createSVGPoint();
+        pt.x = e.clientX; pt.y = 0;
+        const xd = pt.matrixTransform(ctm.inverse()).x;
+        // Inverser mmX
+        if (P.scale === 'log') {
+          const maxLog = Math.log10(1 + Math.max(1, (effMax - effMin)));
+          const tNorm = (xd - MM_PADX) / (W - 2 * MM_PADX);
+          const yearsAgo = Math.pow(10, maxLog * (1 - tNorm)) - 1;
+          return effMax - yearsAgo;
+        } else {
+          const t = (xd - MM_PADX) / (W - 2 * MM_PADX);
+          return effMin + t * (effMax - effMin);
+        }
+      }
+      function centerOn(year) {
+        // On veut que dans le SVG principal, l'année y soit au centre
+        // (x = W/2). xLogical(year) = (selon scale du mode courant).
+        let xLogical;
+        if (P.scale === 'log') {
+          const maxLog = Math.log10(1 + Math.max(1, (effMax - effMin)));
+          const yearsAgo = effMax - year;
+          if (yearsAgo <= 0) xLogical = W - padX;
+          else xLogical = padX + (1 - Math.log10(1 + yearsAgo) / maxLog) * (W - 2 * padX);
+        } else {
+          const t = (year - effMin) / Math.max(1, (effMax - effMin));
+          xLogical = padX + t * (W - 2 * padX);
+        }
+        // xFor_new(year) = W/2 → panX = W/2 - padX - (xLogical - padX) * scale
+        panX = W / 2 - padX - (xLogical - padX) * scale;
+        const minPan = (W - 2 * padX) * (1 - scale);
+        panX = Math.max(minPan, Math.min(0, panX));
+        pinnedKey = null;
+        tooltip.classList.remove('is-visible');
+        render(currentMode, domSel.value);
+        renderMiniMap();
+      }
+      mmSvg.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        const y = pickYearFromEvent(e);
+        if (y != null) centerOn(y);
+        function onMove(ev) {
+          const y2 = pickYearFromEvent(ev);
+          if (y2 != null) centerOn(y2);
+        }
+        function onUp() {
+          window.removeEventListener('mousemove', onMove);
+          window.removeEventListener('mouseup', onUp);
+        }
+        window.addEventListener('mousemove', onMove);
+        window.addEventListener('mouseup', onUp);
+      });
+    }
+
+    function syncModeButtons() {
+      btnLong.classList.toggle('is-active', currentMode === 'long');
+      btnCourt.classList.toggle('is-active', currentMode === 'court');
+    }
+    function switchTo(mode) {
+      if (currentMode === mode) return;
+      currentMode = mode;
       panX = 0; scale = 1;
       pinnedKey = null;
       tooltip.classList.remove('is-visible');
-      render(periodSel.value, domSel.value);
-    });
+      syncModeButtons();
+      render(currentMode, domSel.value);
+      renderMiniMap();
+    }
+    btnLong.addEventListener('click', () => switchTo('long'));
+    btnCourt.addEventListener('click', () => switchTo('court'));
+
+    // Init : mode Long par défaut, montre l'échelle cosmique complète.
+    render(currentMode, '');
+    renderMiniMap();
     domSel.addEventListener('change', () => {
       pinnedKey = null;
       tooltip.classList.remove('is-visible');
-      render(periodSel.value, domSel.value);
+      render(currentMode, domSel.value);
+      renderMiniMap();
     });
   }
 
