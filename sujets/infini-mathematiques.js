@@ -331,6 +331,49 @@ Aujourd\'hui, la **théorie des ensembles** est le langage standard des mathéma
       correcte: 1,
       explication: 'Phrase prononcée à Heidelberg en 1926. Cantor avait été combattu, traité de charlatan, et avait fini en hôpital psychiatrique. Hilbert a contribué à sa réhabilitation posthume. Aujourd\'hui, la théorie des ensembles est la langue standard des mathématiques modernes.'
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Infini potentiel',
+      definition: `Conception aristotélicienne de l'infini : ce qu'on peut **indéfiniment prolonger** sans jamais l'achever (ajouter 1, encore 1...). Position prudente, dominante jusqu'à la fin du XIXᵉ siècle, qui refuse de considérer une totalité infinie comme un objet en soi.`
+    },
+    {
+      terme: 'Infini actuel',
+      definition: `Conception cantorienne : une **totalité infinie** considérée comme un objet mathématique légitime, sur lequel on peut raisonner. Rupture fondatrice qui rend possible la théorie des ensembles moderne.`
+    },
+    {
+      terme: 'Bijection',
+      definition: `Correspondance **un-à-un** entre deux ensembles où chaque élément de l'un est apparié à exactement un élément de l'autre. Sert chez Cantor de **définition** de l'égalité de cardinal — y compris pour les ensembles infinis.`
+    },
+    {
+      terme: 'Cardinal',
+      definition: `*« Taille »* d'un ensemble. Deux ensembles ont le même cardinal s'il existe une bijection entre eux. Pour les ensembles infinis, Cantor a montré qu'il existe une **hiérarchie infinie** de cardinaux distincts.`
+    },
+    {
+      terme: 'Dénombrable',
+      definition: `Se dit d'un ensemble infini dont les éléments peuvent être **numérotés par les entiers** ℕ (mis en bijection avec ℕ). Cardinal noté ℵ₀ — le *plus petit* infini. ℕ, ℤ et ℚ sont dénombrables.`
+    },
+    {
+      terme: 'Argument diagonal',
+      definition: `Démonstration de Cantor (**1891**) prouvant que les réels ne sont pas dénombrables : à toute liste hypothétique de réels, on peut construire un réel qui **diffère diagonalement** de chacun. Même schéma de raisonnement utilisé ensuite par Gödel et Turing.`
+    },
+    {
+      terme: 'Continu',
+      definition: `Cardinal de l'ensemble ℝ des nombres réels, noté 𝔠 = 2^ℵ₀. **Strictement plus grand** que ℵ₀ : aucune liste ne peut épuiser les réels. Toute droite, tout intervalle, tout plan a ce même cardinal.`
+    },
+    {
+      terme: 'Aleph',
+      definition: `Lettre hébraïque ℵ introduite par Cantor pour désigner les cardinaux infinis. ℵ₀ est le plus petit (dénombrable), suivi de ℵ₁, ℵ₂... — une **hiérarchie infinie d'infinis** strictement croissants.`
+    },
+    {
+      terme: 'Hypothèse du continu',
+      definition: `Conjecture de Cantor : il n'existe **aucun cardinal strictement entre** ℵ₀ et 𝔠. Premier problème de Hilbert (1900). **Indécidable** dans les axiomes ZFC — démontrée non réfutable par Gödel (1940) et non prouvable par Cohen (1963).`
+    },
+    {
+      terme: 'Incomplétude de Gödel',
+      definition: `Théorème de **1931** : toute théorie mathématique assez expressive pour contenir l'arithmétique contient des **énoncés vrais mais indémontrables** en son sein. Met fin au rêve de Hilbert d'une mathématique entièrement formalisable.`
+    }
   ]
 
 });

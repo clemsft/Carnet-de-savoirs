@@ -420,6 +420,49 @@ Curiosité pure devenue infrastructure planétaire. Un siècle après que **Hard
       correcte: 1,
       explication: 'Si 1 était premier, la décomposition de 6 pourrait s\'écrire 2 × 3, ou 1 × 2 × 3, ou 1 × 1 × 2 × 3... Plus d\'unicité. Pour préserver le théorème fondamental de l\'arithmétique, on exige des premiers qu\'ils aient exactement deux diviseurs distincts — ce qui exclut 1.'
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Nombre premier',
+      definition: `Entier strictement supérieur à 1 qui n'admet que **deux diviseurs positifs** : 1 et lui-même. Premiers de la liste : 2, 3, 5, 7, 11, 13... Le seul premier pair est **2**. Par convention, 1 n'est pas premier — pour préserver l'unicité de la décomposition.`
+    },
+    {
+      terme: 'Théorème fondamental de l\'arithmétique',
+      definition: `Tout entier supérieur à 1 s'écrit, de manière **unique** (à l'ordre près des facteurs), comme produit de nombres premiers. Les premiers sont donc les *atomes* des entiers — propriété centrale, énoncée par Euclide il y a vingt-trois siècles.`
+    },
+    {
+      terme: 'Crible d\'Ératosthène',
+      definition: `Algorithme antique pour lister les premiers jusqu'à une borne : on écrit les entiers, on barre les multiples de chaque premier successif. Inventé au IIIᵉ siècle av. J.-C. par le bibliothécaire d'Alexandrie, toujours efficace 23 siècles plus tard.`
+    },
+    {
+      terme: 'Théorème des nombres premiers',
+      definition: `Résultat asymptotique conjecturé par **Gauss** à 15 ans, démontré en 1896 par **Hadamard** et **de la Vallée Poussin** : le nombre de premiers ≤ *n* est équivalent à *n / ln(n)*. Décrit la raréfaction moyenne des premiers.`
+    },
+    {
+      terme: 'Hypothèse de Riemann',
+      definition: `Conjecture énoncée en **1859** par **Bernhard Riemann** : tous les zéros non triviaux de la fonction *zêta* ont une partie réelle égale à 1/2. Affirmerait la régularité maximale de la distribution des premiers. L'un des **sept problèmes du millénaire**, doté d'un million de dollars.`
+    },
+    {
+      terme: 'Conjecture de Goldbach',
+      definition: `Énoncée en **1742** dans une lettre à Euler : *tout entier pair strictement supérieur à 2 est la somme de deux nombres premiers*. Vérifiée par ordinateur jusqu'à 4 × 10^18, elle reste non démontrée près de trois siècles plus tard.`
+    },
+    {
+      terme: 'Premiers jumeaux',
+      definition: `Paires de premiers séparés de **2** : (11, 13), (17, 19), (41, 43)... Leur infinité reste une conjecture ouverte. Percée historique de **Yitang Zhang** en 2013 : il existe une infinité de paires séparées de moins de 70 millions (borne ramenée depuis à 246).`
+    },
+    {
+      terme: 'Premiers de Mersenne',
+      definition: `Premiers de la forme **2^p − 1** où *p* est premier, étudiés par le moine **Marin Mersenne** au XVIIᵉ siècle. Le test de **Lucas-Lehmer** leur est spécifiquement adapté : tous les détenteurs actuels du record du plus grand premier connu en font partie.`
+    },
+    {
+      terme: 'RSA',
+      definition: `Algorithme de **cryptographie asymétrique** publié en 1977 par Rivest, Shamir, Adleman. Sa sécurité repose sur l'asymétrie : multiplier deux grands premiers est instantané, retrouver les facteurs est computationnellement intractable. Socle du HTTPS, des signatures électroniques, du commerce en ligne.`
+    },
+    {
+      terme: 'Factorisation',
+      definition: `Décomposition d'un entier en produit de ses **facteurs premiers**. Facile pour de petits nombres, mais **réputée intractable** pour les grands entiers (~600 chiffres) avec les algorithmes classiques. L'algorithme de **Shor** (1994) la résoudrait en temps polynomial sur ordinateur quantique — menace pour RSA.`
+    }
   ]
 
 });

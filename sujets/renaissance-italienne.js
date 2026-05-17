@@ -335,6 +335,49 @@ Et lointainement, c\'est aussi de Florence que viennent **les Lumières** : sans
       correcte: 2,
       explication: `Raphaël meurt brutalement le 6 avril 1520, le jour de son trente-septième anniversaire. Le talent absolu fauché en plein vol. Il est enterré au Panthéon de Rome. Léonard est mort un an plus tôt en France ; Michel-Ange vivra jusqu\'en 1564.`
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Renaissance',
+      definition: `Mouvement culturel européen des **XVᵉ-XVIᵉ siècles** caractérisé par la *rinascita* — renaissance — des arts et lettres de l'Antiquité classique. Le terme a été popularisé rétrospectivement par **Jules Michelet** au XIXᵉ siècle.`
+    },
+    {
+      terme: 'Humanisme',
+      definition: `Mouvement intellectuel central de la Renaissance, fondé sur la **redécouverte des textes antiques** grecs et latins (*studia humanitatis*). Place l'**homme** au centre de la pensée et de l'éducation, contre la scolastique médiévale centrée sur Dieu.`
+    },
+    {
+      terme: 'Quattrocento',
+      definition: `Littéralement *les années 1400* en italien : désigne le **XVᵉ siècle italien**, première phase de la Renaissance centrée sur **Florence**. Brunelleschi, Donatello, Masaccio, Botticelli y inventent la perspective, l'anatomie, le portrait individualisé.`
+    },
+    {
+      terme: 'Cinquecento',
+      definition: `Le **XVIᵉ siècle italien**, apogée de la Renaissance dominée par les *trois géants* — Léonard, Michel-Ange, Raphaël — et le mécénat des papes à Rome. S'achève avec le sac de Rome en 1527 et la Contre-Réforme.`
+    },
+    {
+      terme: 'Mécénat',
+      definition: `**Financement et protection des artistes** par des princes, papes ou banquiers. Modèle économique central de la Renaissance : sans les Médicis, sans Jules II ou Léon X, les œuvres majeures n'auraient pas existé. Inventeur de la figure moderne de l'artiste comme génie individuel.`
+    },
+    {
+      terme: 'Médicis',
+      definition: `Famille de **banquiers florentins** enrichis dès le XIVᵉ siècle, qui dominent la cité à partir des années 1430. Mécènes incomparables (Cosme, Laurent le Magnifique), ils ont financé Botticelli, le jeune Michel-Ange, l'Académie platonicienne. Quatre Médicis monteront sur le trône pontifical.`
+    },
+    {
+      terme: 'Perspective géométrique',
+      definition: `Système de représentation de la **profondeur** sur une surface plane, fondé sur la convergence des lignes parallèles vers un **point de fuite**. Démontrée par **Brunelleschi** vers 1415, théorisée par **Alberti** en 1435. Fait de la peinture une *fenêtre ouverte* sur le monde.`
+    },
+    {
+      terme: 'Imprimerie',
+      definition: `Procédé de reproduction des textes par **caractères mobiles** métalliques, mis au point par **Johannes Gutenberg** à Mayence vers 1450. En cinquante ans, l'Europe imprime ~20 millions d'exemplaires — révolution comparable à celle d'Internet, sans laquelle ni humanisme ni Réforme n'auraient pris cette ampleur.`
+    },
+    {
+      terme: 'Génie universel',
+      definition: `Figure inventée par la Renaissance — incarnée par **Léonard de Vinci** — de l'individu maîtrisant à la fois peinture, science, ingénierie, anatomie, philosophie. Idéal du *uomo universale* qui rompt avec la spécialisation médiévale de l'artisan.`
+    },
+    {
+      terme: 'Contre-Réforme',
+      definition: `Réaction de l'Église catholique à la Réforme protestante, codifiée au **concile de Trente** (1545-1563). Réimpose un contrôle moral et théologique sur les images — les nus de la chapelle Sixtine seront partiellement censurés. Marque la fin progressive de la liberté créatrice de la Renaissance.`
+    }
   ]
 
 });

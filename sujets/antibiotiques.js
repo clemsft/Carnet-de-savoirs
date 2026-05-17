@@ -342,6 +342,41 @@ D'autres pistes sont explorées : **peptides antimicrobiens** naturels (présent
       correcte: 1,
       explication: `Les bactériophages (ou "phages") sont des virus qui n'infectent que les bactéries. Découverts par Félix d'Hérelle en 1917, longtemps utilisés en Géorgie soviétique (Institut Eliava), aujourd'hui redécouverts en Occident face à l'impasse antibiotique. Chaque phage est très spécifique d'une espèce bactérienne, ce qui évite la destruction collatérale du microbiote.`
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Antibiotique',
+      definition: `Molécule qui tue ou inhibe la croissance des bactéries en exploitant une **cible spécifique** absente ou très différente chez l'humain : paroi cellulaire, ribosome 70S, ADN gyrase, ou voie métabolique propre.`
+    },
+    {
+      terme: 'Bêta-lactamines',
+      definition: `Famille d'antibiotiques (**pénicillines**, céphalosporines, carbapénèmes) qui bloque la synthèse du **peptidoglycane** de la paroi bactérienne. La bactérie en division éclate sous la pression osmotique.`
+    },
+    {
+      terme: 'Résistance antimicrobienne',
+      definition: `Capacité acquise par une population bactérienne à survivre à un antibiotique. Conséquence directe d'une **sélection naturelle** accélérée : les mutants résistants prolifèrent sous pression du traitement.`
+    },
+    {
+      terme: 'Transfert horizontal',
+      definition: `Échange de gènes — souvent de résistance — entre bactéries d'espèces différentes, principalement via des [[adn-genetique|plasmides]]. Beaucoup plus rapide que l'évolution par descendance verticale.`
+    },
+    {
+      terme: 'Bêta-lactamase',
+      definition: `Enzyme produite par certaines bactéries qui **dégrade** la structure des pénicillines avant qu'elles agissent. Contournée en clinique par l'association à un inhibiteur comme l'**acide clavulanique** (Augmentin).`
+    },
+    {
+      terme: 'Phagothérapie',
+      definition: `Traitement infectieux utilisant des **bactériophages**, virus naturellement spécifiques d'une espèce bactérienne. Vieille technique née en 1917, maintenue en ex-URSS et redécouverte face à l'impasse antibiotique.`
+    },
+    {
+      terme: 'Spectre',
+      definition: `Étendue des espèces bactériennes sur lesquelles un antibiotique est actif. Un **large spectre** vise de nombreuses bactéries (utile en empirique, mais perturbe le microbiote) ; un **spectre étroit** ne touche qu'un type précis.`
+    },
+    {
+      terme: 'MRSA',
+      definition: `*Méthicilline-resistant Staphylococcus aureus* : souche de staphylocoque doré porteuse d'une **cible modifiée** rendant les bêta-lactamines inopérantes. Cause majeure d'infections nosocomiales sévères.`
+    }
   ]
 
 });

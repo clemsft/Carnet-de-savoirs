@@ -313,6 +313,49 @@ Aujourd'hui, l'évolution n'est plus discutée dans son principe — elle est **
       correcte: 1,
       explication: `L'évolution n'est ni dirigée ni intentionnelle. Elle ne "vise" pas la complexité ou l'humain. Elle fait simplement que les traits favorisant la reproduction deviennent plus fréquents. Penser qu'elle "progresse" est l'un des malentendus les plus répandus — et trompeurs — sur la théorie.`
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Sélection naturelle',
+      definition: `Mécanisme évolutif central proposé par *Darwin* : les individus mieux **adaptés** à leur milieu laissent en moyenne plus de descendants, faisant croître la fréquence de leurs traits dans la population sur des générations. Aveugle, sans but.`
+    },
+    {
+      terme: 'Adaptation',
+      definition: `Caractère héréditaire qui **améliore les chances** de survie et de reproduction d'un organisme dans son environnement. Produit, et non cause, de la sélection naturelle — l'œil, le vol, la photosynthèse en sont des exemples spectaculaires.`
+    },
+    {
+      terme: 'Mutation',
+      definition: `**Modification aléatoire** de la séquence d'ADN lors de la réplication. Source unique de variation génétique nouvelle. Presque toujours neutre ou délétère, très rarement bénéfique — mais c'est ce résidu rare qui alimente toute l'évolution.`
+    },
+    {
+      terme: 'Dérive génétique',
+      definition: `**Changement aléatoire** de la fréquence des allèles dans une population au fil des générations, indépendamment de tout avantage adaptatif. Effet dominant dans les **petites populations** et lors des goulots d'étranglement.`
+    },
+    {
+      terme: 'Spéciation',
+      definition: `Processus par lequel une population se scinde en **deux espèces distinctes** incapables de se reproduire fertilement entre elles. Le scénario le plus courant est *allopatrique* : isolement géographique, puis divergence indépendante.`
+    },
+    {
+      terme: 'Ancêtre commun',
+      definition: `Population ou organisme ancestral dont descendent **plusieurs lignées** actuelles. Concept fondateur de la phylogénie darwinienne : humains et chimpanzés partagent un ancêtre commun il y a 6-7 millions d'années — ils ne descendent pas l'un de l'autre.`
+    },
+    {
+      terme: 'Homologie',
+      definition: `Similitude entre structures héritée d'un **ancêtre commun** (bras humain, aile de chauve-souris, nageoire de baleine : même plan osseux). Preuve anatomique majeure de la descendance commune. À distinguer de l'*analogie*, ressemblance par convergence.`
+    },
+    {
+      terme: 'Synthèse néo-darwinienne',
+      definition: `Cadre théorique formalisé dans les années **1930-1950** par *Fisher*, *Haldane*, *Mayr*, *Dobzhansky* : unit la sélection darwinienne et la génétique mendélienne. Les variations sont des mutations de gènes, transmises selon les lois de l'hérédité.`
+    },
+    {
+      terme: 'Phylogénie',
+      definition: `**Arbre généalogique** des espèces, reconstruit aujourd'hui à partir des similarités d'ADN. Trois grands domaines à la racine du vivant : **bactéries**, **archées**, **eucaryotes**. Outil unificateur de toute la biologie comparée.`
+    },
+    {
+      terme: 'Pinsons de Darwin',
+      definition: `Quinze espèces d'oiseaux endémiques des îles **Galápagos**, descendantes d'une espèce ancestrale unique. Leurs becs spécialisés (graines, insectes, cactus) sont le cas d'école de la [radiation adaptative]{accent} et de la spéciation allopatrique.`
+    }
   ]
 
 });

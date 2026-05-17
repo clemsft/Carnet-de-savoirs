@@ -311,6 +311,49 @@ La justice climatique est l'angle moral et géopolitique du problème. Les pays 
       correcte: 1,
       explication: `Le méthane provient principalement de l'élevage, de la riziculture, des fuites de gaz fossile et des décharges. Sa courte durée de vie atmosphérique (~12 ans) en fait un levier d'action particulièrement efficace : agir maintenant sur le méthane ralentit visiblement le réchauffement en quelques décennies.`
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Effet de serre',
+      definition: `Mécanisme par lequel certains gaz atmosphériques absorbent l'infrarouge réémis par la Terre et **réchauffent** la basse atmosphère. Phénomène naturel indispensable (+33 °C par rapport à un sol nu), mais amplifié par les émissions humaines.`
+    },
+    {
+      terme: 'Courbe de Keeling',
+      definition: `Série de mesures continues du **CO₂ atmosphérique** au sommet du **Mauna Loa** depuis **1958**. De 315 ppm initialement à plus de 425 ppm aujourd'hui — l'une des données les plus emblématiques de la science contemporaine.`
+    },
+    {
+      terme: 'GIEC',
+      definition: `**Groupe d'experts intergouvernemental sur l'évolution du climat**, créé en 1988. N'effectue pas de recherche : *évalue* la littérature publiée et publie des rapports validés par les 195 États membres — instance de consensus la plus solide jamais constituée.`
+    },
+    {
+      terme: 'Forçage radiatif',
+      definition: `Modification du bilan énergétique terrestre (en W/m²) due à un facteur perturbateur, comme l'augmentation des gaz à effet de serre. Pour le CO₂, suit la loi **ΔF = 5,35 × ln(C/C₀)**.`
+    },
+    {
+      terme: 'Boucle de rétroaction',
+      definition: `Mécanisme par lequel une variation climatique en **amplifie** (rétroaction positive) ou en **atténue** (négative) ses propres causes. L'**albédo** glace-eau ou la fonte du pergélisol sont des rétroactions positives majeures.`
+    },
+    {
+      terme: 'Point de bascule',
+      definition: `Seuil au-delà duquel un système climatique bascule vers un **nouvel état stable**, souvent irréversible à l'échelle humaine. Une étude de 2022 en identifie **16 majeurs**, dont 5 potentiellement franchis dès le réchauffement actuel.`
+    },
+    {
+      terme: 'Scénarios SSP',
+      definition: `*Shared Socioeconomic Pathways* : cinq trajectoires socio-économiques utilisées par le GIEC pour projeter le climat de 2100, du **SSP1-1.9** (+1,4 °C, durabilité) au **SSP5-8.5** (+4,4 °C, fossiles maximaux).`
+    },
+    {
+      terme: 'AMOC',
+      definition: `*Atlantic Meridional Overturning Circulation* : circulation thermohaline atlantique incluant le **Gulf Stream**. Affaiblissement mesuré ; un effondrement complet reconfigurerait le climat européen et la mousson africaine.`
+    },
+    {
+      terme: 'Mitigation',
+      definition: `Levier d'action climatique consistant à **réduire les émissions** de gaz à effet de serre (décarbonation énergétique, électrification, sobriété). À distinguer de l'[adaptation]{accent}, qui prépare les sociétés aux changements inévitables.`
+    },
+    {
+      terme: 'Budget carbone',
+      definition: `Quantité **cumulée** de CO₂ qui peut encore être émise pour rester sous un certain seuil de réchauffement. Pour 1,5 °C (50 % de chances), il reste fin 2024 ~260 Gt CO₂ — épuisable en moins de sept ans au rythme actuel.`
+    }
   ]
 
 });

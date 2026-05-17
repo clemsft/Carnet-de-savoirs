@@ -368,6 +368,49 @@ Le rap est aussi, partout, une **voix générationnelle**. Il a porté la parole
       correcte: 1,
       explication: `Kendrick Lamar a reçu en 2018 le Prix Pulitzer de musique pour son album DAMN. (2017) — première fois qu'un rappeur reçoit cette récompense de très haut prestige, longtemps réservée à la musique classique contemporaine. Avec good kid, m.A.A.d city (2012), To Pimp a Butterfly (2015) et DAMN., il s'est imposé comme la voix la plus écoutée de sa génération et le symbole de la maturité institutionnelle du rap.`
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Hip-hop',
+      definition: `Mouvement culturel global né dans le **Bronx** au début des années 1970, structuré autour de **quatre piliers** : MCing (rap), DJing (platinisme), breakdance (danse au sol) et graffiti. Le rap n'en est qu'une composante — sa partie verbale.`
+    },
+    {
+      terme: 'Breakbeat',
+      definition: `Passage purement rythmique d'un disque funk — quelques mesures de batterie nue — **bouclé sur deux platines** pour servir de base à un morceau. Inventé par **DJ Kool Herc** le 11 août 1973 lors de la soirée fondatrice du hip-hop.`
+    },
+    {
+      terme: 'MC',
+      definition: `*Master of ceremony*. À l'origine, animateur qui prend le micro pour chauffer le public et présenter le DJ. Devient progressivement le **centre de gravité** de la musique : c'est le rappeur lui-même, auteur et interprète des couplets.`
+    },
+    {
+      terme: 'Flow',
+      definition: `Manière dont la voix du rappeur **épouse le tempo** : densité syllabique, accents, respirations, placement en avance ou en retard sur la pulsation. Signature personnelle d'un rappeur, aussi reconnaissable qu'un timbre vocal.`
+    },
+    {
+      terme: 'Sample',
+      definition: `Quelques mesures **empruntées à un disque ancien** (jazz, funk, soul) utilisées comme base d'un morceau neuf. Technique centrale de la production rap qui fait du producteur un *archéologue musical* — héritage direct de la pratique jazz de la citation.`
+    },
+    {
+      terme: 'Boom-bap',
+      definition: `Grammaire rythmique du rap des années **1985-2005** : **kick** lourd sur le 1, **snare** claquant sur le 3, charleston droit, samples soul-jazz découpés à la main. Son emblématique de l'âge d'or new-yorkais (DJ Premier, Pete Rock, J Dilla).`
+    },
+    {
+      terme: 'Trap',
+      definition: `Sous-genre né à **Atlanta** vers 2003 et devenu standard rythmique mondial depuis 2015. Reconnaissable à ses **kicks 808** profonds et longs, sa **charleston en triolets** rapides, ses snares clappés, ses tempos lents perçus doubles.`
+    },
+    {
+      terme: 'G-funk',
+      definition: `Son **West Coast** codé par **Dr. Dre** sur *The Chronic* (1992) : synthés mélancoliques tenus, basses lourdes, atmosphères ensoleillées et menaçantes. Bande-son du gangsta rap californien de Snoop Dogg à 2Pac.`
+    },
+    {
+      terme: 'Rime multisyllabique',
+      definition: `Rime qui porte sur **plusieurs syllabes consécutives** plutôt que sur la seule syllabe finale. Sophistication apparue avec **Rakim** à la fin des années 1980, perfectionnée par Nas, Eminem, Big Pun ; en français par Booba, Nekfeu, Damso.`
+    },
+    {
+      terme: 'Drill',
+      definition: `Sous-genre né à **Chicago** en 2012 avec **Chief Keef**, mondialisé à Londres (Headie One), Brooklyn (Pop Smoke) et Paris (Gazo). Plus dur et plus rapide que la trap, basses massives, paroles brutes liées à la violence des rues.`
+    }
   ]
 
 });

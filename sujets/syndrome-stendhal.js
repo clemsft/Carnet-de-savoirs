@@ -307,6 +307,45 @@ Au-delà de la querelle nosologique, le syndrome conserve une **valeur épistém
       correcte: 1,
       explication: `Trois facteurs convergent : la densité d'œuvres au mètre carré (Santa Croce, Bargello, Offices, Accademia en quelques centaines de mètres) ; Florence comme berceau de la Renaissance qui structure l'imaginaire esthétique occidental ; et la fatigue du voyage qui fragilise les capacités de régulation émotionnelle.`
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Syndrome de Stendhal',
+      definition: `**Trouble psychosomatique aigu** déclenché par une exposition intense à des œuvres d'art : vertiges, tachycardie, dépersonnalisation, parfois hallucinations brèves. Observé pour la première fois par **Stendhal** à Florence en 1817, formalisé par **Graziella Magherini** en 1989.`
+    },
+    {
+      terme: 'Trouble psychosomatique',
+      definition: `Affection où des **symptômes corporels** réels (tachycardie, vertige, sueurs, malaise) sont déclenchés ou amplifiés par des facteurs **psychiques**. Le corps signale ce que l'esprit ne parvient pas à réguler — pas de simulation, pas de pathologie organique sous-jacente détectable.`
+    },
+    {
+      terme: 'Dépersonnalisation',
+      definition: `Sensation troublante de **ne plus être soi-même**, d'observer ses pensées et son corps de l'extérieur, comme déconnecté. Souvent associée à la **déréalisation** (le monde paraît irréel, scénique). Composante cognitive fréquente des attaques de panique et du syndrome de Stendhal.`
+    },
+    {
+      terme: 'Saturation perceptive',
+      definition: `**Surcharge sensorielle, émotionnelle et symbolique** dépassant les capacités de régulation neurovégétative du cerveau. Hypothèse neurologique principale du syndrome de Stendhal : l'exposition intense à des œuvres chargées d'attentes culturelles fait basculer le système en crise.`
+    },
+    {
+      terme: 'Syndrome culturellement spécifique',
+      definition: `Trouble dont la **forme et la prévalence** dépendent fortement du contexte culturel où il survient. Le syndrome de Stendhal y appartient : son existence semble liée à des attentes esthétiques spécifiquement occidentales, des lieux mythifiés et un cadre médical qui le reconnaît.`
+    },
+    {
+      terme: 'Effet nocebo',
+      definition: `Envers de l'**effet placebo** : aggravation ou apparition de symptômes provoquée par les **attentes négatives** ou anxieuses du sujet. Apparenté aux mécanismes du syndrome de Stendhal, où l'attente d'une expérience esthétique transcendante peut, à elle seule, mobiliser des ressources émotionnelles qui débordent.`
+    },
+    {
+      terme: 'Syndrome de Jérusalem',
+      definition: `Trouble apparenté décrit depuis les années 1980 : **délires mystiques** chez certains pèlerins de la Ville sainte (~100 cas par an), qui se prennent pour des personnages bibliques et prêchent en vêtement blanc. Symptômes typiquement résolutifs après retour au pays.`
+    },
+    {
+      terme: 'Syndrome de Paris',
+      definition: `Décrit en 1986 par le psychiatre japonais **Hiroaki Ota** : choc dépressif chez de jeunes touristes (principalement japonais) déçus de l'écart entre la **Paris rêvée** et la **Paris vécue**. L'ambassade du Japon à Paris dispose d'une ligne dédiée au rapatriement de ces cas.`
+    },
+    {
+      terme: 'DSM-5',
+      definition: `Cinquième édition (2013) du **Manuel diagnostique et statistique des troubles mentaux** de l'Association psychiatrique américaine. Référence nosographique mondiale en psychiatrie. Le syndrome de Stendhal n'y figure **pas** comme entité distincte — ni dans la **CIM-11** de l'OMS.`
+    }
   ]
 
 });

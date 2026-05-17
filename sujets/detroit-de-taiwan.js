@@ -297,6 +297,49 @@ C\'est ce que les analystes appellent le [bouclier de silicium]{accent} : l\'id�
       correcte: 1,
       explication: 'Le rapport gouvernemental annuel chinois de 2026 a remplacé "oppose Taiwan independence" par "crack down on Taiwan independence" (écraser). Durcissement rhétorique qui reflète la pression croissante depuis l\'élection de Lai Ching-te.'
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Ambiguïté stratégique',
+      definition: `Doctrine diplomatique américaine vis-à-vis de Taïwan depuis 1979 : **ne jamais préciser** si Washington interviendrait militairement en cas d'invasion chinoise. Vise à dissuader simultanément l'agression de Pékin et la proclamation d'indépendance par Taïpei.`
+    },
+    {
+      terme: 'Bouclier de silicium',
+      definition: `Théorie selon laquelle la concentration extrême de la fabrication des semi-conducteurs avancés chez [TSMC]{accent} rend une invasion de Taïwan **économiquement insupportable** pour tous, y compris la Chine — créant ainsi une dissuasion par interdépendance.`
+    },
+    {
+      terme: 'ADIZ',
+      definition: `*Air Defense Identification Zone* — zone d'identification de défense aérienne. Espace aérien étendu au-delà des eaux territoriales dans lequel un État exige l'identification des aéronefs. Les incursions chinoises répétées dans l'ADIZ taïwanaise constituent l'outil principal de la **pression militaire en zone grise**.`
+    },
+    {
+      terme: 'Zone grise',
+      definition: `Stratégie de pression militaire restant **en deçà du seuil** du conflit ouvert : incursions aériennes, exercices, harcèlement maritime, cyberattaques. Permet d'éroder l'adversaire sans déclencher une réponse armée claire.`
+    },
+    {
+      terme: 'Taiwan Relations Act',
+      definition: `Loi américaine de **1979** adoptée après la reconnaissance diplomatique de Pékin. Oblige les États-Unis à fournir à Taïwan les armes nécessaires à sa défense et instaure des relations non officielles via l'*American Institute in Taiwan*.`
+    },
+    {
+      terme: 'TSMC',
+      definition: `*Taiwan Semiconductor Manufacturing Company*, fondée par Morris Chang en 1987. Plus grand fondeur de puces au monde : ~70 % du marché global de la fonderie et plus de **90 %** des nœuds de gravure les plus avancés (≤ 5 nm).`
+    },
+    {
+      terme: 'Politique d\'une seule Chine',
+      definition: `Position diplomatique selon laquelle il n'existe qu'une seule Chine, dont Taïwan fait partie. Adoptée formellement par la quasi-totalité des États du monde, elle est l'**axiome** sur lequel Pékin a bâti l'isolement diplomatique de Taïpei.`
+    },
+    {
+      terme: 'Ligne médiane',
+      definition: `Frontière informelle traversant le **détroit de Taïwan** en son milieu, respectée tacitement par les deux camps pendant des décennies. Depuis 2022, l'aviation chinoise la franchit régulièrement, brisant un tabou stratégique majeur.`
+    },
+    {
+      terme: 'Kuomintang',
+      definition: `Parti nationaliste chinois fondé par *Sun Yat-sen* puis dirigé par *Tchang Kaï-chek*. Vaincu par les communistes de Mao en 1949, il se replie à Taïwan où il dirigea l'île jusqu'en 2000 et reste l'un des deux grands partis, généralement favorable à un **rapprochement** avec le continent.`
+    },
+    {
+      terme: 'DPP',
+      definition: `*Democratic Progressive Party* — parti démocrate progressiste taïwanais, fondé en 1986. Force politique favorable à la **souveraineté** distincte de Taïwan, au pouvoir depuis 2016 avec *Tsai Ing-wen* puis *Lai Ching-te*. Considéré par Pékin comme *séparatiste*.`
+    }
   ]
 
 });

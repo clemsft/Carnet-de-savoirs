@@ -326,6 +326,45 @@ Reste, malgré tout, l'extraordinaire **actualité** de l'attitude stoïcienne. 
       correcte: 1,
       explication: `Contre l'usage courant : le sage stoïcien ressent les émotions, il ne les laisse simplement pas dicter ses jugements ni ses actions. C'est une discipline de la raison, pas une anesthésie. La caricature de l'impassibilité absolue est un contresens populaire.`
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Stoïcisme',
+      definition: `École philosophique fondée à Athènes vers **-301** par **Zénon de Citium**, sous le portique peint (*Stoa Poikilè*) qui lui donne son nom. Conçoit la philosophie comme une **discipline de vie** combinant logique, physique et éthique.`
+    },
+    {
+      terme: 'Logos',
+      definition: `**Raison universelle** qui, pour les stoïciens, anime le cosmos comme un grand corps cohérent. Chacun en porte une étincelle — c'est ce que nous appelons la raison humaine. Notion reprise par le christianisme dans le prologue de l'évangile de Jean.`
+    },
+    {
+      terme: 'Dichotomie du contrôle',
+      definition: `Outil pratique central du stoïcien, formulé par **Épictète** à l'incipit du *Manuel* : distinguer ce qui dépend de nous (jugements, désirs, actions) de ce qui n'en dépend pas (corps, biens, réputation, événements). N'investir notre effort que sur la première catégorie.`
+    },
+    {
+      terme: 'Ataraxie',
+      definition: `**Tranquillité de l'âme**, état de paix intérieure imperturbable visé par le sage. Atteinte non par fuite ou anesthésie, mais par l'usage droit de la raison face aux représentations qui se présentent à l'esprit.`
+    },
+    {
+      terme: 'Vertu',
+      definition: `Pour le stoïcien, le **seul vrai bien** : exercice droit de la raison. Tout le reste — santé, richesse, réputation, longévité — n'est qu'*indifférent*. Un homme vertueux pauvre est plus heureux qu'un homme vicieux fortuné.`
+    },
+    {
+      terme: 'Praemeditatio malorum',
+      definition: `**Préméditation des maux**. Exercice spirituel recommandé par **Sénèque** : se représenter calmement à l'avance ce qui pourrait arriver de pire (deuil, ruine, maladie). Pas pour s'angoisser, mais pour désarmer la surprise et la révolte le moment venu.`
+    },
+    {
+      terme: 'Vue d\'en haut',
+      definition: `Exercice de **relativisation cosmique** pratiqué par **Marc Aurèle** : imaginer la Terre vue du ciel, les armées comme des fourmilières, les villes comme des taches. Permet de redimensionner ses tracas à l'échelle du monde et du temps.`
+    },
+    {
+      terme: 'Indifférents',
+      definition: `Catégorie stoïcienne des choses **sans valeur morale propre** — ni biens ni maux véritables. Santé, richesse, réputation, longévité : préférables au quotidien, mais leur perte ne compromet pas le bonheur du sage, qui ne dépend que de la **vertu**.`
+    },
+    {
+      terme: 'Thérapie cognitivo-comportementale',
+      definition: `Approche psychothérapeutique fondée par **Albert Ellis** et **Aaron Beck** dans les années 1950-1960. Identifie et confronte les pensées automatiques déformées qui causent la souffrance. Reprend directement le principe d'Épictète : ce ne sont pas les événements qui nous troublent, mais nos jugements sur eux.`
+    }
   ]
 
 });

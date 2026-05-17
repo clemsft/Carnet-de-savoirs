@@ -340,6 +340,41 @@ La fonte du **permafrost** — sol gelé en permanence — pose un double probl�
       correcte: 2,
       explication: 'Les Inuits couvrent l\'arc Canada-Groenland-Alaska. Les Sames vivent en Scandinavie (et un peu en Russie), les Nenets et les Tchouktches en Russie sibérienne. Ces peuples sont représentés au Conseil de l\'Arctique via six organisations observatrices.'
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Banquise',
+      definition: `Glace de **mer** flottante, formée par la congélation de l'eau salée. Variation saisonnière forte. Sa fonte ne fait pas monter le niveau marin (principe d'Archimède), contrairement à la glace continentale.`
+    },
+    {
+      terme: 'Amplification arctique',
+      definition: `Phénomène par lequel l'Arctique se réchauffe environ **quatre fois plus vite** que la moyenne mondiale. Cause principale : la **boucle de rétroaction de l'albédo** — la glace blanche réfléchissante laisse place à une eau sombre absorbante.`
+    },
+    {
+      terme: 'Albédo',
+      definition: `Fraction du rayonnement solaire **réfléchie** par une surface. La glace a un albédo élevé (~80 %), l'eau libre un albédo faible (~10 %) : leur substitution est au cœur de l'emballement climatique polaire.`
+    },
+    {
+      terme: 'Inlandsis',
+      definition: `Calotte de glace **continentale** reposant sur la terre ferme, comme celle du **Groenland** (~1,7 million de km²). Sa fonte fait monter le niveau marin mondial, à la différence de la banquise.`
+    },
+    {
+      terme: 'Permafrost',
+      definition: `Sol gelé en permanence des hautes latitudes. Contient environ deux fois plus de carbone que l'atmosphère terrestre, sous forme de **méthane** piégé. Sa fonte libère ce gaz, alimentant une rétroaction climatique.`
+    },
+    {
+      terme: 'Route maritime du Nord',
+      definition: `Voie maritime longeant les côtes sibériennes, contrôlée par la **Russie**. Raccourcit le trajet Asie-Europe d'environ **40 %** par rapport à la route de Suez (~13 000 km contre ~21 000 km).`
+    },
+    {
+      terme: 'Conseil de l\'Arctique',
+      definition: `Forum intergouvernemental créé en **1996** réunissant les **8 États** arctiques (Russie, États-Unis, Canada, Norvège, Danemark, Islande, Suède, Finlande) et six organisations autochtones observatrices. Coopération suspendue avec Moscou depuis 2022.`
+    },
+    {
+      terme: 'État proche de l\'Arctique',
+      definition: `Statut auto-déclaré par la **Chine** dans un livre blanc de 2018 pour légitimer sa présence dans la région, malgré l'absence de toute frontière polaire. Sous-tend sa *route polaire de la soie*.`
+    }
   ]
 
 });

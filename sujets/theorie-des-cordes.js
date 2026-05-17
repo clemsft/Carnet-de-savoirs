@@ -394,6 +394,49 @@ L\'histoire de la théorie des cordes — son ascension fulgurante, sa dominatio
       correcte: 2,
       explication: 'C\'est la position lucide. La théorie n\'a pas tenu sa promesse d\'unification prédictive, mais ses retombées mathématiques et conceptuelles (AdS/CFT notamment) sont indéniables. Reconnaître cela demande un peu d\'honnêteté intellectuelle de part et d\'autre du débat.'
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Gravité quantique',
+      definition: `**Cadre théorique unifié** qui devrait réconcilier la [[theorie-relativite]] générale (gravité) et la [[mecanique-quantique]] (matière), incompatibles aux échelles extrêmes des trous noirs et du Big Bang. La théorie des cordes en est la candidate la plus étudiée — sans succès expérimental à ce jour.`
+    },
+    {
+      terme: 'Longueur de Planck',
+      definition: `Échelle de distance fondamentale, environ **10⁻³⁵ m**, soit 10²⁰ fois plus petite qu'un proton. À cette échelle, les fluctuations quantiques de l'espace-temps deviennent du même ordre que l'espace-temps lui-même — la géométrie classique cesse d'avoir un sens.`
+    },
+    {
+      terme: 'Corde',
+      definition: `Objet fondamental hypothétique à **une dimension**, de longueur typique de l'ordre de la longueur de Planck. Chaque **mode de vibration** correspond à une particule différente — comme les harmoniques d'un instrument. Toutes les particules du modèle standard ne seraient que des notes de cette corde unique.`
+    },
+    {
+      terme: 'Graviton',
+      definition: `Particule hypothétique médiatrice de la **gravité**, analogue du photon pour l'électromagnétisme. Émerge **naturellement** comme l'un des modes de vibration d'une corde fermée — argument le plus fort en faveur de la théorie des cordes depuis 1974.`
+    },
+    {
+      terme: 'Supersymétrie',
+      definition: `**Symétrie hypothétique** entre bosons (particules de force) et fermions (particules de matière) : à chaque particule connue correspondrait un partenaire supersymétrique. Indispensable à la cohérence des théories de **supercordes**. Aucune particule supersymétrique n'a été détectée au LHC à ce jour.`
+    },
+    {
+      terme: 'Théorie M',
+      definition: `Théorie unique à **11 dimensions** proposée par **Edward Witten** en 1995, qui unifie les cinq théories de supercordes comme cinq facettes d'un même cadre sous-jacent. Le « M » reste de signification volontairement ambiguë (*magic*, *mystery*, *membrane*).`
+    },
+    {
+      terme: 'Variété de Calabi-Yau',
+      definition: `Classe de **géométries à 6 dimensions complexes** dans lesquelles les dimensions supplémentaires de la théorie des cordes sont compactifiées. Préservent la supersymétrie et déterminent les particules et forces apparaissant dans le monde à 4 dimensions observé.`
+    },
+    {
+      terme: 'Compactification',
+      definition: `Mécanisme par lequel des **dimensions supplémentaires** sont enroulées sur elles-mêmes à une échelle si petite (typiquement la longueur de Planck) qu'aucune expérience accessible ne peut les détecter. Analogie : un câble vu de loin paraît à une dimension, de près on découvre sa circonférence.`
+    },
+    {
+      terme: 'Paysage des cordes',
+      definition: `Ensemble estimé à environ **10⁵⁰⁰ vacua** possibles correspondant à autant de géométries de compactification distinctes — chacun produisant un univers aux particules et constantes différentes. Cœur des critiques contre la théorie : si elle peut tout accommoder, elle ne prédit rien de spécifique au sens de Popper.`
+    },
+    {
+      terme: 'Dualité AdS/CFT',
+      definition: `**Correspondance holographique** découverte par **Juan Maldacena** en 1997 : une théorie des cordes dans un espace courbé (*anti-de Sitter*) est mathématiquement équivalente à une théorie de champs ordinaire sur sa frontière. Retombée la plus féconde des cordes, utilisée bien au-delà (plasmas de quarks-gluons, supraconducteurs, [[trous-noirs]]).`
+    }
   ]
 
 });

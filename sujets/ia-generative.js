@@ -324,6 +324,49 @@ C\'est ce qui rend la dépendance à TSMC si stratégique — et pourquoi le [d�
       correcte: 2,
       explication: 'Pour les modèles open source (Llama, DeepSeek, Mistral, Qwen), les poids du modèle sont publiquement téléchargeables — on peut les exécuter chez soi, les modifier, les fine-tuner. Les modèles propriétaires (GPT-5.5, Claude, Gemini) ne sont accessibles qu\'à travers une API contrôlée par leur éditeur.'
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Transformer',
+      definition: `Architecture de réseau de neurones introduite par Google en **2017** (article *Attention Is All You Need*). Repose sur le **mécanisme d'attention** qui permet à chaque mot de pondérer dynamiquement l'importance de tous les autres. Socle technique de toute l'IA générative moderne.`
+    },
+    {
+      terme: 'Mécanisme d\'attention',
+      definition: `Opération qui permet à un modèle de pondérer, pour chaque élément d'une séquence, l'importance relative de **tous les autres éléments** simultanément. Remplace les architectures séquentielles antérieures et autorise une parallélisation massive du calcul.`
+    },
+    {
+      terme: 'LLM',
+      definition: `*Large Language Model* — grand modèle de langage entraîné à **prédire le mot suivant** sur des téraoctets de texte. Acquiert implicitement grammaire, faits du monde, raisonnement et structures argumentatives par cette tâche unique massivement répétée.`
+    },
+    {
+      terme: 'Pré-entraînement',
+      definition: `Première phase d'apprentissage d'un LLM, durant laquelle le modèle ingère des corpus massifs (web, livres, code) pour apprendre à prédire le token suivant. Coûte des **dizaines à centaines de millions** de dollars en calcul GPU.`
+    },
+    {
+      terme: 'RLHF',
+      definition: `*Reinforcement Learning from Human Feedback* : post-entraînement qui ajuste un modèle brut aux préférences humaines via des annotateurs classant ses réponses. Transforme un prédicteur de texte en **assistant** utile, sûr et aligné.`
+    },
+    {
+      terme: 'Hallucination',
+      definition: `Production par un LLM d'une **affirmation factuellement fausse** présentée avec confiance. Conséquence structurelle d'un modèle optimisé pour la *plausibilité textuelle* plutôt que pour la vérité — limite fondamentale du paradigme actuel.`
+    },
+    {
+      terme: 'Multimodalité',
+      definition: `Capacité d'un même modèle à traiter et générer **plusieurs types de données** : texte, image, audio, vidéo. Frontière active de la recherche en 2026, où la génération vidéo (Sora, Veo) commence à atteindre une qualité cinéma.`
+    },
+    {
+      terme: 'Mixture of Experts (MoE)',
+      definition: `Architecture où le modèle est composé de plusieurs sous-réseaux *experts* spécialisés, dont seule une **fraction est activée** à chaque inférence. Permet d'atteindre des trillions de paramètres en gardant un coût d'exécution maîtrisé.`
+    },
+    {
+      terme: 'Paramètres',
+      definition: `Les **"neurones" entraînés** d'un modèle, dont les valeurs encodent ce qu'il a appris. GPT-3 en comptait 175 milliards ; les modèles de pointe 2026 dépassent souvent le trillion, presque toujours en architecture MoE.`
+    },
+    {
+      terme: 'Open weights',
+      definition: `Désigne un modèle dont les **poids entraînés sont publiquement téléchargeables** (Llama, DeepSeek, Qwen, Mistral). Permet exécution locale, modification et fine-tuning, par opposition aux modèles propriétaires accessibles uniquement via API contrôlée.`
+    }
   ]
 
 });

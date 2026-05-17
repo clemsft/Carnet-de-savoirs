@@ -65,12 +65,12 @@
     star: '<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><polygon points="12 2 15.1 8.7 22 9.7 17 14.6 18.2 21.5 12 18.2 5.8 21.5 7 14.6 2 9.7 8.9 8.7 12 2"/></svg>',
     starOutline: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><polygon points="12 2 15.1 8.7 22 9.7 17 14.6 18.2 21.5 12 18.2 5.8 21.5 7 14.6 2 9.7 8.9 8.7 12 2"/></svg>',
     arrowLeft: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>',
-    glossaire: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',
     quiz: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
     notes: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>',
     search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
     parcours: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 9 6 12 12 15 18 21 18"/><circle cx="3" cy="6" r="1.5" fill="currentColor"/><circle cx="9" cy="6" r="1.5" fill="currentColor"/><circle cx="15" cy="18" r="1.5" fill="currentColor"/><circle cx="21" cy="18" r="1.5" fill="currentColor"/></svg>',
-    timeline: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><circle cx="6" cy="12" r="2" fill="currentColor"/><circle cx="12" cy="12" r="2" fill="currentColor"/><circle cx="18" cy="12" r="2" fill="currentColor"/></svg>'
+    timeline: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><circle cx="6" cy="12" r="2" fill="currentColor"/><circle cx="12" cy="12" r="2" fill="currentColor"/><circle cx="18" cy="12" r="2" fill="currentColor"/></svg>',
+    vocab: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="13" x2="13" y2="13"/></svg>'
   };
 
   // =================================================================
@@ -314,6 +314,26 @@
       }
     }
 
+    // ---- vocabulaire (optionnel) ----
+    if (s.vocabulaire != null) {
+      if (!Array.isArray(s.vocabulaire)) {
+        w.push('vocabulaire doit être un tableau');
+      } else {
+        s.vocabulaire.forEach((v, i) => {
+          if (!v || typeof v !== 'object') {
+            w.push(`vocabulaire[${i}] doit être un objet { terme, definition }`);
+            return;
+          }
+          if (typeof v.terme !== 'string' || !v.terme.trim()) {
+            w.push(`vocabulaire[${i}].terme vide ou absent`);
+          }
+          if (typeof v.definition !== 'string' || !v.definition.trim()) {
+            w.push(`vocabulaire[${i}].definition vide ou absente`);
+          }
+        });
+      }
+    }
+
     return w;
   }
 
@@ -336,7 +356,9 @@
     }
     if (parts[0] === 'carte') return { view: 'carte' };
     if (parts[0] === 'profil') return { view: 'profil' };
-    if (parts[0] === 'glossaire') return { view: 'glossaire' };
+    // 'glossaire' a été remplacé par 'vocabulaire' — on redirige les anciens
+    // bookmarks/historiques pour ne pas casser les vieux liens.
+    if (parts[0] === 'glossaire') return { view: 'vocabulaire' };
     if (parts[0] === 'quiz-mixte') return { view: 'quiz-mixte' };
     if (parts[0] === 'notes') return { view: 'notes' };
     if (parts[0] === 'parcours') {
@@ -344,6 +366,7 @@
       return { view: 'parcours-liste' };
     }
     if (parts[0] === 'timeline') return { view: 'timeline' };
+    if (parts[0] === 'vocabulaire') return { view: 'vocabulaire' };
     return { view: 'bibliotheque' };
   }
 
@@ -458,7 +481,7 @@
         navLink('carte', activeView, 'Carte globale', ICONS.map, '/carte'),
         navLink('timeline', activeView, 'Timeline', ICONS.timeline, '/timeline'),
         navLink('parcours-liste', activeView, 'Parcours', ICONS.parcours, '/parcours'),
-        navLink('glossaire', activeView, 'Glossaire', ICONS.glossaire, '/glossaire'),
+        navLink('vocabulaire', activeView, 'Vocabulaire', ICONS.vocab, '/vocabulaire'),
         navLink('quiz-mixte', activeView, 'Quiz mixte', ICONS.quiz, '/quiz-mixte'),
         navLink('notes', activeView, 'Mes notes', ICONS.notes, '/notes'),
         navLink('profil', activeView, 'Mon profil', ICONS.profile, '/profil')
@@ -1376,11 +1399,8 @@
         });
         return domains.size >= 5;
       } },
-    { id: 'cartographe',   label: 'Cartographe',        desc: '30 termes ou plus indexés dans le glossaire.',
-      check: () => {
-        const sujets = state.sujetsOrder.map(id => state.sujets[id]);
-        return Object.keys(extractGlossaryTerms(sujets)).length >= 30;
-      } },
+    { id: 'cartographe',   label: 'Cartographe',        desc: '30 termes ou plus indexés dans le vocabulaire.',
+      check: () => buildVocabIndex().length >= 30 },
     // ----- Quiz dédiés -----
     // Les compteurs cumulatifs (state.user.quizCounters) sont la source de
     // vérité pour les achievements de volume — le quizLog est capé à 500
@@ -1726,6 +1746,87 @@
         container.appendChild(grid);
       }
     }
+
+    // ---- Backlinks : qui cite ce sujet ? ----
+    // Lecture du maillage à l'envers : utile pour repérer les sujets-hubs
+    // et remonter le fil d'une notion d'un sujet à l'autre.
+    renderBacklinksPanel(container, sujet.meta.id);
+  }
+
+  // Panneau "Qui cite ce sujet ?" — affiché en bas de l'onglet Résumé.
+  // Agrège les sources par sujet, montre les snippets cliquables.
+  function renderBacklinksPanel(container, targetSlug) {
+    const entries = getBacklinksFor(targetSlug);
+    if (!entries.length) return;
+    // Groupe par source
+    const bySource = {};
+    entries.forEach(e => {
+      if (!bySource[e.sourceId]) bySource[e.sourceId] = { lie_a: false, citations: [] };
+      if (e.via === 'lie_a') bySource[e.sourceId].lie_a = true;
+      else bySource[e.sourceId].citations.push(e);
+    });
+    const sources = Object.keys(bySource);
+    if (!sources.length) return;
+
+    const sec = el('section', { class: 'backlinks-panel' });
+    sec.appendChild(el('h3', { class: 'backlinks-title' },
+      'Qui cite ce sujet'));
+    sec.appendChild(el('p', { class: 'backlinks-sub' },
+      sources.length + ' sujet' + (sources.length > 1 ? 's' : '') + ' du carnet pointe' + (sources.length > 1 ? 'nt' : '') + ' vers cette fiche.'));
+
+    const list = el('div', { class: 'backlinks-list' });
+    sources.forEach(srcId => {
+      const src = state.sujets[srcId];
+      if (!src) return;
+      const dom = (src.meta.domaines || ['Autre'])[0];
+      const dotColor = domainColor(dom);
+      const info = bySource[srcId];
+      const item = el('div', { class: 'backlinks-item', style: { '--bl-color': dotColor } });
+      const head = el('div', { class: 'backlinks-item-head' });
+      head.appendChild(el('span', { class: 'backlinks-dot' }));
+      head.appendChild(el('a', {
+        class: 'backlinks-sujet-link',
+        href: '#/sujet/' + encodeURIComponent(srcId),
+        onclick: (e) => { e.preventDefault(); navigate('/sujet/' + encodeURIComponent(srcId)); },
+        html: htmlEscapeButKeepEm(src.meta.titre)
+      }));
+      const tags = [];
+      if (info.lie_a) tags.push('lien direct');
+      if (info.citations.length) tags.push(info.citations.length + ' citation' + (info.citations.length > 1 ? 's' : ''));
+      if (tags.length) head.appendChild(el('span', { class: 'backlinks-tag' }, tags.join(' · ')));
+      item.appendChild(head);
+
+      // Snippets : on en montre jusqu'à 3, le reste est replié
+      const cites = info.citations;
+      if (cites.length) {
+        const snippetsWrap = el('div', { class: 'backlinks-snippets' });
+        cites.slice(0, 3).forEach(c => {
+          if (!c.snippet) return;
+          let path = '/sujet/' + encodeURIComponent(srcId);
+          if (c.blockIdx >= 0) path += '/cours/bloc-' + c.blockIdx;
+          else if (c.blockIdx === -2) path += '/carte';
+          else path += '/resume';
+          const sn = el('a', {
+            class: 'backlinks-snippet',
+            href: '#' + path,
+            title: 'Ouvrir ce passage dans « ' + String(src.meta.titre).replace(/<[^>]+>/g, '') + ' »',
+            onclick: (e) => { e.preventDefault(); navigate(path); }
+          },
+            el('span', { class: 'backlinks-snippet-loc' }, c.blockTitle || 'Cité'),
+            el('span', { class: 'backlinks-snippet-text' }, c.snippet)
+          );
+          snippetsWrap.appendChild(sn);
+        });
+        if (cites.length > 3) {
+          snippetsWrap.appendChild(el('span', { class: 'backlinks-more' },
+            '+ ' + (cites.length - 3) + ' autre' + (cites.length - 3 > 1 ? 's' : '') + ' citation' + (cites.length - 3 > 1 ? 's' : '')));
+        }
+        item.appendChild(snippetsWrap);
+      }
+      list.appendChild(item);
+    });
+    sec.appendChild(list);
+    container.appendChild(sec);
   }
 
   // =================================================================
@@ -5049,121 +5150,6 @@
     main.appendChild(status);
   }
 
-  // =================================================================
-  // VIEW: GLOSSAIRE GLOBAL
-  // =================================================================
-  // Index transverse de tous les [terme]{accent} apparaissant dans
-  // n'importe quel sujet (points-clés, contenu_md, descriptions de
-  // widgets, descriptions de noeuds de carte mentale).
-
-  function extractGlossaryTerms(sujets) {
-    const map = {}; // norm -> { display, sources: [{id, title}] }
-    sujets.forEach(sujet => {
-      const seenForSujet = new Set();
-      function visit(text) {
-        if (!text) return;
-        const re = /\[([^\]]+)\]\{accent\}/g;
-        let m;
-        while ((m = re.exec(text)) !== null) {
-          const term = m[1];
-          const norm = normalizeForSearch(term);
-          if (!norm) continue;
-          if (!map[norm]) map[norm] = { display: term, sources: [] };
-          if (!seenForSujet.has(norm)) {
-            seenForSujet.add(norm);
-            map[norm].sources.push({ id: sujet.meta.id, title: sujet.meta.titre });
-          }
-        }
-      }
-      if (Array.isArray(sujet.points_cles)) sujet.points_cles.forEach(visit);
-      if (Array.isArray(sujet.cours)) {
-        sujet.cours.forEach(b => {
-          if (!b) return;
-          if (b.contenu_md) visit(b.contenu_md);
-          const p = b.params;
-          if (p) {
-            (p.options  || []).forEach(o  => o  && visit(o.description));
-            (p.seuils   || []).forEach(s  => s  && visit(s.description));
-            (p.cartes   || []).forEach(c  => c  && visit(c.description));
-            (p.methodes || []).forEach(me => me && visit(me.description));
-          }
-        });
-      }
-      if (sujet.carte_mentale && Array.isArray(sujet.carte_mentale.noeuds)) {
-        sujet.carte_mentale.noeuds.forEach(n => n && visit(n.description));
-      }
-    });
-    return map;
-  }
-
-  function renderGlossaire(main) {
-    main.appendChild(el('span', { class: 'eyebrow' }, 'Index transverse'));
-    main.appendChild(el('h1', { class: 'page-title', html: 'Glossaire <em>global</em>' }));
-
-    const sujets = state.sujetsOrder.map(id => state.sujets[id]);
-    const terms = extractGlossaryTerms(sujets);
-    const keys = Object.keys(terms).sort((a, b) => a.localeCompare(b, 'fr'));
-
-    if (keys.length === 0) {
-      main.appendChild(el('p', { class: 'lead' },
-        'Aucun terme indexé pour l\'instant. Les mots mis en valeur avec la syntaxe [mot]{accent} dans tes sujets apparaîtront ici, regroupés par première lettre.'));
-      return;
-    }
-
-    main.appendChild(el('p', { class: 'page-subtitle' },
-      keys.length + ' terme' + (keys.length > 1 ? 's' : '') +
-      ' indexé' + (keys.length > 1 ? 's' : '') +
-      ', extrait' + (keys.length > 1 ? 's' : '') +
-      ' des concepts mis en valeur dans tes contenus.'));
-
-    // Regroupe par première lettre (avec normalisation pour les accents)
-    const byLetter = {};
-    keys.forEach(k => {
-      const letter = (k.charAt(0) || '#').toUpperCase();
-      const safe = /[A-Z]/.test(letter) ? letter : '#';
-      if (!byLetter[safe]) byLetter[safe] = [];
-      byLetter[safe].push(k);
-    });
-    const letters = Object.keys(byLetter).sort();
-
-    // Ancres alphabétiques en haut. On utilise onclick + scrollIntoView au
-    // lieu d'un vrai href : le routing étant hash-based, naviguer vers
-    // `#glossaire-letter-X` casserait la vue (parseHash ne reconnaîtrait
-    // pas la route). On garde quand même href pour l'accessibilité.
-    main.appendChild(el('div', { class: 'glossaire-anchors' },
-      ...letters.map(L => el('a', {
-        class: 'glossaire-anchor',
-        href: '#/glossaire',
-        'data-letter': L,
-        onclick: (e) => {
-          e.preventDefault();
-          const target = document.getElementById('glossaire-letter-' + L);
-          if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      }, L))
-    ));
-
-    letters.forEach(L => {
-      const section = el('section', { class: 'glossaire-section', id: 'glossaire-letter-' + L },
-        el('h3', { class: 'glossaire-letter' }, L)
-      );
-      byLetter[L].forEach(key => {
-        const t = terms[key];
-        section.appendChild(el('div', { class: 'glossaire-entry' },
-          el('span', { class: 'glossaire-term' }, t.display),
-          el('div', { class: 'glossaire-sources' },
-            ...t.sources.map(src => el('a', {
-              class: 'glossaire-source',
-              href: '#/sujet/' + encodeURIComponent(src.id),
-              html: htmlEscapeButKeepEm(src.title)
-            }))
-          )
-        ));
-      });
-      main.appendChild(section);
-    });
-  }
-
   // Mini calendrier du mois courant — zoom détaillé sur la heatmap
   function renderMonthCalendar() {
     const now = new Date();
@@ -5702,9 +5688,6 @@
       renderCarte(main);
     } else if (route.view === 'profil') {
       renderProfil(main);
-    } else if (route.view === 'glossaire') {
-      setAccent(null);
-      renderGlossaire(main);
     } else if (route.view === 'quiz-mixte') {
       setAccent(null);
       renderQuizMixte(main);
@@ -5717,6 +5700,8 @@
       renderParcoursDetail(main, route.id);
     } else if (route.view === 'timeline') {
       renderTimelineGlobale(main);
+    } else if (route.view === 'vocabulaire') {
+      renderVocabulaire(main);
     } else {
       setAccent(null);
       renderBibliotheque(main);
@@ -5760,6 +5745,408 @@
   // Build paresseux : on construit au 1er appel après chargement des sujets.
 
   const SEARCH_INDEX = { built: false, entries: [] };
+
+  // =================================================================
+  // INDEX DE BACKLINKS — pour chaque sujet : qui le cite (lie_a + [[slug]])
+  // =================================================================
+  // Construit paresseusement, partagé entre l'onglet Résumé (panneau
+  // "Qui cite ce sujet ?") et potentiellement d'autres vues futures.
+  // Entrées par target slug :
+  //   { sourceId, via: 'lie_a' | 'citation', blockIdx?, blockTitle?, snippet? }
+  const BACKLINKS_INDEX = { built: false, byTarget: {} };
+
+  function backlinksMakeSnippet(text, target) {
+    const marker = '[[' + target + ']]';
+    const idx = text.indexOf(marker);
+    if (idx < 0) return '';
+    const radius = 110;
+    let start = Math.max(0, idx - radius);
+    let end = Math.min(text.length, idx + marker.length + radius);
+    if (start > 0) {
+      const sp = text.indexOf(' ', start);
+      if (sp >= 0 && sp < idx) start = sp + 1;
+    }
+    if (end < text.length) {
+      const sp = text.lastIndexOf(' ', end);
+      if (sp > idx + marker.length) end = sp;
+    }
+    let snip = text.slice(start, end);
+    snip = snip
+      .replace(/\[\[([a-z0-9-]+)\]\]/g, (_, sl) => sl.replace(/-/g, ' '))
+      .replace(/\*\*([^*]+)\*\*/g, '$1')
+      .replace(/(?<!\*)\*([^*\n]+)\*(?!\*)/g, '$1')
+      .replace(/`([^`]+)`/g, '$1')
+      .replace(/\[([^\]]+)\]\{accent\}/g, '$1')
+      .replace(/\s+/g, ' ').trim();
+    if (start > 0) snip = '… ' + snip;
+    if (end < text.length) snip = snip + ' …';
+    return snip;
+  }
+
+  function buildBacklinksIndex() {
+    if (BACKLINKS_INDEX.built) return BACKLINKS_INDEX.byTarget;
+    const byTarget = {};
+    function addEntry(target, entry) {
+      if (!byTarget[target]) byTarget[target] = [];
+      byTarget[target].push(entry);
+    }
+    state.sujetsOrder.forEach(sourceId => {
+      const s = state.sujets[sourceId];
+      if (!s || !s.meta) return;
+      // Dédoublonnage à l'échelle (source, target, bloc) — un même [[slug]]
+      // mentionné plusieurs fois dans un bloc ne génère qu'une entrée.
+      const seen = new Set();
+
+      // 1. lie_a (lien fort sans extrait textuel)
+      (s.meta.lie_a || []).forEach(target => {
+        if (target === sourceId) return;
+        if (!state.sujets[target]) return;
+        const key = sourceId + '|' + target + '|lie_a';
+        if (seen.has(key)) return;
+        seen.add(key);
+        addEntry(target, { sourceId, via: 'lie_a' });
+      });
+
+      // 2. [[slug]] dans le contenu
+      const re = /\[\[([a-z0-9-]+)\]\]/g;
+      function recordHits(text, blockIdx, blockTitle) {
+        if (!text) return;
+        re.lastIndex = 0;
+        let m;
+        while ((m = re.exec(text)) !== null) {
+          const target = m[1];
+          if (target === sourceId || !state.sujets[target]) continue;
+          const key = sourceId + '|' + target + '|' + blockIdx;
+          if (seen.has(key)) continue;
+          seen.add(key);
+          addEntry(target, {
+            sourceId,
+            via: 'citation',
+            blockIdx,
+            blockTitle,
+            snippet: backlinksMakeSnippet(text, target)
+          });
+        }
+      }
+      function scanAny(val, blockIdx, blockTitle) {
+        if (val == null) return;
+        if (typeof val === 'string') recordHits(val, blockIdx, blockTitle);
+        else if (Array.isArray(val)) val.forEach(v => scanAny(v, blockIdx, blockTitle));
+        else if (typeof val === 'object') Object.values(val).forEach(v => scanAny(v, blockIdx, blockTitle));
+      }
+      if (s.resume) recordHits(s.resume, -1, 'Résumé');
+      if (Array.isArray(s.points_cles)) s.points_cles.forEach(p => recordHits(p, -1, 'Points-clés'));
+      if (Array.isArray(s.cours)) {
+        s.cours.forEach((b, i) => {
+          if (!b) return;
+          const rawTitle = b.titre || b.label || ('Bloc ' + (i + 1));
+          const blockTitle = String(rawTitle).replace(/<[^>]+>/g, '').trim() || ('Bloc ' + (i + 1));
+          scanAny(b, i, blockTitle);
+        });
+      }
+      if (s.carte_mentale && Array.isArray(s.carte_mentale.noeuds)) {
+        s.carte_mentale.noeuds.forEach(n => {
+          if (n && n.description) recordHits(n.description, -2, 'Carte mentale');
+        });
+      }
+    });
+    BACKLINKS_INDEX.byTarget = byTarget;
+    BACKLINKS_INDEX.built = true;
+    return byTarget;
+  }
+
+  function getBacklinksFor(targetSlug) {
+    const idx = buildBacklinksIndex();
+    return idx[targetSlug] || [];
+  }
+
+  // =================================================================
+  // VOCABULAIRE GLOBAL — deck transverse des concepts du carnet
+  // =================================================================
+  // Source : champ `vocabulaire` curaté par sujet — chaque sujet déclare
+  // explicitement la liste des termes-à-retenir avec leur définition propre.
+  // Schéma par sujet :
+  //   vocabulaire: [
+  //     { terme: 'Plus-value', definition: 'Concept marxien : ...' },
+  //     ...
+  //   ]
+  // Quand un même terme apparaît dans plusieurs sujets, on déduplique
+  // par forme normalisée et on cumule les occurrences (différentes
+  // facettes / contextes du même concept).
+  const VOCAB_INDEX = { built: false, terms: [] };
+
+  function buildVocabIndex() {
+    if (VOCAB_INDEX.built) return VOCAB_INDEX.terms;
+    const byNorm = {};
+    state.sujetsOrder.forEach(id => {
+      const s = state.sujets[id];
+      if (!s || !s.meta) return;
+      if (!Array.isArray(s.vocabulaire)) return;
+      const sourceTitle = String(s.meta.titre).replace(/<[^>]+>/g, '');
+      const domain = (s.meta.domaines || ['Autre'])[0];
+
+      s.vocabulaire.forEach(v => {
+        if (!v || !v.terme || !v.definition) return;
+        const term = String(v.terme).trim();
+        if (!term) return;
+        const norm = searchNormalize(term);
+        if (!byNorm[norm]) byNorm[norm] = { term, norm, occurrences: [] };
+        // Préfère la version avec majuscule pour les noms propres
+        if (term[0] === term[0].toUpperCase() && byNorm[norm].term[0] !== byNorm[norm].term[0].toUpperCase()) {
+          byNorm[norm].term = term;
+        }
+        byNorm[norm].occurrences.push({
+          sourceId: id,
+          sourceTitle,
+          domain,
+          definition: v.definition  // markdown-lite, rendu via md() à l'affichage
+        });
+      });
+    });
+    const terms = Object.values(byNorm).sort((a, b) => a.norm.localeCompare(b.norm));
+    VOCAB_INDEX.terms = terms;
+    VOCAB_INDEX.built = true;
+    return terms;
+  }
+
+  // ---- Vue principale du vocabulaire ----
+  function renderVocabulaire(main) {
+    setAccent(null);
+    main.appendChild(el('span', { class: 'eyebrow' }, 'Lexique transverse du carnet'));
+    main.appendChild(el('h1', { class: 'page-title', html: '<em>Vocabulaire</em> du carnet' }));
+    main.appendChild(el('p', { class: 'page-subtitle' },
+      'Tous les concepts définis dans les cartes mentales des sujets, agrégés en un lexique unique. Chaque carte = un terme avec sa définition propre, plus un lien vers la fiche d\'origine. Le mode flashcards te fait défiler le deck pour mémoriser.'));
+
+    const terms = buildVocabIndex();
+    if (terms.length === 0) {
+      main.appendChild(el('div', { class: 'empty-state' },
+        el('div', { class: 'empty-state-icon' }, '✦'),
+        el('p', null, 'Aucun terme accentué pour le moment.')));
+      return;
+    }
+
+    const totalOcc = terms.reduce((s, t) => s + t.occurrences.length, 0);
+
+    const toolbar = el('div', { class: 'vocab-toolbar' });
+    const searchInput = el('input', {
+      class: 'vocab-search',
+      type: 'text',
+      placeholder: 'Filtrer (terme, sujet, domaine…)',
+      autocomplete: 'off'
+    });
+    toolbar.appendChild(searchInput);
+    toolbar.appendChild(el('span', { class: 'vocab-counter' },
+      terms.length + ' termes uniques · ' + totalOcc + ' occurrences'));
+    toolbar.appendChild(el('button', {
+      class: 'btn',
+      onclick: () => openVocabFlashcards(terms)
+    }, 'Réviser en flashcards →'));
+    main.appendChild(toolbar);
+
+    const grid = el('div', { class: 'vocab-grid' });
+    main.appendChild(grid);
+
+    function renderGrid(filter) {
+      clear(grid);
+      const q = searchNormalize(filter || '').trim();
+      const visible = !q ? terms : terms.filter(t => {
+        if (searchNormalize(t.term).indexOf(q) >= 0) return true;
+        return t.occurrences.some(o =>
+          searchNormalize(o.sourceTitle).indexOf(q) >= 0 ||
+          searchNormalize(o.domain).indexOf(q) >= 0);
+      });
+      if (visible.length === 0) {
+        grid.appendChild(el('p', { class: 'vocab-empty' }, 'Aucun terme ne correspond à ce filtre.'));
+        return;
+      }
+      visible.forEach(t => grid.appendChild(makeVocabCard(t)));
+    }
+    let inputDebounce = null;
+    searchInput.addEventListener('input', () => {
+      if (inputDebounce) clearTimeout(inputDebounce);
+      inputDebounce = setTimeout(() => renderGrid(searchInput.value), 80);
+    });
+    renderGrid('');
+  }
+
+  function makeVocabCard(termData) {
+    const t = termData;
+    // Couleur dominante = domaine majoritaire des occurrences
+    const counts = {};
+    t.occurrences.forEach(o => { counts[o.domain] = (counts[o.domain] || 0) + 1; });
+    let bestDom = null, bestN = 0;
+    Object.keys(counts).forEach(d => { if (counts[d] > bestN) { bestN = counts[d]; bestDom = d; } });
+    const color = domainColor(bestDom || 'Autre');
+
+    const card = el('article', {
+      class: 'vocab-card',
+      style: { '--card-accent': color }
+    });
+    const head = el('header', { class: 'vocab-card-head' });
+    head.appendChild(el('span', { class: 'vocab-card-term' }, t.term));
+    if (t.occurrences.length > 1) {
+      head.appendChild(el('span', { class: 'vocab-card-count' },
+        '×' + t.occurrences.length));
+    }
+    card.appendChild(head);
+
+    const body = el('div', { class: 'vocab-card-body' });
+    const main = t.occurrences[0];
+    // Définition principale rendue via md() (rendu **gras**, [terme]{accent},
+    // [[slug]] etc. proprement).
+    if (main && main.definition) {
+      body.appendChild(el('div', {
+        class: 'vocab-card-def',
+        html: md(main.definition).replace(/^<p>|<\/p>$/g, '')
+      }));
+    }
+    const src = el('a', {
+      class: 'vocab-card-source',
+      href: '#/sujet/' + encodeURIComponent(main.sourceId) + '/carte',
+      onclick: (e) => {
+        e.preventDefault();
+        navigate('/sujet/' + encodeURIComponent(main.sourceId) + '/carte');
+      }
+    },
+      el('span', { class: 'vocab-card-dot' }),
+      el('span', { class: 'vocab-card-source-text' },
+        main.sourceTitle + ' · ' + main.domain)
+    );
+    body.appendChild(src);
+
+    // Autres occurrences si >1 (variantes du même concept dans d'autres
+    // cartes mentales — souvent des définitions complémentaires).
+    if (t.occurrences.length > 1) {
+      const moreToggle = el('button', { class: 'vocab-card-more' },
+        'Voir les ' + (t.occurrences.length - 1) + ' autres définition' +
+        (t.occurrences.length - 1 > 1 ? 's' : ''));
+      const moreList = el('div', { class: 'vocab-card-more-list' });
+      moreList.style.display = 'none';
+      t.occurrences.slice(1).forEach(o => {
+        const c = domainColor(o.domain);
+        const link = el('a', {
+          class: 'vocab-card-other',
+          style: { '--card-accent': c },
+          href: '#/sujet/' + encodeURIComponent(o.sourceId) + '/carte',
+          onclick: (e) => {
+            e.preventDefault();
+            navigate('/sujet/' + encodeURIComponent(o.sourceId) + '/carte');
+          }
+        });
+        link.appendChild(el('span', { class: 'vocab-card-dot' }));
+        link.appendChild(el('span', { class: 'vocab-card-other-text' },
+          o.sourceTitle + ' · ' + o.domain));
+        if (o.definition) link.appendChild(el('span', {
+          class: 'vocab-card-other-def',
+          html: md(o.definition).replace(/^<p>|<\/p>$/g, '')
+        }));
+        moreList.appendChild(link);
+      });
+      moreToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const open = moreList.style.display !== 'none';
+        moreList.style.display = open ? 'none' : '';
+        moreToggle.textContent = open
+          ? 'Voir les ' + (t.occurrences.length - 1) + ' autres définition' +
+            (t.occurrences.length - 1 > 1 ? 's' : '')
+          : 'Replier';
+      });
+      body.appendChild(moreToggle);
+      body.appendChild(moreList);
+    }
+
+    card.appendChild(body);
+    return card;
+  }
+
+  // ---- Mode flashcards du vocabulaire global ----
+  // Mêmes contrôles que openFlashcardsMode (sujet) : ← → flèches, espace
+  // pour retourner, Echap pour quitter.
+  function openVocabFlashcards(terms) {
+    if (!terms || !terms.length) return;
+    // Mélange pour ne pas toujours commencer par les premiers alphabétiques
+    const deck = terms.slice();
+    for (let i = deck.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const t = deck[i]; deck[i] = deck[j]; deck[j] = t;
+    }
+    let idx = 0, revealed = false;
+
+    const overlay = el('div', { class: 'flashcards-overlay vocab-flashcards' });
+    const closeBtn = el('button', { class: 'flashcard-close', title: 'Quitter (Esc)' }, '✕');
+    const counter = el('div', { class: 'flashcard-counter' });
+    const card = el('div', { class: 'flashcard', title: 'Cliquer pour révéler' });
+    const cardInner = el('div', { class: 'flashcard-inner' });
+    const cardFront = el('div', { class: 'flashcard-face flashcard-front' });
+    const cardBack = el('div', { class: 'flashcard-face flashcard-back' });
+    cardInner.appendChild(cardFront);
+    cardInner.appendChild(cardBack);
+    card.appendChild(cardInner);
+
+    const prevBtn = el('button', { class: 'btn btn-secondary' }, '← Précédent');
+    const flipBtn = el('button', { class: 'btn' }, 'Voir la définition');
+    const nextBtn = el('button', { class: 'btn btn-secondary' }, 'Suivant →');
+    const controls = el('div', { class: 'flashcard-controls' }, prevBtn, flipBtn, nextBtn);
+    const hint = el('div', { class: 'flashcard-hint' },
+      'Espace/Entrée pour retourner · ← → pour naviguer · Esc pour quitter');
+
+    overlay.appendChild(closeBtn);
+    overlay.appendChild(counter);
+    overlay.appendChild(card);
+    overlay.appendChild(controls);
+    overlay.appendChild(hint);
+
+    function escHtml(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+    function update() {
+      const t = deck[idx];
+      counter.textContent = 'Carte ' + (idx + 1) + ' / ' + deck.length;
+      cardFront.innerHTML = '<span class="flashcard-term">' + escHtml(t.term) + '</span>' +
+        '<span class="flashcard-prompt-sub">(souviens-toi de la définition, puis retourne)</span>';
+      const occ = t.occurrences[0];
+      let backHtml = '';
+      if (occ && occ.definition) {
+        backHtml += '<div class="vocab-fc-def">' + md(occ.definition).replace(/^<p>|<\/p>$/g, '') + '</div>';
+      }
+      backHtml += '<div class="vocab-fc-source">Source : <a href="#/sujet/' +
+        encodeURIComponent(occ.sourceId) + '/carte">' + escHtml(occ.sourceTitle) +
+        '</a> · ' + escHtml(occ.domain) + '</div>';
+      if (t.occurrences.length > 1) {
+        backHtml += '<div class="vocab-fc-more">+ ' + (t.occurrences.length - 1) +
+          ' autre' + (t.occurrences.length - 1 > 1 ? 's' : '') + ' définition' +
+          (t.occurrences.length - 1 > 1 ? 's' : '') + ' dans le carnet</div>';
+      }
+      cardBack.innerHTML = backHtml;
+      card.classList.toggle('is-flipped', revealed);
+      flipBtn.textContent = revealed ? 'Cacher' : 'Voir la définition';
+      prevBtn.disabled = idx === 0;
+      nextBtn.disabled = idx === deck.length - 1;
+    }
+    function flip() { revealed = !revealed; update(); }
+    function next() { if (idx < deck.length - 1) { idx++; revealed = false; update(); } }
+    function prev() { if (idx > 0) { idx--; revealed = false; update(); } }
+    function close() {
+      if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+      document.removeEventListener('keydown', onKey);
+      document.body.classList.remove('overlay-active');
+    }
+    function onKey(e) {
+      if (e.key === 'Escape')      { close(); e.preventDefault(); }
+      else if (e.key === 'ArrowLeft')  { prev(); e.preventDefault(); }
+      else if (e.key === 'ArrowRight') { next(); e.preventDefault(); }
+      else if (e.key === ' ' || e.key === 'Enter') { flip(); e.preventDefault(); }
+    }
+    closeBtn.addEventListener('click', close);
+    flipBtn.addEventListener('click', flip);
+    prevBtn.addEventListener('click', prev);
+    nextBtn.addEventListener('click', next);
+    card.addEventListener('click', flip);
+    document.addEventListener('keydown', onKey);
+
+    document.body.classList.add('overlay-active');
+    document.body.appendChild(overlay);
+    update();
+  }
 
   function searchStripMarkdown(s) {
     return String(s || '')
@@ -6199,6 +6586,12 @@
         }
       }, 'Commencer le parcours'));
     }
+    // Bouton "Présenter en plein écran" — diaporama des étapes
+    ctaRow.appendChild(el('button', {
+      class: 'btn',
+      title: 'Voir les étapes en plein écran, une par une',
+      onclick: () => openParcoursPresentation(p)
+    }, 'Présenter →'));
     main.appendChild(ctaRow);
 
     const list = el('ol', { class: 'parcours-etapes' });
@@ -6235,6 +6628,91 @@
       list.appendChild(li);
     });
     main.appendChild(list);
+  }
+
+  // ---- Mode diaporama d'un parcours ----
+  // Overlay plein écran qui présente une étape par slide : titre + résumé
+  // + points-clés du sujet de l'étape, plus la note du parcours. Navigation
+  // clavier ← / → / Esc.
+  function openParcoursPresentation(parcours) {
+    if (!parcours || !Array.isArray(parcours.etapes) || parcours.etapes.length === 0) return;
+    const etapes = parcours.etapes;
+    let idx = 0;
+    const accent = domainColor(parcours.meta.domaine || 'Atelier');
+
+    const overlay = el('div', { class: 'parcours-pres-overlay' });
+    overlay.style.setProperty('--pres-accent', accent);
+    const closeBtn = el('button', { class: 'presentation-close', title: 'Quitter (Esc)' }, '✕');
+    const counter = el('div', { class: 'presentation-counter' });
+    const slide = el('div', { class: 'parcours-pres-slide' });
+    const prevBtn = el('button', { class: 'presentation-nav presentation-prev', title: 'Précédent (←)' }, '‹');
+    const nextBtn = el('button', { class: 'presentation-nav presentation-next', title: 'Suivant (→)' }, '›');
+    overlay.appendChild(closeBtn);
+    overlay.appendChild(counter);
+    overlay.appendChild(prevBtn);
+    overlay.appendChild(slide);
+    overlay.appendChild(nextBtn);
+
+    function escHtml(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+    function render() {
+      const e = etapes[idx];
+      const sujet = state.sujets[e.slug];
+      const parTitre = String(parcours.meta.titre).replace(/<[^>]+>/g, '');
+      counter.textContent = parTitre + ' — Étape ' + (idx + 1) + ' / ' + etapes.length;
+      let html = '';
+      html += '<div class="parcours-pres-eyebrow">' + escHtml(parTitre) + ' · Étape ' + (idx + 1) + '</div>';
+      if (sujet) {
+        html += '<h1 class="parcours-pres-title">' + htmlEscapeButKeepEm(sujet.meta.titre) + '</h1>';
+        if (sujet.resume) {
+          html += '<p class="parcours-pres-resume">' + md(sujet.resume).replace(/^<p>|<\/p>$/g, '') + '</p>';
+        }
+        if (Array.isArray(sujet.points_cles) && sujet.points_cles.length > 0) {
+          html += '<ul class="parcours-pres-points">';
+          sujet.points_cles.forEach(p => {
+            html += '<li>' + md(p).replace(/^<p>|<\/p>$/g, '') + '</li>';
+          });
+          html += '</ul>';
+        }
+      } else {
+        html += '<h1 class="parcours-pres-title">' + escHtml(e.slug) + '</h1>';
+        html += '<p class="parcours-pres-resume parcours-pres-missing">Sujet manquant dans le carnet.</p>';
+      }
+      if (e.note) {
+        html += '<aside class="parcours-pres-note">' + md(e.note).replace(/^<p>|<\/p>$/g, '') + '</aside>';
+      }
+      // Lien pour ouvrir la fiche complète
+      if (sujet) {
+        html += '<div class="parcours-pres-cta"><a class="btn primary" href="#/sujet/' + encodeURIComponent(e.slug) + '">Ouvrir la fiche complète →</a></div>';
+      }
+      slide.innerHTML = html;
+      prevBtn.disabled = idx === 0;
+      nextBtn.disabled = idx === etapes.length - 1;
+    }
+    function next() { if (idx < etapes.length - 1) { idx++; render(); } }
+    function prev() { if (idx > 0) { idx--; render(); } }
+    function close() {
+      if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+      document.removeEventListener('keydown', onKey);
+      document.body.classList.remove('overlay-active');
+    }
+    function onKey(e) {
+      if (e.key === 'Escape') { close(); e.preventDefault(); }
+      else if (e.key === 'ArrowLeft')  { prev(); e.preventDefault(); }
+      else if (e.key === 'ArrowRight') { next(); e.preventDefault(); }
+    }
+    closeBtn.addEventListener('click', close);
+    prevBtn.addEventListener('click', prev);
+    nextBtn.addEventListener('click', next);
+    // Clic sur le lien "Ouvrir la fiche" → close avant navigation
+    slide.addEventListener('click', (e) => {
+      const a = e.target.closest('a');
+      if (a) close();
+    });
+    document.addEventListener('keydown', onKey);
+    document.body.classList.add('overlay-active');
+    document.body.appendChild(overlay);
+    render();
   }
 
   // ---- Bandeau de parcours actif (au-dessus de la fiche sujet) ----

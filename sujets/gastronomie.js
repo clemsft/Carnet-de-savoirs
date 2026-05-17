@@ -419,6 +419,49 @@ Que reste-t-il de la haute cuisine au XXIᵉ siècle ? Une scène **mondialisée
       correcte: 1,
       explication: 'Décrite par Louis-Camille Maillard en 1912, la réaction se produit au-delà d\'environ 140 °C entre acides aminés et sucres réducteurs. Elle produit des centaines de composés aromatiques et un brunissage caractéristique. La croûte du pain, le parfum de la viande grillée, le café torréfié, la bière brune en sont les manifestations quotidiennes.'
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Gastronomie',
+      definition: `*Art de bien manger* élevé au rang d'objet culturel. Du grec *gastêr* (estomac) et *nomos* (loi). Mot forgé en français par **Joseph Berchoux** en **1801**, dans le sillage de la naissance du restaurant parisien post-révolutionnaire.`
+    },
+    {
+      terme: 'Brigade',
+      definition: `Organisation **hiérarchique** d'une cuisine professionnelle codifiée par *Escoffier* sur le modèle militaire : chef, sous-chef, [chefs de partie]{accent} spécialisés (saucier, poissonnier, entremétier, garde-manger, pâtissier). Standard mondial encore en vigueur.`
+    },
+    {
+      terme: 'Sauces mères',
+      definition: `Cinq sauces de base de la cuisine française classique dont dérivent toutes les autres : **espagnole**, **velouté**, **béchamel**, **tomate**, **hollandaise**. Codifiées par *Carême* puis simplifiées par *Escoffier*. Squelette de tout le répertoire des sauces.`
+    },
+    {
+      terme: 'Nouvelle cuisine',
+      definition: `Mouvement lancé par le **manifeste Gault-Millau** d'octobre **1973**. Réaction contre les sauces lourdes héritées d'Escoffier : produits frais, cuissons courtes, dressage par le chef, légèreté. *Paul Bocuse* en est la figure tutélaire.`
+    },
+    {
+      terme: 'Cuisine moléculaire',
+      definition: `Courant des années 1990-2010 incarné par **Ferran Adrià** à elBulli, qui applique la chimie à la cuisine : espumas, sphérifications, gels chauds, déconstruction. La cuisine devient **laboratoire** et jeu sensoriel.`
+    },
+    {
+      terme: 'Sphérification',
+      definition: `Technique d'**Adrià** : un liquide aromatisé plongé dans un bain de chlorure de calcium forme instantanément une **bille à fine membrane** gélifiée, au cœur liquide. Sous la dent, la sphère éclate — effet de surprise gustative caractéristique.`
+    },
+    {
+      terme: 'Umami',
+      definition: `**Cinquième saveur** fondamentale, isolée par *Kikunae Ikeda* en **1908** dans un bouillon de kombu. Correspond à la perception du **glutamate** monosodique. Saveur du parmesan, des tomates mûres, du soja, des bouillons longuement braisés.`
+    },
+    {
+      terme: 'Réaction de Maillard',
+      definition: `Réaction chimique décrite par *Louis-Camille Maillard* en **1912** entre acides aminés et sucres réducteurs, au-dessus d'environ 140 °C. Produit le **brunissage** et des centaines de composés aromatiques. Fondement chimique de toute la cuisine au feu vif.`
+    },
+    {
+      terme: 'Olfaction rétronasale',
+      definition: `Perception des arômes par l'**arrière du palais** pendant la mastication, lorsque l'air chargé d'odeurs monte vers la cavité nasale. Représente environ **80 %** de ce que l'on appelle « goût » — la langue ne détecte que les cinq saveurs.`
+    },
+    {
+      terme: 'Foraging',
+      definition: `Pratique de **cueillette sauvage** en forêt, prairie ou bord de mer pour s'approvisionner en herbes, baies, lichens, champignons. Marque de fabrique du **Noma** de *Redzepi* et de la nouvelle cuisine nordique : faire émerger un terroir hyperlocal.`
+    }
   ]
 
 });

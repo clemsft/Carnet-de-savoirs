@@ -301,6 +301,49 @@ Pourquoi cherche-t-on alors à imiter la photosynthèse ? Parce qu'elle fonction
       correcte: 1,
       explication: `La forêt amazonienne reste écologiquement et climatiquement cruciale, mais elle n'est pas le "poumon" qu'on imagine : son bilan oxygène net est proche de zéro à long terme (la respiration et la décomposition consomment ce que la photosynthèse produit), et le phytoplancton océanique assure une part comparable de la production d'O₂ mondiale.`
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Photosynthèse',
+      definition: `Processus biologique qui transforme **CO₂** et **eau** en glucose et dioxygène, en captant l'énergie lumineuse. Bilan : *6 CO₂ + 6 H₂O → C₆H₁₂O₆ + 6 O₂*. Interface fondamentale entre le monde minéral et le monde vivant.`
+    },
+    {
+      terme: 'Chloroplaste',
+      definition: `**Organite cellulaire** spécialisé qui abrite la photosynthèse chez les plantes et les algues. Descend d'une **cyanobactérie** englobée par endosymbiose il y a ~1,5 milliard d'années — il a conservé son propre ADN circulaire bactérien.`
+    },
+    {
+      terme: 'Chlorophylle',
+      definition: `Pigment vert des chloroplastes qui absorbe la lumière. Sélective : capte efficacement le **bleu** (~430 nm) et le **rouge** (~660 nm), **réfléchit le vert**. C'est pourquoi les plantes apparaissent vertes — non parce qu'elles utilisent cette couleur, mais parce qu'elles ne s'en servent pas.`
+    },
+    {
+      terme: 'Cycle de Calvin',
+      definition: `**Phase sombre** de la photosynthèse : utilise l'ATP et le NADPH issus de la phase claire pour fixer le CO₂ atmosphérique en molécules organiques, finalement en glucose. Décrit par **Melvin Calvin** au moyen du carbone 14 radioactif — Nobel de chimie 1961.`
+    },
+    {
+      terme: 'Rubisco',
+      definition: `Enzyme du cycle de Calvin qui **fixe le CO₂** atmosphérique. **Protéine la plus abondante de la biosphère** en tonnage, mais étonnamment lente et peu spécifique : elle confond parfois CO₂ et O₂, causant la **photorespiration** — source structurelle d'inefficacité.`
+    },
+    {
+      terme: 'Endosymbiose',
+      definition: `Mécanisme évolutif majeur : une cellule en englobe une autre **sans la digérer**, et elles vivent en symbiose puis fusionnent durablement. Origine des **chloroplastes** (cyanobactérie englobée) et des **mitochondries** (bactérie aérobie). Théorisée par **Lynn Margulis** dans les années 1960.`
+    },
+    {
+      terme: 'Cyanobactéries',
+      definition: `Bactéries **photosynthétiques** apparues il y a ~3,5 milliards d'années. Inventrices de la photosynthèse oxygénique et donc, indirectement, de toute la vie aérobie. À l'origine de la **Grande Oxygénation** et ancêtres des chloroplastes des plantes actuelles.`
+    },
+    {
+      terme: 'Grande Oxygénation',
+      definition: `Événement géochimique majeur survenu il y a ~**2,4 milliards d'années** : l'oxygène produit par les cyanobactéries s'accumule durablement dans l'atmosphère. Première extinction de masse (anaérobies), refroidissement climatique, apparition de la couche d'ozone, ouverture vers la vie complexe.`
+    },
+    {
+      terme: 'Phytoplancton',
+      definition: `Micro-organismes photosynthétiques **océaniques** (algues unicellulaires, cyanobactéries marines). Invisible à l'œil nu, mais sa masse cumulée surpasse celle de toutes les forêts. Assure environ la **moitié** de la photosynthèse mondiale — donc une part majeure de l'oxygène que nous respirons.`
+    },
+    {
+      terme: 'Photorespiration',
+      definition: `Réaction parasite : la **Rubisco** fixe par erreur de l'O₂ à la place du CO₂, ce qui coûte de l'énergie à la cellule en récupération. Les plantes en **C4** (maïs, canne à sucre) ont évolué un mécanisme de concentration du CO₂ pour contourner ce défaut.`
+    }
   ]
 
 });

@@ -347,6 +347,49 @@ C\'est un linguiste français, **Jean-François Champollion**, qui en perce le m
       correcte: 1,
       explication: 'La pyramide est avant tout un dispositif funéraire et religieux : elle protège la momie, héberge les offrandes, abrite les textes magiques nécessaires au voyage du défunt. Sa forme triangulaire pointée vers le ciel est une rampe symbolique vers le soleil — Rê — que rejoint le pharaon.'
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Pyramide',
+      definition: `**Tombeau pharaonique** monumental de l'Ancien Empire égyptien (~2700-2200 av. J.-C.). Dispositif religieux destiné à assurer le voyage du roi vers l'au-delà : sa **forme triangulaire** pointée vers le ciel figure une rampe symbolique vers le soleil Rê.`
+    },
+    {
+      terme: 'Mastaba',
+      definition: `**Tertre funéraire** rectangulaire en briques crues surmontant la chambre enterrée, ancêtre direct de la pyramide. Imhotep en empile six de tailles décroissantes vers 2650 av. J.-C. pour le pharaon Djoser — naissance de la pyramide à degrés.`
+    },
+    {
+      terme: 'Ka',
+      definition: `**Force vitale** ou *double immatériel* du défunt dans la religion égyptienne. Pour survivre éternellement, il a besoin que le corps soit préservé (momification), qu'il dispose d'offrandes et de textes magiques. Toute l'architecture pyramidale est conçue pour le servir.`
+    },
+    {
+      terme: 'Pharaon',
+      definition: `**Roi de l'Égypte ancienne**, considéré comme l'incarnation terrestre d'Horus et pont entre les dieux et les hommes. Sa mort n'est qu'un passage, à condition que le voyage vers l'au-delà soit correctement équipé — d'où la débauche d'efforts pour son tombeau.`
+    },
+    {
+      terme: 'Hiéroglyphes',
+      definition: `Écriture sacrée égyptienne, mêlant **signes phonétiques** (qui notent des sons) et **signes idéographiques** (qui désignent des choses). Restée muette pendant deux millénaires, déchiffrée en **1822** par **Jean-François Champollion** grâce à la pierre de Rosette.`
+    },
+    {
+      terme: 'Pierre de Rosette',
+      definition: `Stèle de basalte gravée en **trois écritures** (hiéroglyphique, démotique, grecque), découverte en 1799 près de Rosette dans le Delta par l'expédition d'Égypte de Bonaparte. Clé du déchiffrement des hiéroglyphes par Champollion.`
+    },
+    {
+      terme: 'Papyrus de Merer',
+      definition: `**Plus anciens papyrus inscrits du monde** (~4 500 ans), découverts en 2013 à Ouadi el-Jarf. Journal de bord d'un chef d'équipe sous Khéops documentant le transport par bateau des blocs de calcaire de **Tourah** vers Gizeh — première description directe de la logistique pyramidale.`
+    },
+    {
+      terme: 'Imhotep',
+      definition: `**Premier nom d'architecte** conservé dans l'histoire humaine. Vers 2650 av. J.-C., il conçoit pour le pharaon **Djoser** la première pyramide à degrés de Saqqara, première construction monumentale en pierre de taille. Divinisé un millénaire plus tard.`
+    },
+    {
+      terme: 'Muographie',
+      definition: `Technique d'**imagerie par muons cosmiques**, particules subatomiques qui traversent la matière. Permet de cartographier la **densité interne** de gros objets — pyramides, volcans, réacteurs. La mission **ScanPyramids** a détecté ainsi une grande cavité inconnue dans Khéops en 2017.`
+    },
+    {
+      terme: 'Crue du Nil',
+      definition: `Inondation annuelle du fleuve (juillet-octobre) qui fertilise les terres et rythme toute l'économie égyptienne antique. Pendant ces mois, les champs étant submergés, les **paysans** étaient mobilisés sur les chantiers pharaoniques — main-d'œuvre rémunérée sans casser l'agriculture.`
+    }
   ]
 
 });

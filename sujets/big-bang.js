@@ -299,6 +299,45 @@ Le troisième, c'est l'**unification avec la mécanique quantique**. À l'instan
       correcte: 1,
       explication: `C'est l'événement de **recombinaison**. Avant lui, l'univers ressemblait à un brouillard ionisé opaque. Après, la lumière a pu voyager librement — et c'est cette lumière, refroidie par l'expansion à 2,7 K, qui constitue aujourd'hui le fond diffus cosmologique.`
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Big Bang',
+      definition: `Modèle standard de la cosmologie : l'univers est en **expansion** depuis ~13,8 milliards d'années, à partir d'un état initial extrêmement dense et chaud. Ce n'est pas une explosion dans l'espace, mais une dilatation de l'espace lui-même.`
+    },
+    {
+      terme: 'Loi de Hubble-Lemaître',
+      definition: `Relation linéaire **v = H·d** : la vitesse de fuite d'une galaxie est proportionnelle à sa distance. Observée par Hubble en **1929**, elle constitue la première preuve directe de l'expansion cosmique.`
+    },
+    {
+      terme: 'Fond diffus cosmologique',
+      definition: `Rayonnement micro-onde à **2,7 K** qui remplit tout le ciel, vestige refroidi du plasma primordial. Émis vers **380 000 ans** après le Big Bang, lors de la *recombinaison*. Détecté par Penzias et Wilson en 1965.`
+    },
+    {
+      terme: 'Nucléosynthèse primordiale',
+      definition: `Formation des premiers noyaux atomiques dans les **trois premières minutes** de l'univers. Fixe les proportions cosmiques d'hydrogène (~75 %) et d'hélium (~25 %) — vérifiées à 1 % près par les observations.`
+    },
+    {
+      terme: 'Inflation cosmique',
+      definition: `Phase d'expansion **exponentielle** postulée par Alan Guth en 1980, dans les ~10⁻³² premières secondes. L'univers se serait dilaté d'un facteur ~10²⁶, expliquant l'uniformité du fond diffus et la platitude observée.`
+    },
+    {
+      terme: 'Matière noire',
+      definition: `Composante invisible mais gravitationnellement active, représentant ~**27 %** du contenu énergétique cosmique. Postulée dès 1933 par Zwicky pour expliquer la cohésion des galaxies. Nature toujours inconnue.`
+    },
+    {
+      terme: 'Énergie noire',
+      definition: `Composante mystérieuse responsable de l'**accélération** de l'expansion cosmique, découverte en 1998 (Nobel 2011). Représente ~**68 %** du bilan énergétique. Peut-être identifiable à la *constante cosmologique* d'Einstein.`
+    },
+    {
+      terme: 'Recombinaison',
+      definition: `Événement survenu vers **380 000 ans** après le Big Bang : la température descend sous 3 000 K, les électrons se lient aux noyaux, et l'univers devient **transparent** à la lumière pour la première fois.`
+    },
+    {
+      terme: 'Constante de Hubble',
+      definition: `Taux d'expansion actuel de l'univers, noté *H₀*, exprimé en km/s par mégaparsec. Valeur ~70 km/s/Mpc, mais avec une *tension* persistante entre méthodes (Planck ~67 vs supernovas ~73) qui défie le modèle standard.`
+    }
   ]
 
 });

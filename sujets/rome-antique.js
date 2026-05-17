@@ -317,6 +317,45 @@ Mais l\'empire ne disparaît pas vraiment. À l\'**est**, à Constantinople, il 
       correcte: 1,
       explication: `Le chef barbare Odoacre dépose Romulus Augustule en 476. Date traditionnelle de la fin de l\'Antiquité. Mais en Orient, l\'Empire — qui sera appelé byzantin par les historiens modernes — continue jusqu\'en 1453.`
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'République romaine',
+      definition: `Régime politique mixte (509-27 av. J.-C.) combinant un **Sénat** aristocratique, des magistrats annuels (consuls, tribuns) et des assemblées populaires. Modèle institutionnel direct des républiques modernes, des États-Unis à la France révolutionnaire.`
+    },
+    {
+      terme: 'Consul',
+      definition: `Magistrat suprême de la **République romaine**, élu pour un an. Toujours **deux** simultanément, chacun disposant d'un droit de veto sur l'autre — dispositif conçu pour rendre toute tyrannie techniquement impossible.`
+    },
+    {
+      terme: 'Sénat',
+      definition: `Assemblée d'anciens magistrats nommés à vie, cœur du pouvoir réel à Rome pendant cinq siècles. Sa devise *SPQR* (*Senatus Populusque Romanus*) figurait sur les étendards des légions.`
+    },
+    {
+      terme: 'Principat',
+      definition: `Régime instauré par **Auguste** en 27 av. J.-C. : monarchie absolue déguisée en république. L'empereur se proclame modestement *princeps* (premier citoyen) tout en concentrant tous les pouvoirs militaires, religieux et financiers.`
+    },
+    {
+      terme: 'Pax Romana',
+      definition: `Longue période de paix relative (27 av. J.-C. — 180 ap. J.-C.) sur l'ensemble du bassin méditerranéen, sous l'Empire. Sécurise les routes, accélère la romanisation des provinces et urbanise tout le pourtour de la *Mare Nostrum*.`
+    },
+    {
+      terme: 'Imperium',
+      definition: `Pouvoir militaire et civil suprême détenu par certains magistrats romains (consuls, dicateurs, empereurs). Symbolisé par les **faisceaux** portés par les licteurs. Racine étymologique d'*empire*.`
+    },
+    {
+      terme: 'Romanisation',
+      definition: `Processus par lequel les provinces conquises adoptent la langue (**latin**), le droit, l'urbanisme (forums, thermes, aqueducs) et les institutions de Rome. Aboutissement : l'**édit de Caracalla** (212) qui étend la citoyenneté à tous les hommes libres de l'empire.`
+    },
+    {
+      terme: 'Droit romain',
+      definition: `Corpus juridique élaboré sur douze siècles, codifié au VIᵉ siècle par **Justinien** dans le *Corpus juris civilis*. Distinction entre droit public et privé, notion de personne juridique, contrat, propriété : base de la plupart des systèmes juridiques européens, dont le **Code Napoléon** (1804) descend directement.`
+    },
+    {
+      terme: 'Latin',
+      definition: `Langue parlée à Rome puis dans tout l'empire. Le **latin vulgaire** a donné naissance aux langues romanes (français, italien, espagnol, portugais, roumain). Près de 800 millions de locuteurs natifs aujourd'hui héritiers directs de la langue de Cicéron.`
+    }
   ]
 
 });

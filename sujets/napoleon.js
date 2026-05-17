@@ -347,6 +347,49 @@ D\'où, depuis deux siècles, une **mémoire ambiguë** : génie administratif, 
       correcte: 2,
       explication: `Après Waterloo (18 juin 1815), les vainqueurs ne laissent rien au hasard. Napoléon est déporté à Sainte-Hélène, à 1 900 km de la côte africaine. Six ans de captivité humiliante. Il y dicte ses mémoires à Las Cases — le futur Mémorial, bréviaire du mythe napoléonien. Mort probablement d\'un cancer de l\'estomac, à 51 ans. Ses cendres seront rapatriées aux Invalides en 1840.`
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Consulat',
+      definition: `Régime politique français de **1799 à 1804**, instauré par le coup d'État du 18 brumaire. Trois consuls, mais le **Premier Consul** Bonaparte concentre l'essentiel du pouvoir. Période de refonte administrative décisive : préfets, Banque de France, Code civil.`
+    },
+    {
+      terme: 'Code civil',
+      definition: `Codification monumentale du droit français promulguée en **1804** : 2 281 articles synthétisant droit romain, coutume et acquis révolutionnaires. *Ma vraie gloire*, dira Napoléon à Sainte-Hélène. Transposé en Belgique, Italie, Égypte, Japon, Louisiane, Québec.`
+    },
+    {
+      terme: 'Préfet',
+      definition: `Haut fonctionnaire nommé par le pouvoir central dans chaque **département**, créé par Napoléon en 1800. Courroie de transmission entre Paris et la province, casse l'autonomie des notables locaux. Pilier toujours actif de l'administration française deux siècles plus tard.`
+    },
+    {
+      terme: 'Blocus continental',
+      definition: `Stratégie économique décrétée par Napoléon à Berlin en **1806** pour étrangler l'Angleterre : interdire à toute l'Europe le commerce avec elle. Engrenage logique qui mène à la guerre d'Espagne puis à la campagne de Russie — la machine impériale se grippe par sa propre surextension.`
+    },
+    {
+      terme: 'Grande Armée',
+      definition: `Nom officiel des forces napoléoniennes à partir de 1805. Innovation majeure : la **manœuvre par corps autonomes**, qui marchent séparés et convergent au son du canon. Saignée fondatrice en Russie : 600 000 partis, ~30 000 revenus.`
+    },
+    {
+      terme: 'Garde impériale',
+      definition: `**Élite des élites** de la Grande Armée, recrutée parmi les vétérans : Vieille, Moyenne, Jeune Garde. Réserve gardée pour l'instant décisif. Son recul à Waterloo signe la défaite. *La Garde meurt et ne se rend pas*.`
+    },
+    {
+      terme: 'Légion d\'honneur',
+      definition: `Ordre méritocratique créé en **1802**, ouvert à tous — soldat, savant, artiste, industriel. Remplace les ordres aristocratiques d'Ancien Régime. *Il faut donner aux hommes des hochets, c'est avec cela qu'on les mène*, disait son fondateur.`
+    },
+    {
+      terme: 'Concordat',
+      definition: `Accord signé en **1801** entre Bonaparte et le pape **Pie VII**. Le catholicisme redevient *religion de la majorité des Français* sans redevenir religion d'État ; l'État nomme les évêques que le pape investit. Réconciliation après dix ans de rupture révolutionnaire.`
+    },
+    {
+      terme: 'Cent-Jours',
+      definition: `Période de mars à juin **1815** durant laquelle Napoléon, évadé de l'île d'Elbe, reprend le pouvoir en France sans tirer un coup de feu. S'achève à **Waterloo** (18 juin) et débouche sur la déportation à Sainte-Hélène.`
+    },
+    {
+      terme: 'Sainte-Hélène',
+      definition: `Rocher britannique de l'**Atlantique sud**, à 1 900 km de la côte africaine, où Napoléon est déporté après Waterloo. Six ans de captivité humiliante. Il y dicte ses mémoires à Las Cases — le *Mémorial*, bréviaire du futur mythe napoléonien. Meurt le 5 mai 1821.`
+    }
   ]
 
 });

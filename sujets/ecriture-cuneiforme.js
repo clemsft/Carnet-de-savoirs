@@ -264,6 +264,49 @@ Quand Mehmet II prend Constantinople en 1453 (revoir [[empire-byzantin]]), c\'es
       correcte: 1,
       explication: 'Les mathématiques babyloniennes utilisaient une base 60. C\'est de là que vient notre division du cercle en 360 degrés, de l\'heure en 60 minutes, de la minute en 60 secondes — héritage indirect mais quotidien de leur culture savante, transmise par les Grecs.'
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Cunéiforme',
+      definition: `Système d'écriture formé de signes en **clous** ou coins, imprimés au calame de roseau dans l'argile fraîche. Du latin *cuneus*, « coin ». Apparu en Mésopotamie vers 3300 av. J.-C., utilisé pendant près de [trois millénaires]{accent}.`
+    },
+    {
+      terme: 'Calame',
+      definition: `Outil de roseau **taillé en biseau** servant à imprimer les signes cunéiformes dans l'argile humide. Sa forme triangulaire impose la géométrie des signes : courbes proscrites, traits droits privilégiés.`
+    },
+    {
+      terme: 'Pictogramme',
+      definition: `Signe d'écriture qui **représente directement** une chose par un dessin stylisé (un poisson, une étoile). Stade initial du cunéiforme, abandonné au profit de signes abstraits puis phonétiques.`
+    },
+    {
+      terme: 'Logogramme',
+      definition: `Signe qui note un **mot entier** plutôt qu'un son. Permet une écriture compacte mais exige de mémoriser des centaines voire milliers de signes. Le chinois moderne en est l'exemple vivant.`
+    },
+    {
+      terme: 'Sumérien',
+      definition: `Langue parlée dans le sud de la Mésopotamie aux IVᵉ-IIIᵉ millénaires av. J.-C. **Langue isolée** sans parenté connue avec aucune autre. Premier idiome porté par l'écriture cunéiforme.`
+    },
+    {
+      terme: 'Akkadien',
+      definition: `Langue sémitique parlée en Mésopotamie à partir du IIIᵉ millénaire av. J.-C., apparentée à l'arabe et à l'hébreu. Décliné en deux grands dialectes — **babylonien** et **assyrien**. Devint la *lingua franca* diplomatique du Proche-Orient ancien.`
+    },
+    {
+      terme: 'Tablette',
+      definition: `Support standard de l'écriture cunéiforme : galette d'**argile** d'une dizaine de centimètres, gravée fraîche puis séchée au soleil ou cuite au four. Sa robustesse explique la survie de plus de **500 000** exemplaires.`
+    },
+    {
+      terme: 'Pierre de Rosette',
+      definition: `Stèle égyptienne (-196) à inscription **trilingue** (hiéroglyphes, démotique, grec) qui permit à *Champollion* de déchiffrer les hiéroglyphes en 1822. Par analogie, on appelle « pierre de Rosette cunéiforme » l'inscription trilingue de **Behistun**.`
+    },
+    {
+      terme: 'Behistun',
+      definition: `Falaise iranienne où *Darius Iᵉʳ* fit graver vers 520 av. J.-C. un récit trilingue (vieux perse, élamite, akkadien) en cunéiforme. Copiée par **Henry Rawlinson** au prix d'années d'escalade, elle servit de clé pour le déchiffrement du système en 1857.`
+    },
+    {
+      terme: 'Système sexagésimal',
+      definition: `Numération en **base 60** mise au point par les Babyloniens. Héritée jusqu'à nous : 60 secondes, 60 minutes, 360 degrés. Sa divisibilité (par 1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30) en fait un outil pratique pour le partage et l'astronomie.`
+    }
   ]
 
 });

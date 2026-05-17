@@ -359,6 +359,41 @@ Le chantier mobilise **plus de 1 000 personnes** : archéologues, charpentiers, 
       correcte: 1,
       explication: `Un incendie accidentel s\'est déclaré vers 18h50 dans les combles. La charpente médiévale du XIIᵉ siècle (1 300 chênes — surnommée "la forêt") et la flèche néogothique de Viollet-le-Duc ont été détruites. Les voûtes de pierre, les vitraux principaux et les deux tours ont été sauvés. La cathédrale a rouvert le 7 décembre 2024, restaurée à l\'identique.`
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Opus francigenum',
+      definition: `Nom **d'époque** du style gothique — littéralement *œuvre française*. Les contemporains du Moyen Âge savaient parfaitement que cette manière nouvelle venait d'**Île-de-France**, autour de Saint-Denis vers 1140.`
+    },
+    {
+      terme: 'Arc brisé',
+      definition: `Arc en **pointe** plutôt qu'en demi-cercle. Sa courbe plus tendue redirige les forces vers le bas plutôt que sur les côtés, autorisant des hauteurs accrues. Hérité de l'architecture islamique via les Cisterciens.`
+    },
+    {
+      terme: 'Croisée d\'ogives',
+      definition: `Voûte sur **nervures diagonales** qui concentrent les charges en **quatre points d'appui** par travée. Les voûtains entre les nervures deviennent légers et non porteurs — première condition de l'évidement des murs.`
+    },
+    {
+      terme: 'Arc-boutant',
+      definition: `Arc **extérieur** qui reçoit la poussée latérale des voûtes et la reporte sur une **culée** massive plantée à distance. Apparaît au dernier tiers du XIIᵉ siècle. Sans lui, pas de murs ajourés ni de verrières immenses.`
+    },
+    {
+      terme: 'Lux divina',
+      definition: `Lumière divine, concept néoplatonicien hérité du **Pseudo-Denys l'Aréopagite** et théorisé par l'abbé **Suger**. Justifie l'effacement des murs au profit de **vitraux** colorés qui transfigurent la lumière du jour en présence du Bien.`
+    },
+    {
+      terme: 'Gothique flamboyant',
+      definition: `Dernière phase stylistique du gothique (**XVᵉ siècle**). Exubérance ornementale : remplages en *flammèches*, voûtes en réseau étoilé, gâbles fleuris. Saint-Maclou de Rouen en est un exemple emblématique.`
+    },
+    {
+      terme: 'Compagnonnage',
+      definition: `Organisation des **ouvriers itinérants** (appareilleurs, tailleurs de pierre, sculpteurs, vitriers) qui circulent d'un grand chantier à l'autre à travers l'Europe gothique. Vecteur principal de la diffusion des techniques.`
+    },
+    {
+      terme: 'Maître d\'œuvre',
+      definition: `Architecte médiéval qui conçoit et dirige un chantier de cathédrale. **Villard de Honnecourt**, **Pierre de Montreuil**, **Jean d'Orbais** comptent parmi ceux dont le nom a été conservé.`
+    }
   ]
 
 });

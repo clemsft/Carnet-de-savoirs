@@ -19,7 +19,8 @@ window.CarnetDeSavoirs.register({
   points_cles: [ /* ... */ ],
   carte_mentale: { /* ... */ },
   cours: [ /* ... */ ],
-  quiz: [ /* ... */ ]
+  quiz: [ /* ... */ ],
+  vocabulaire: [ /* ... */ ]   // [optionnel mais recommandé] mini-glossaire
 });
 ```
 
@@ -445,6 +446,34 @@ quiz: [
 
 ---
 
+## 9bis. Le bloc `vocabulaire` (mini-glossaire du sujet)
+
+Une **liste curatée** de 5 à 10 termes-clés du sujet, chacun accompagné d'une vraie définition autoporteuse (1-2 phrases). Le carnet agrège tous les `vocabulaire` de tous les sujets en un **lexique transverse** consultable depuis l'entrée *Vocabulaire* de la sidebar, avec mode flashcards de révision.
+
+```js
+vocabulaire: [
+  {
+    terme: 'Plus-value',
+    definition: 'Concept central de l\'analyse marxiste : différence entre la valeur produite par le travail du salarié et la rémunération versée. Source structurelle du profit dans le capitalisme.'
+  },
+  {
+    terme: 'Main invisible',
+    definition: 'Métaphore d\'**Adam Smith** (*Recherches sur la nature et les causes de la richesse des nations*, 1776) : la poursuite par chacun de son intérêt personnel produit, sans intention collective, l\'ordre économique le plus efficace.'
+  },
+  // ... 5 à 10 entrées
+]
+```
+
+**Règles strictes :**
+- `terme` : le mot ou l'expression à retenir. Une seule forme par entrée. Préfère la majuscule pour les noms propres (*Adam Smith*, *Plus-value*), minuscule pour les concepts communs (*main invisible*).
+- `definition` : 1 à 2 phrases **autoporteuses**. Quelqu'un qui lit cette définition seule doit comprendre le concept sans avoir besoin de lire le sujet entier. Markdown-lite supporté (`**gras**`, `*italique*`, `[terme]{accent}`, `` `code` ``, `[[slug]]`).
+- **Curation, pas exhaustivité** : 5 à 10 termes maximum. Choisis les concepts les plus importants, ceux qui méritent d'être mémorisés pour eux-mêmes.
+- Évite les termes anecdotiques (dates, événements isolés, noms propres ponctuels).
+- Si un même terme apparaît dans plusieurs sujets (ex. `Improvisation` dans `jazz` et `le-rap`), le lexique global affichera les **deux définitions complémentaires** — c'est voulu, ça enrichit.
+- **Ton** : posé, dense, autoporteur. Pas de "voir le sujet pour plus de détails", pas de référence à des passages externes — la définition doit se suffire.
+
+---
+
 ## 10. Style et ton
 
 L'app a une voix : **élégante, dense, posée, à la fois rigoureuse et émerveillée**. Reproduis-la.
@@ -483,6 +512,7 @@ L'app a une voix : **élégante, dense, posée, à la fois rigoureuse et émerve
 - [ ] Tous les `liens` réfèrent à des nœuds existants.
 - [ ] 5-10 blocs de `cours` mélangeant texte, encadré et au moins un widget.
 - [ ] 5-10 questions de `quiz` avec `correcte` valide.
+- [ ] 5-10 entrées de `vocabulaire` avec définitions autoporteuses.
 - [ ] Aucun `<script>`, aucun `fetch()`, aucune dépendance externe.
 
 Une fois ces points cochés, tu peux livrer le fichier à l'utilisateur qui l'ajoutera à son atelier via Cowork.

@@ -337,6 +337,49 @@ Les premiers traitements **modificateurs** de la maladie — notamment le **léc
       correcte: 2,
       explication: `Alzheimer débute typiquement par une dégénérescence de l'hippocampe, ce qui explique que les patients oublient les événements récents tout en conservant longtemps leurs souvenirs anciens (déjà consolidés dans le cortex). Au plan microscopique : plaques amyloïdes et dégénérescences neurofibrillaires (protéine tau).`
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Hippocampe',
+      definition: `Structure cérébrale du lobe temporal médian, indispensable à la **formation des nouveaux souvenirs explicites** (faits et événements). Son ablation chez le patient H.M. en 1953 a révélé sa fonction ; c'est aussi la première région touchée par la maladie d'Alzheimer.`
+    },
+    {
+      terme: 'Mémoire de travail',
+      definition: `Système qui maintient et manipule un petit nombre d'éléments (≈ 4 à 7) pendant ~20 secondes. Le *bureau mental* sur lequel se déroulent calcul, raisonnement et compréhension. Modèle de référence : **Baddeley** (1974).`
+    },
+    {
+      terme: 'Mémoire épisodique',
+      definition: `Mémoire des **événements vécus**, situés dans le temps et l'espace, avec contexte personnel et émotionnel. *Hier, j'ai bu un café à la cuisine*. Repose sur l'hippocampe — premier système touché par Alzheimer.`
+    },
+    {
+      terme: 'Mémoire sémantique',
+      definition: `Mémoire des **connaissances générales** détachées du contexte personnel d'apprentissage. *Paris est la capitale de la France*. Repose sur le cortex temporal latéral. Plus résistante à la dégénérescence.`
+    },
+    {
+      terme: 'Mémoire procédurale',
+      definition: `Mémoire des **savoir-faire moteurs** automatisés — faire du vélo, taper au clavier, jouer du piano. Indépendante de l'hippocampe (cervelet, ganglions de la base). H.M. pouvait apprendre de nouvelles compétences malgré son amnésie.`
+    },
+    {
+      terme: 'Consolidation',
+      definition: `Passage d'un souvenir fragile, encore dépendant de l'hippocampe, à un souvenir durable intégré dans le cortex. Se déroule principalement pendant le **sommeil lent profond**, où l'hippocampe *rejoue* les expériences récentes.`
+    },
+    {
+      terme: 'Plasticité synaptique',
+      definition: `Capacité des connexions entre neurones à se renforcer ou s'affaiblir avec l'usage. Base moléculaire de la mémoire, formalisée par **Donald Hebb** : *les neurones qui s'activent ensemble se câblent ensemble*. Mécanisme étoile : la *LTP* (long-term potentiation).`
+    },
+    {
+      terme: 'Courbe de l\'oubli',
+      definition: `Loi quantifiée par **Hermann Ebbinghaus** en 1885 : on oublie ~50 % d'une liste neuve dans l'heure, ~70 % en une journée. Chaque répétition espacée *aplatit* la courbe — principe des méthodes modernes d'apprentissage espacé (Anki, SuperMemo).`
+    },
+    {
+      terme: 'Faux souvenir',
+      definition: `Souvenir détaillé et sincèrement éprouvé d'un événement qui n'a jamais eu lieu. **Elizabeth Loftus** a démontré qu'on peut en implanter par simple suggestion répétée — conséquence directe du caractère reconstructif de chaque rappel.`
+    },
+    {
+      terme: 'Maladie d\'Alzheimer',
+      definition: `Maladie neurodégénérative identifiée par **Aloïs Alzheimer** en 1906, première cause de démence dans le monde (~55 millions de patients). Débute par la dégénérescence de l'hippocampe. Marqueurs microscopiques : **plaques amyloïdes** et dégénérescences neurofibrillaires de protéine *tau*.`
+    }
   ]
 
 });

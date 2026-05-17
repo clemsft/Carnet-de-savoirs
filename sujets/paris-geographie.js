@@ -293,6 +293,45 @@ Le **Grand Paris Express**, en cours de construction depuis 2016, ajoutera **200
       correcte: 1,
       explication: 'Lancé en 2016, c\'est le plus grand chantier de transports en cours en Europe. 200 km de métro automatique en construction, avec des lignes circulaires qui ne passent plus par le centre — révolution structurelle pour la mobilité de la région parisienne. Premières mises en service partielles depuis 2024, achèvement prévu vers 2035.'
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Lutèce',
+      definition: `Nom **gallo-romain** de Paris (*Lutetia*), bourgade celtique des **Parisii** fortifiée par les Romains après la conquête vers 50 av. J.-C. Étendue de l'île de la Cité à la rive gauche. Vestiges visibles : arènes du Iᵉʳ siècle et thermes de Cluny.`
+    },
+    {
+      terme: 'Haussmannisation',
+      definition: `**Transformation urbaine** de Paris menée par le préfet **Georges-Eugène Haussmann** sous Napoléon III (1853-1870). Percée de 80 km de boulevards rectilignes, démolition de ~20 000 immeubles, façades unifiées en pierre de taille. La plus grande refonte d'une capitale européenne.`
+    },
+    {
+      terme: 'Catacombes',
+      definition: `**Ossuaire municipal** parisien créé en 1786 dans d'anciennes carrières de calcaire pour vider les cimetières insalubres (notamment celui des Innocents). Y reposent environ **6 millions de squelettes**. Inscription à l'entrée : *Arrête, c'est ici l'empire de la mort*.`
+    },
+    {
+      terme: 'Carrières de Paris',
+      definition: `Environ **300 km de galeries** héritées de l'extraction du **calcaire lutétien** et du **gypse** depuis l'époque romaine — la pierre même de la ville. L'Inspection générale des carrières, créée en 1777 après plusieurs effondrements, surveille toujours leur stabilité.`
+    },
+    {
+      terme: 'Calcaire lutétien',
+      definition: `**Pierre de taille** blonde caractéristique des immeubles parisiens, extraite du sous-sol de la ville depuis l'Antiquité. Sédimentaire, formée au Lutétien (étage du milieu de l'Éocène, ~47 millions d'années). Donne à Paris son unité chromatique.`
+    },
+    {
+      terme: 'Cataphiles',
+      definition: `Personnes qui explorent **clandestinement** les sections non ouvertes au public des carrières et catacombes parisiennes. Communauté informelle ancienne, malgré l'interdiction et les amendes régulièrement appliquées par la police municipale.`
+    },
+    {
+      terme: 'Cité-Cuvette',
+      definition: `Configuration géographique parisienne : une **boucle de la Seine** dans une cuvette sédimentaire entourée de collines basses (Montmartre, Belleville, Sainte-Geneviève), à l'intersection des routes naturelles entre Atlantique et Rhénanie, Nord et Méditerranée.`
+    },
+    {
+      terme: 'Pierre de Rosette',
+      definition: `Référence : voir [[pyramides-egypte]] pour le sujet général. À Paris, le **Louvre** conserve en revanche le Code d'Hammurabi et des collections antiques majeures — la capitale comme dépôt mondial du patrimoine, héritage des grandes expéditions scientifiques du XIXᵉ.`
+    },
+    {
+      terme: 'Grand Paris Express',
+      definition: `**Plus grand chantier de transports d'Europe** en cours depuis 2016 : 200 km de métro automatique, lignes circulaires desservant la banlieue sans passer par le centre. Recomposition structurelle de la mobilité francilienne, achèvement prévu vers 2035.`
+    }
   ]
 
 });

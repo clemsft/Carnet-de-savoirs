@@ -439,6 +439,49 @@ L\'enjeu n\'est pas tant de battre la nature que de **comprimer la phase de dép
       correcte: 2,
       explication: 'L\'analyse des athlètes d\'élite a révélé un schéma 80/20 robuste : beaucoup de volume facile pour développer la base aérobie, des séances très dures pour tirer la VO2max et le seuil, et très peu de zone "grise" intermédiaire — qui fatigue sans produire d\'adaptations équivalentes.'
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'ATP',
+      definition: `**Adénosine triphosphate**, molécule qui sert de monnaie énergétique universelle dans toute cellule vivante. Sa rupture de liaison phosphate libère l'énergie qui permet la contraction musculaire — mais le muscle n'en stocke que quelques secondes de réserve.`
+    },
+    {
+      terme: 'Filière aérobie',
+      definition: `Voie de production d'**ATP** dans les **mitochondries**, utilisant l'oxygène pour brûler glucose et graisses. Lente à démarrer mais ressources quasi illimitées. Filière de l'endurance, dominante au-delà de deux minutes d'effort.`
+    },
+    {
+      terme: 'Filière anaérobie lactique',
+      definition: `Voie de production d'ATP par **glycolyse sans oxygène**, produisant du lactate. Très puissante mais limitée à 10-60 secondes : l'acidification musculaire devient vite intolérable. Mobilisée sur 400 m, 800 m, dernier sprint.`
+    },
+    {
+      terme: 'VO2max',
+      definition: `**Volume maximal d'oxygène** que l'organisme peut consommer par minute et par kilo de masse corporelle (mL/min/kg). Indicateur cardinal du potentiel d'endurance : 35-45 chez le sédentaire, 80-90 chez le cycliste professionnel.`
+    },
+    {
+      terme: 'Seuil lactique',
+      definition: `Intensité d'effort au-delà de laquelle le **lactate** sanguin s'accumule plus vite qu'il n'est éliminé. Recule fortement avec l'entraînement. En pratique, plus important que la **VO2max** pour les efforts longs — un marathonien d'élite tient sa course à 85-88 % de sa VO2max.`
+    },
+    {
+      terme: 'Fibres musculaires de type I',
+      definition: `Fibres **lentes**, riches en mitochondries et en myoglobine, faibles en puissance mais quasi infatigables. Dominantes chez les marathoniens et dans les muscles posturaux. Leur proportion est en grande partie déterminée génétiquement.`
+    },
+    {
+      terme: 'Fibres musculaires de type IIx',
+      definition: `Fibres **rapides glycolytiques**, blanches, pauvres en mitochondries. Produisent une force énorme en une fraction de seconde et fatiguent immédiatement. Dominantes chez les sprinters et haltérophiles d'élite (parfois 70-80 % de leurs fibres).`
+    },
+    {
+      terme: 'Surcompensation',
+      definition: `Principe fondamental de l'entraînement : après un effort qui fatigue, la récupération ramène le corps **au-dessus** de son niveau initial. Si la séance suivante tombe au sommet de cette fenêtre, on progresse. Trop tôt : surentraînement. Trop tard : stagnation.`
+    },
+    {
+      terme: 'EPO',
+      definition: `**Érythropoïétine**, hormone naturellement sécrétée par les reins qui stimule la production de **globules rouges**. Synthétique depuis les années 1980, elle augmente artificiellement la capacité de transport d'oxygène — substance dopante reine des sports d'endurance dans les années 1990-2000.`
+    },
+    {
+      terme: 'Sarcopénie',
+      definition: `Perte progressive de **masse musculaire** avec l'âge (environ 1 % par an après 50 ans). Les fibres rapides régressent plus vite que les lentes. Largement préventible par un entraînement régulier en force et en endurance.`
+    }
   ]
 
 });

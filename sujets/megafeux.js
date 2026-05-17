@@ -275,6 +275,41 @@ C\'est cette transformation **qualitative** que désigne le mot mégafeu : moins
       correcte: 1,
       explication: 'Le front d\'un mégafeu n\'est plus une ligne nette — c\'est une zone diffuse de foyers satellites allumés par les projections. Aucun coupe-feu classique ne peut arrêter cela. C\'est l\'une des raisons pour lesquelles ces feux deviennent "non combattables".'
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Mégafeu',
+      definition: `Incendie hors norme par sa **taille**, son **intensité** ou son **comportement**, dépassant toute capacité humaine de contrôle. Notion sans définition scientifique stable — taille > 10 000 ha pour certains, *non combattable* pour d'autres.`
+    },
+    {
+      terme: 'Pyrocumulonimbus',
+      definition: `Nuage d'orage généré par la chaleur d'un grand incendie : le panache convectif produit ses propres éclairs, vents rabattants et parfois grêle. Le feu *fabrique sa propre météo* — phénomène emblématique des mégafeux.`
+    },
+    {
+      terme: 'Sauts de feu',
+      definition: `Projection de fragments incandescents (*firebrands*) à plusieurs kilomètres en avant du front d'incendie, qui allument de nouveaux foyers et rendent inopérants les coupe-feux classiques.`
+    },
+    {
+      terme: 'Saison sèche',
+      definition: `Période annuelle de faible humidité atmosphérique et de stress hydrique de la végétation. Son **allongement** sous l'effet du changement climatique élargit la fenêtre de vulnérabilité aux feux extrêmes.`
+    },
+    {
+      terme: 'Brûlage dirigé',
+      definition: `Mise à feu contrôlée d'une zone végétale pour **réduire la biomasse combustible** avant la saison à risque. Technique inspirée notamment des pratiques aborigènes australiennes, désormais intégrée à la prévention occidentale.`
+    },
+    {
+      terme: 'Particules PM2,5',
+      definition: `Particules fines de moins de **2,5 micromètres** émises par les feux et la combustion. Pénètrent profondément dans les poumons et la circulation sanguine — principal vecteur sanitaire des panaches de fumée à longue distance.`
+    },
+    {
+      terme: 'Puits de carbone',
+      definition: `Écosystème (forêt, océan, sol) qui absorbe plus de CO₂ qu'il n'en émet. Les feux extrêmes transforment ponctuellement les forêts en **sources** de carbone, inversant pour des décennies leur rôle climatique.`
+    },
+    {
+      terme: 'Feu non combattable',
+      definition: `Incendie dont l'intensité dépasse les seuils d'efficacité des moyens d'extinction (≈ 10 000 kW/m de front linéaire). Les pompiers renoncent à l'attaque directe et se concentrent sur l'**évacuation** et la protection des structures.`
+    }
   ]
 
 });

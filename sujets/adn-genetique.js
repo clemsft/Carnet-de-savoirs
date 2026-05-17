@@ -318,6 +318,45 @@ L'outil ouvre des perspectives vertigineuses (correction de maladies génétique
       correcte: 1,
       explication: `Bactéries, champignons, plantes, animaux utilisent quasiment la même table de correspondance entre codons et acides aminés. Une telle conservation s'explique le plus simplement par une descendance commune — c'est l'un des indices les plus puissants à l'appui de la théorie de l'évolution.`
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Double hélice',
+      definition: `Structure tridimensionnelle de l'ADN : deux brins **antiparallèles** enroulés l'un autour de l'autre, reliés par des paires de bases complémentaires. Élucidée en **1953** par Watson et Crick à partir des clichés de Rosalind Franklin.`
+    },
+    {
+      terme: 'Codon',
+      definition: `Triplet de trois bases nucléotidiques qui spécifie un acide aminé. Avec 4³ = **64 combinaisons** possibles pour 20 acides aminés, le code est *redondant*, ce qui le rend robuste aux mutations ponctuelles.`
+    },
+    {
+      terme: 'Transcription',
+      definition: `Première étape de l'expression des gènes : l'ADN est copié en **ARN messager** par l'ARN polymérase dans le noyau. L'information est transcrite dans un alphabet voisin (l'uracile remplace la thymine).`
+    },
+    {
+      terme: 'Traduction',
+      definition: `Seconde étape : les **ribosomes** lisent l'ARN messager par codons et assemblent la chaîne d'acides aminés correspondante. La protéine ainsi formée se replie en quelques millisecondes en une structure 3D fonctionnelle.`
+    },
+    {
+      terme: 'Génome',
+      definition: `Ensemble complet de l'ADN d'un organisme. Le génome humain compte environ **3,2 milliards** de paires de bases sur 23 paires de chromosomes — dont seulement **1,5 %** codent directement pour des protéines.`
+    },
+    {
+      terme: 'CRISPR-Cas9',
+      definition: `Outil d'édition génétique adapté en **2012** par Charpentier et Doudna (Nobel 2020) à partir d'un système immunitaire bactérien. Un *ARN guide* cible une séquence précise ; la protéine Cas9 y coupe l'ADN comme des ciseaux moléculaires.`
+    },
+    {
+      terme: 'Épissage alternatif',
+      definition: `Mécanisme par lequel un même gène peut produire **plusieurs protéines différentes** : les *introns* (séquences non codantes) sont retirés et les *exons* raboutés selon des combinaisons variables.`
+    },
+    {
+      terme: 'Plasmide',
+      definition: `Petit ADN **circulaire** distinct du chromosome principal, présent surtout chez les bactéries. Échangeable entre individus même d'espèces différentes — vecteur central du **transfert horizontal** de gènes.`
+    },
+    {
+      terme: 'Repliement protéique',
+      definition: `Processus par lequel une chaîne linéaire d'acides aminés adopte sa structure tridimensionnelle fonctionnelle. Problème ouvert pendant cinquante ans, résolu en **2020** par l'IA AlphaFold de DeepMind.`
+    }
   ]
 
 });

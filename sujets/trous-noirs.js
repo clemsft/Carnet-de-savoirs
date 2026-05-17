@@ -461,6 +461,49 @@ Cette corrélation est intrigante : comment un objet aussi compact peut-il être
       correcte: 1,
       explication: 'La relativité générale prédit une singularité, mais cette prédiction d\'infinis est plutôt le signe qu\'il manque une théorie : la gravité quantique. Comprendre vraiment ce qui s\'y passe reste l\'un des grands défis ouverts de la physique.'
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Trou noir',
+      definition: `Objet astrophysique si **compact** que sa **vitesse de libération** dépasse celle de la lumière. Aucune particule, aucun rayonnement ne peut s'en échapper. Existe en trois familles principales selon la masse : stellaires, intermédiaires, supermassifs.`
+    },
+    {
+      terme: 'Vitesse de libération',
+      definition: `**Vitesse minimale** nécessaire pour s'arracher définitivement à la gravité d'un astre. 11,2 km/s sur Terre, 617 km/s sur le Soleil. Quand elle atteint celle de la **lumière** (~300 000 km/s), l'objet est un trou noir.`
+    },
+    {
+      terme: 'Horizon des événements',
+      definition: `**Frontière mathématique** d'un trou noir au-delà de laquelle rien — pas même la lumière — ne peut s'échapper. Ce n'est pas une paroi physique : un astronaute la franchirait sans rien sentir. Sa surface, proportionnelle au carré de la masse, définit la « taille » du trou noir.`
+    },
+    {
+      terme: 'Singularité',
+      definition: `Point théorique central d'un trou noir, de **volume nul et de densité infinie**, où la relativité générale produit des résultats infinis — signe que la théorie n'est plus valable. Comprendre ce qui s'y passe nécessiterait une [gravité quantique]{accent} qui n'existe pas encore.`
+    },
+    {
+      terme: 'Disque d\'accrétion',
+      definition: `**Tourbillon de matière** (gaz, poussière, débris stellaires) en chute vers un trou noir. Les frottements colossaux portent la matière à des **millions de degrés**, qui rayonne intensément en rayons X. C'est ce rayonnement, et non le trou noir lui-même, que l'on détecte.`
+    },
+    {
+      terme: 'Trou noir supermassif',
+      definition: `Trou noir de **millions à milliards** de masses solaires, trônant au centre de presque toutes les grandes galaxies. **Sagittarius A*** (notre galaxie) pèse ~4 millions de M☉ ; **M87*** ~6,5 milliards. Régule la formation stellaire de sa galaxie hôte via le feedback de son disque d'accrétion.`
+    },
+    {
+      terme: 'Effondrement stellaire',
+      definition: `Mort gravitationnelle d'une étoile très massive (>25 M☉) quand son combustible nucléaire s'épuise. L'équilibre entre gravité et pression de radiation se rompt : le cœur implose, déclenche une **supernova**, et le résidu central s'effondre au-delà de toute résistance — naissance d'un trou noir stellaire.`
+    },
+    {
+      terme: 'Event Horizon Telescope',
+      definition: `**Réseau planétaire de radiotélescopes** coordonnés en interférométrie, formant un télescope virtuel de la taille de la Terre. Première image directe de l'ombre d'un trou noir (**M87*** en 2019, puis **Sgr A*** en 2022). Confirme spectaculairement les prédictions de la [[theorie-relativite]] générale.`
+    },
+    {
+      terme: 'Onde gravitationnelle',
+      definition: `**Ondulation de l'espace-temps** émise lorsque deux objets très compacts (trous noirs, étoiles à neutrons) se mettent en spirale et fusionnent. Détectée pour la première fois par **LIGO/Virgo** en 2015 — confirmation d'une prédiction d'Einstein de 1916. Prix Nobel 2017.`
+    },
+    {
+      terme: 'Feedback du quasar',
+      definition: `Mécanisme par lequel un trou noir supermassif **actif** rayonne tellement (parfois plus que toutes les étoiles de sa galaxie réunies) qu'il chauffe et chasse le gaz interstellaire. Étouffe la formation de nouvelles étoiles et s'auto-régule — explique le rapport ~**1/1000** entre masse du trou noir et masse du bulbe galactique.`
+    }
   ]
 
 });

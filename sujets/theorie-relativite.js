@@ -286,6 +286,45 @@ Aujourd'hui, les satellites embarquent une horloge dont la fréquence est **dél
       correcte: 1,
       explication: `1905 : restreinte aux référentiels inertiels (mouvement uniforme). 1915 : généralisée à tout référentiel, y compris accélérés, ce qui intègre naturellement la gravitation comme géométrie de l'espace-temps.`
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Relativité restreinte',
+      definition: `Théorie publiée par **Einstein** en **1905**, fondée sur deux postulats : invariance des lois physiques dans tous les référentiels inertiels, et invariance de la **vitesse de la lumière** dans le vide. Conséquences : dilatation du temps, contraction des longueurs, perte de la simultanéité absolue, **E = mc²**.`
+    },
+    {
+      terme: 'Relativité générale',
+      definition: `Extension de la relativité restreinte aux référentiels accélérés et à la gravitation, publiée par **Einstein** en **1915**. La gravité y devient une **courbure de l'espace-temps** produite par la masse et l'énergie, et non plus une force au sens de Newton.`
+    },
+    {
+      terme: 'Espace-temps',
+      definition: `**Cadre géométrique à 4 dimensions** (3 d'espace + 1 de temps) où évoluent les événements physiques selon la relativité. Sa **courbure**, produite par la masse-énergie, dicte aux corps comment se déplacer — *« la matière dit à l'espace-temps comment se courber ; l'espace-temps dit à la matière comment bouger »* (Wheeler).`
+    },
+    {
+      terme: 'Dilatation du temps',
+      definition: `Phénomène par lequel une horloge en **mouvement rapide** ou plongée dans un **champ gravitationnel** fort bat plus lentement qu'une horloge au repos en champ faible. Vérifié sur les muons cosmiques, sur des horloges atomiques embarquées en avion, et corrigé en permanence sur le GPS.`
+    },
+    {
+      terme: 'Équivalence masse-énergie',
+      definition: `Relation **E = mc²** établie en 1905 : masse et énergie sont deux faces d'une même grandeur. Un seul gramme de matière équivaut à ~9·10¹³ joules, soit environ **25 millions de kWh**. Fondement énergétique de la fission, de la fusion solaire et de toute la physique nucléaire.`
+    },
+    {
+      terme: 'Principe d\'équivalence',
+      definition: `Principe fondateur de la relativité générale (Einstein, **1907**) : un observateur en chute libre ne ressent pas son poids. Localement, **gravité et accélération sont indiscernables** — la « pensée la plus heureuse » d'Einstein, qui le conduira à reformuler la gravitation comme géométrie.`
+    },
+    {
+      terme: 'Géodésique',
+      definition: `Ligne la plus **droite possible** dans un espace-temps courbé — généralisation de la ligne droite à une géométrie déformée. Les corps en chute libre ne sont pas poussés par une force : ils suivent la géodésique tracée par la courbure que la masse-énergie environnante impose à l'espace-temps.`
+    },
+    {
+      terme: 'Onde gravitationnelle',
+      definition: `**Ondulation de l'espace-temps** lui-même, émise quand des masses très compactes accélèrent (fusion de deux trous noirs par exemple). Prédite par Einstein dès 1916, détectée pour la première fois par **LIGO** le 14 septembre 2015. Prix Nobel 2017.`
+    },
+    {
+      terme: 'Décalage gravitationnel vers le rouge',
+      definition: `**Ralentissement** du temps mesuré par une horloge proche d'une masse importante, comparée à une horloge éloignée. Un photon qui « grimpe » un champ gravitationnel perd de l'énergie et voit sa fréquence baisser. Effet vérifié dès 1959 par **Pound et Rebka** sur 22 mètres de hauteur.`
+    }
   ]
 
 });

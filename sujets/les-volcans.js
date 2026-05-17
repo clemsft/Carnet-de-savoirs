@@ -284,6 +284,49 @@ L\'Islande, perchée sur la dorsale atlantique, vit dans une éruption quasi per
       correcte: 1,
       explication: 'L\'éruption du Tambora (avril 1815, VEI 7) projeta tellement de SO₂ dans la stratosphère que l\'année suivante fut "sans été" : récoltes désastreuses, famines, des centaines de milliers de morts. C\'est aussi cette météo détraquée qui enferma Mary Shelley sur les bords du Léman, où elle écrivit Frankenstein.'
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Magma',
+      definition: `Roche en **fusion** à 1 000-1 200 °C (parfois davantage), située dans la croûte ou le manteau supérieur, mélange de liquide silicaté, de cristaux et de gaz dissous. Devient **lave** dès qu'elle atteint la surface et perd ses gaz.`
+    },
+    {
+      terme: 'Tectonique des plaques',
+      definition: `Théorie des années 1960 décrivant la surface terrestre comme une dizaine de **plaques rigides** flottant sur un manteau visqueux, se déplaçant de quelques cm/an. Explique la répartition presque totale des volcans et des séismes.`
+    },
+    {
+      terme: 'Subduction',
+      definition: `Plongée d'une **plaque océanique** sous une autre plaque (continentale ou océanique). Les fluides libérés font fondre le manteau au-dessus, produisant un magma **visqueux et explosif**. Mécanisme dominant de la Ceinture de feu du Pacifique.`
+    },
+    {
+      terme: 'Dorsale océanique',
+      definition: `Frontière de plaques **divergentes** où le manteau remonte et fond par décompression. Volcanisme fluide (basaltique), souvent sous-marin et discret. L'Islande est une dorsale émergée traversant aussi un point chaud.`
+    },
+    {
+      terme: 'Point chaud',
+      definition: `**Anomalie thermique fixe** du manteau, indépendante du mouvement des plaques. Quand une plaque passe au-dessus, elle se fait percer en série, formant un *chapelet d'îles* d'âges décroissants (Hawaï, Réunion, Yellowstone).`
+    },
+    {
+      terme: 'Éruption effusive',
+      definition: `Éruption à magma **fluide** (basaltique), pauvre en gaz : les gaz s'échappent facilement et la lave coule. Spectaculaire (fontaines, rivières incandescentes) mais rarement très meurtrière. Type **hawaïen**.`
+    },
+    {
+      terme: 'Éruption plinienne',
+      definition: `Éruption **explosive** à magma visqueux et riche en gaz : le bouchon éclate, projetant cendres et fragments à grande vitesse dans un panache kilométrique. Nommée d'après Pline le Jeune, témoin du Vésuve en 79. Type le plus dangereux.`
+    },
+    {
+      terme: 'Nuée ardente',
+      definition: `Avalanche de gaz et de cendres incandescents (~**700 °C**) dévalant les flancs d'un volcan à **100-200 km/h**. Phénomène volcanique le plus meurtrier — celle de la Montagne Pelée a anéanti Saint-Pierre en 1902 (~28 000 morts).`
+    },
+    {
+      terme: 'VEI',
+      definition: `*Volcanic Explosivity Index* (1982) : échelle **logarithmique** de 0 à 8 classant les éruptions selon leur volume émis et la hauteur du panache. Chaque palier représente environ **10 fois** la matière du précédent. Pinatubo 1991 = VEI 6, Tambora 1815 = VEI 7.`
+    },
+    {
+      terme: 'Caldera',
+      definition: `Vaste cratère formé par l'**effondrement du sommet** d'un volcan après une éruption massive ayant vidé sa chambre magmatique. Yellowstone, Toba, les Phlégréens en sont les exemples spectaculaires — siège des plus grandes éruptions de l'histoire géologique.`
+    }
   ]
 
 });

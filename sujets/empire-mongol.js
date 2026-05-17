@@ -271,6 +271,49 @@ L\'empire unifié n\'aura duré que **cent cinquante ans environ**. Mais ses des
       correcte: 1,
       explication: 'La peste noire, partie d\'Asie centrale, a circulé via les caravanes commerciales pacifiées par les Mongols avant d\'atteindre l\'Europe via les comptoirs génois en Crimée vers 1347. C\'est l\'envers sombre de la Pax Mongolica : ce qui circule librement, c\'est aussi les microbes.'
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Khan',
+      definition: `Titre des **souverains** turco-mongols, désignant un chef de tribu ou d'empire. *Gengis Khan* signifie littéralement « khan universel » : chef suprême au-dessus de tous les autres khans.`
+    },
+    {
+      terme: 'Qurultay',
+      definition: `Grande **assemblée des chefs** mongols qui élit le khan suprême, valide les successions et tranche les grandes décisions stratégiques. C'est lors du qurultay de 1206 que Temüjin est proclamé Gengis Khan.`
+    },
+    {
+      terme: 'Pax Mongolica',
+      definition: `Période d'environ un siècle (~**1240-1340**) durant laquelle l'unification politique de l'Eurasie sous domination mongole sécurise la [route de la soie]{accent} et permet un brassage commercial, culturel et technologique sans précédent.`
+    },
+    {
+      terme: 'Yassa',
+      definition: `**Code de lois** promulgué par Gengis Khan, mêlant droit coutumier nomade et décrets impériaux. Régit la discipline militaire, la succession, la tolérance religieuse, les peines. Tenu pour secret par les Mongols eux-mêmes — aucun manuscrit complet n'a survécu.`
+    },
+    {
+      terme: 'Yam',
+      definition: `Système postal mongol : réseau de **relais de chevaux** espacés d'environ 40 km à travers l'empire, permettant aux messagers de couvrir jusqu'à 300 km par jour. Première poste rapide à l'échelle continentale de l'histoire.`
+    },
+    {
+      terme: 'Khanat',
+      definition: `Entité politique gouvernée par un khan. À la mort de Gengis, l'empire éclate en **quatre khanats** (Yuan, Chagatai, Ilkhanat, Horde d'Or) qui suivent chacun leur destin tout en conservant un temps une allégeance symbolique au Grand Khan.`
+    },
+    {
+      terme: 'Horde d\'Or',
+      definition: `Khanat occidental fondé par *Batu*, petit-fils de Gengis, couvrant la **Russie**, l'Ukraine et le Kazakhstan actuels. Domine et taxe les principautés russes pendant deux siècles — période parfois appelée *joug mongol* dans l'historiographie russe.`
+    },
+    {
+      terme: 'Méritocratie',
+      definition: `Principe d'organisation où le **talent et la loyauté** priment sur la naissance. Innovation sociale de Gengis Khan : promotions militaires sans considération tribale, intégration d'étrangers compétents, rupture radicale avec l'aristocratie héréditaire des sociétés voisines.`
+    },
+    {
+      terme: 'Route de la soie',
+      definition: `Réseau de **routes commerciales** reliant la Chine à la Méditerranée à travers l'Asie centrale, actif depuis l'Antiquité. Pacifiée par les Mongols, elle achemine soie, épices, papier, poudre à canon — mais aussi idées, religions et épidémies.`
+    },
+    {
+      terme: 'Steppe',
+      definition: `Vaste écosystème d'**herbages semi-arides** s'étendant d'Europe orientale à la Mongolie. Berceau des sociétés nomades pastorales et de la cavalerie d'archers, elle structure mille ans de pression sur les civilisations sédentaires de Chine, de Perse et de Russie.`
+    }
   ]
 
 });

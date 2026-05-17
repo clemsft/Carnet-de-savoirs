@@ -353,6 +353,49 @@ Aujourd'hui le jazz n'est plus la pop music — il l'a été un bref instant his
       correcte: 1,
       explication: `Le free jazz, lancé par Ornette Coleman (Free Jazz, 1960) et Albert Ayler, abolit les contraintes formelles du jazz traditionnel : plus de grille d'accords prédéfinie, plus de mesure régulière obligatoire, parfois plus de tonalité. Les musiciens improvisent collectivement sur des motifs, des cris, des couleurs sonores. C'est la rupture la plus radicale de l'histoire du jazz, esthétique autant que politique.`
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Improvisation',
+      definition: `Pratique centrale du jazz où le musicien **invente sa partie** en temps réel sur la grille harmonique partagée d'un standard. Art profondément codifié, jamais aléatoire : grands solos étudiés comme des œuvres à part entière.`
+    },
+    {
+      terme: 'Standard',
+      definition: `Morceau du **répertoire commun** que tout jazzman est censé connaître (*Body and Soul*, *Autumn Leaves*, *Summertime*). Fournit la grille d'accords et la mélodie de départ ; le reste est laissé à l'invention. Langue commune permettant à des musiciens étrangers de jouer ensemble.`
+    },
+    {
+      terme: 'Swing',
+      definition: `Deux sens. Au sens strict : la **pulsation rythmique souple et flottante** propre au jazz, où les croches sont jouées de façon inégale. Au sens large : le **style** des big bands dansants des années 1930-1940 (Ellington, Basie, Goodman).`
+    },
+    {
+      terme: 'Blue notes',
+      definition: `Notes caractéristiques du blues : **tierce, septième** (parfois quinte) légèrement *abaissées* par rapport à la gamme majeure. Donnent cette couleur indéfinissable, mi-majeure mi-mineure, qui irrigue tout le jazz par-delà ses styles.`
+    },
+    {
+      terme: 'Big band',
+      definition: `Grande formation de 12 à 20 musiciens organisée en **sections** (anches, trompettes, trombones, rythmique). Tout est arrangé par écrit, les solos s'insèrent dans des moments précis. Format dominant à l'ère **swing**.`
+    },
+    {
+      terme: 'Bebop',
+      definition: `Révolution stylistique de **1945** menée par **Charlie Parker**, **Dizzy Gillespie** et **Thelonious Monk**. Tempos vertigineux, harmonies enrichies, petits combos. Fait basculer le jazz de la **piste de danse** vers la **salle de concert** pour musiciens virtuoses.`
+    },
+    {
+      terme: 'Jazz modal',
+      definition: `Approche inaugurée par **Miles Davis** sur *Kind of Blue* (**1959**) : remplacer la grille rapide d'accords par un ou deux **modes** (gammes étendues) tenus sur de longs passages. Offre à l'improvisateur un espace plus libre pour les couleurs mélodiques.`
+    },
+    {
+      terme: 'Free jazz',
+      definition: `Rupture portée par **Ornette Coleman** (*Free Jazz*, 1960) et **Albert Ayler** : abolition de la grille d'accords, de la mesure régulière, parfois de la tonalité. Improvisation collective sur des motifs et atmosphères. La plus radicale des mutations du jazz, esthétique et politique.`
+    },
+    {
+      terme: 'Call-and-response',
+      definition: `**Appel-réponse** : structure dialogique héritée des *work songs* africaines où un soliste lance une phrase à laquelle un autre (ou un chœur) répond. Reste structurellement présent dans tout le jazz, du swing au free.`
+    },
+    {
+      terme: 'Fusion',
+      definition: `Croisement du jazz avec le **rock** et le **funk** inauguré par *Bitches Brew* de **Miles Davis** (1970). Trompette électrique, guitares, claviers, rythmes binaires. Weather Report et Herbie Hancock en sont les figures majeures.`
+    }
   ]
 
 });

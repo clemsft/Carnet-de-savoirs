@@ -341,6 +341,49 @@ La **troisième vague**, depuis ~2015, est celle du **streaming global**. **Crun
       correcte: 2,
       explication: `Le Voyage de Chihiro de Hayao Miyazaki, sorti au Japon en 2001 (où il bat tous les records de box-office), remporte l'Oscar du meilleur film d'animation en 2003. C'est la première fois qu'un film d'animation japonais reçoit cette distinction — moment de bascule pour la reconnaissance critique mondiale du médium. Akira et Mononoké sont antérieurs, Your Name (2016) ne sera pas nominé.`
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Animé',
+      definition: `Hors du Japon, désigne l'**animation produite au Japon** comme tradition artistique distincte de l'animation occidentale. Au Japon (アニメ, abréviation de *animēshon*), le mot désigne en réalité **toute animation**, occidentale comprise.`
+    },
+    {
+      terme: 'Limited animation',
+      definition: `Économie radicale d'images inventée par **Tezuka** en 1963 : **8 à 12 dessins par seconde** contre 24 chez Disney, plans fixes prolongés, recyclage de cellulos. Contrainte budgétaire devenue **grammaire visuelle** — la valeur d'un plan tient à la composition, au silence, à la musique.`
+    },
+    {
+      terme: 'Manga',
+      definition: `Bande dessinée japonaise, support **majoritaire** des adaptations animées. Le modèle économique fondateur repose sur la boucle *manga → animé → produits dérivés* : le manga teste les histoires en magazine hebdomadaire, l'animé adapte les succès qui relancent ses ventes.`
+    },
+    {
+      terme: 'Shonen',
+      definition: `Genre marketing visant les **jeunes garçons** (8-18 ans). Combats, amitié, dépassement de soi, montée en puissance progressive. Segment dominant à l'export : *Dragon Ball*, *Naruto*, *One Piece*, *Jujutsu Kaisen*.`
+    },
+    {
+      terme: 'Seinen',
+      definition: `Genre marketing visant les **jeunes adultes masculins**. Récits plus **sombres**, moralement ambigus, parfois ultra-violents. Densité narrative qui se rapproche du roman ou de la BD européenne adulte (*Berserk*, *Monster*, *Vagabond*).`
+    },
+    {
+      terme: 'Mecha',
+      definition: `Famille thématique mettant en scène des **robots géants pilotés par des humains**, souvent adolescents. Né avec *Mazinger Z* (1972), codifié par *Gundam* (1979), bouleversé par *Evangelion* (1995) qui en fait une méditation existentielle.`
+    },
+    {
+      terme: 'Isekai',
+      definition: `Genre où un héros contemporain est **transposé dans un monde fantastique parallèle**. Devenu hégémonique dans les années 2010 au point d'être largement parodié pour son abus de tropes (*Sword Art Online*, *Re:Zero*, *Mushoku Tensei*).`
+    },
+    {
+      terme: 'Studio Ghibli',
+      definition: `Studio fondé en **1985** par **Hayao Miyazaki** et **Isao Takahata**. Pôle d'auteur du long métrage japonais : *Totoro* (1988), *Mononoké* (1997), *Le Voyage de Chihiro* (2001, **Oscar 2003**). Refus de l'animation numérique pure, soin pictural extrême des décors.`
+    },
+    {
+      terme: 'Character design',
+      definition: `Iconographie immédiatement reconnaissable de l'animé : **grands yeux** (lieu privilégié de l'émotion, hérité de Disney via Tezuka), cheveux colorés à fonction signalétique, expressions exagérées codifiées (goutte de sueur, veines saillantes). Véritable **alphabet émotionnel** partagé.`
+    },
+    {
+      terme: 'Cool Japan',
+      definition: `**Politique culturelle officielle** lancée par le gouvernement japonais à partir de 2007, qui reconnaît dans les exports culturels — animé, manga, cuisine, mode, jeux vidéo — un instrument de **soft power** diplomatique et économique.`
+    }
   ]
 
 });

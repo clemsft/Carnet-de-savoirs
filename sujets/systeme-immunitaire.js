@@ -286,6 +286,49 @@ Autre dérèglement : l\'**allergie**, où le système réagit fort à des subst
       correcte: 1,
       explication: 'Les tumeurs activent des "checkpoints" qui freinent les lymphocytes. Les immunothérapies bloquent ces freins, libérant la réponse immunitaire contre la tumeur. Allison et Honjo ont reçu le Nobel 2018 pour cette découverte qui a transformé la cancérologie.'
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Immunité innée',
+      definition: `**Première ligne de défense** de l'organisme : barrières (peau, muqueuses), protéines circulantes (complément), cellules phagocytaires (macrophages, neutrophiles). Réaction rapide (minutes à heures), non spécifique, identique chez tous les individus.`
+    },
+    {
+      terme: 'Immunité adaptative',
+      definition: `Deuxième étage du système immunitaire : réponse **lente** (5 à 14 jours), **spécifique** à un agent précis, dotée de **mémoire**. Repose sur les **lymphocytes B** (anticorps) et **T** (cytotoxiques et auxiliaires). Fondement de la vaccination.`
+    },
+    {
+      terme: 'Antigène',
+      definition: `Toute molécule reconnue comme **étrangère** par le système immunitaire et capable de déclencher une réponse. Souvent une protéine ou un sucre de surface d'un pathogène. Une même bactérie porte des dizaines d'antigènes différents.`
+    },
+    {
+      terme: 'Anticorps',
+      definition: `Protéines en forme de **Y** produites par les **lymphocytes B**, capables de se fixer avec une précision extrême sur un antigène spécifique pour le neutraliser ou le marquer pour destruction. Le corps humain peut en produire environ **un milliard** de spécificités différentes.`
+    },
+    {
+      terme: 'Lymphocyte T',
+      definition: `Cellule clé de l'**immunité adaptative**, mûrissant dans le **thymus** (d'où le « T »). Les T **CD4** orchestrent la réponse en activant les autres cellules ; les T **CD8** tuent au contact les cellules infectées par des virus ou cancéreuses.`
+    },
+    {
+      terme: 'Mémoire immunitaire',
+      definition: `Capacité du système immunitaire à **se souvenir** des agents rencontrés grâce à des lymphocytes mémoires persistants. Permet une réponse plus rapide et puissante lors d'une réinfection. Base de l'**immunité acquise** et de la **vaccination**.`
+    },
+    {
+      terme: 'Vaccination',
+      definition: `Exposition contrôlée du système immunitaire à un agent **inoffensif mais ressemblant** à un pathogène, pour développer une mémoire protectrice sans subir la maladie. Inventée par **Edward Jenner** en 1796 contre la variole, à partir de la *vaccine* bovine (d'où le mot).`
+    },
+    {
+      terme: 'Maladie auto-immune',
+      definition: `Pathologie où le système immunitaire attaque par erreur les **propres tissus** du corps, faute d'avoir éliminé les lymphocytes auto-réactifs à la maturation. Diabète de type 1, sclérose en plaques, lupus, polyarthrite : plus de **80 maladies** connues, touchant ~5 % de la population.`
+    },
+    {
+      terme: 'Immunothérapie',
+      definition: `Stratégie thérapeutique consistant à **mobiliser le système immunitaire** contre un cancer ou une autre maladie. Les anticorps anti-PD-1 et anti-CTLA-4 lèvent les « freins » des lymphocytes T contre les tumeurs (**Nobel 2018**, Allison et Honjo). A transformé le pronostic de plusieurs cancers.`
+    },
+    {
+      terme: 'ARN messager',
+      definition: `Molécule qui transporte l'**information génétique** de l'ADN aux ribosomes, où les protéines sont synthétisées. Les vaccins ARNm contre la **COVID-19** (2020) injectent directement cet ARN pour faire produire une protéine virale par les cellules elles-mêmes. **Nobel 2023** pour Karikó et Weissman.`
+    }
   ]
 
 });

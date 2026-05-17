@@ -271,6 +271,49 @@ Les **cauchemars**, les **rêves lucides** (où tu es conscient de rêver), la *
       correcte: 1,
       explication: 'Plusieurs études le confirment : 17 h sans sommeil = ~0,5 g/l d\'alcool en équivalent cognitif ; 24 h = ~0,8 g/l. La privation de sommeil reste socialement banalisée — elle est pourtant biologiquement comparable à l\'ivresse.'
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Cycle de sommeil',
+      definition: `Unité de base structurant la nuit, d'une durée d'environ **90 minutes**, alternant **sommeil lent** (léger puis profond) puis **sommeil paradoxal**. Une nuit normale en enchaîne 4 à 6, avec un sommeil profond dominant en début de nuit et un paradoxal plus long au petit matin.`
+    },
+    {
+      terme: 'Sommeil lent profond',
+      definition: `Stade **N3** caractérisé par des **ondes cérébrales lentes et amples** (ondes delta). Phase la plus *réparatrice* : c'est là que se consolident les apprentissages et que le système glymphatique nettoie le cerveau. Le réveil y est difficile et confus.`
+    },
+    {
+      terme: 'Sommeil paradoxal',
+      definition: `Phase **REM** (*Rapid Eye Movement*) où le cerveau est presque aussi actif qu'à l'éveil, mais les muscles **paralysés** (atonie). Lieu des **rêves narratifs**. Nommé "paradoxal" par **Michel Jouvet** (1959) à cause de cette contradiction entre activité cérébrale et immobilité corporelle.`
+    },
+    {
+      terme: 'Rythme circadien',
+      definition: `Horloge biologique interne battant sur **environ 24 heures** (*circa diem*), qui régit l'alternance veille-sommeil, la température corporelle, la vigilance et la sécrétion hormonale. Chef d'orchestre : le **noyau suprachiasmatique** de l'hypothalamus, recalé en permanence par la lumière.`
+    },
+    {
+      terme: 'Mélatonine',
+      definition: `Hormone sécrétée par l'**épiphyse** à partir du soir, qui **amorce l'endormissement** et signale à l'organisme l'entrée dans la phase nocturne. Sa production est inhibée par la lumière, particulièrement par les longueurs d'onde courtes (lumière bleue des écrans).`
+    },
+    {
+      terme: 'Système glymphatique',
+      definition: `Réseau de drainage cérébral identifié en **2012** par Maiken Nedergaard. Pendant le sommeil profond, les espaces entre les neurones se dilatent et le **liquide céphalo-rachidien** y circule, évacuant les déchets métaboliques — dont la *bêta-amyloïde* liée à Alzheimer.`
+    },
+    {
+      terme: 'Consolidation mnésique',
+      definition: `Processus par lequel les souvenirs encodés dans l'**hippocampe** pendant la journée sont *rejoués* et progressivement transférés vers le **cortex** pour un stockage à long terme. Se déroule essentiellement pendant le sommeil profond.`
+    },
+    {
+      terme: 'Dette de sommeil',
+      definition: `Accumulation chronique d'un déficit de sommeil (régulièrement moins de 6h/nuit). Associée à un risque accru de maladies **cardiovasculaires**, de diabète de type 2, d'obésité, de dépression et de troubles cognitifs. **17 heures** d'éveil continu équivalent cognitivement à 0,5 g/l d'alcool.`
+    },
+    {
+      terme: 'Noyau suprachiasmatique',
+      definition: `Petit groupe de neurones de l'**hypothalamus**, situé juste au-dessus du chiasma optique, qui constitue l'horloge centrale du rythme circadien. Reçoit directement l'information lumineuse via des cellules ganglionnaires à *mélanopsine* de la rétine.`
+    },
+    {
+      terme: 'Atonie musculaire',
+      definition: `**Paralysie active** des muscles squelettiques durant le sommeil paradoxal (sauf yeux, diaphragme et muscles respiratoires). Empêche de *mettre en acte* les mouvements rêvés. Sa défaillance produit le *trouble du comportement en sommeil paradoxal*.`
+    }
   ]
 
 });

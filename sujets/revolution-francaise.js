@@ -352,6 +352,49 @@ Plus largement, la Révolution est l\'événement qui invente la modernité poli
       correcte: 1,
       explication: `Le Code civil, promulgué le 21 mars 1804, codifie l\'égalité civile, l\'abolition des privilèges, la laïcité de l\'état civil, la propriété individuelle. Il inspirera des dizaines de pays — de la Belgique au Japon, en passant par la Louisiane et le Québec.`
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'États généraux',
+      definition: `**Assemblée représentative** des trois ordres du royaume — clergé, noblesse, tiers état — convoquée par le roi de France en cas de crise majeure. Réunie le **5 mai 1789** par Louis XVI pour résoudre la faillite financière, après 175 ans d'éclipse. Étincelle de la Révolution.`
+    },
+    {
+      terme: 'Tiers état',
+      definition: `Le **troisième ordre** de la société d'Ancien Régime, regroupant tout ce qui n'est ni noble ni ecclésiastique : ~97 % de la population. Paye l'essentiel des impôts. Le 17 juin 1789, ses députés se proclament **Assemblée nationale**, acte fondateur de la Révolution.`
+    },
+    {
+      terme: 'Déclaration des droits de l\'homme et du citoyen',
+      definition: `Texte voté le **26 août 1789** par l'Assemblée nationale : 17 articles proclamant la **liberté**, l'**égalité devant la loi**, la souveraineté de la nation, la séparation des pouvoirs. Acte fondateur de la modernité politique mondiale ; inspirera la Déclaration universelle de l'ONU de 1948.`
+    },
+    {
+      terme: 'Sans-culottes',
+      definition: `**Militants populaires** parisiens de la Révolution — artisans, ouvriers, petits boutiquiers — ainsi nommés parce qu'ils portent le pantalon de travail et non la culotte aristocratique. Force motrice des journées révolutionnaires de 1792-1794, animateurs des sections parisiennes.`
+    },
+    {
+      terme: 'Terreur',
+      definition: `**Régime d'exception** mis en place de l'été 1793 à juillet 1794, pouvoir concentré entre les mains du **Comité de salut public** dirigé par **Robespierre**. ~16 000 guillotinés, et des dizaines de milliers de morts en province (Vendée, Lyon). Justifié au nom du *salut public* face à la guerre étrangère et aux soulèvements intérieurs.`
+    },
+    {
+      terme: 'Jacobins',
+      definition: `Club politique radical de la Révolution, montagnard et centraliste, dont **Robespierre** est la figure dominante. Tire sa force du soutien populaire parisien. Dirige la Terreur (1793-1794) au nom d'une *République de la vertu*. Tombe avec son chef au 9 thermidor.`
+    },
+    {
+      terme: 'Girondins',
+      definition: `Faction des **républicains modérés**, surtout députés de province (notamment de la Gironde), partisans d'une République fédérale et libérale. Évincés violemment du pouvoir par les sans-culottes les 31 mai-2 juin 1793. La plupart guillotinés en octobre 1793.`
+    },
+    {
+      terme: 'Thermidor',
+      definition: `**Mois du calendrier révolutionnaire** (juillet-août) qui désigne, par métonymie, la **chute de Robespierre** le 9 thermidor an II (27 juillet 1794). Met fin à la Terreur. Ouvre une réaction modérée mais instable qui mène au Directoire puis au coup d'État de Brumaire.`
+    },
+    {
+      terme: 'Directoire',
+      definition: `**Régime républicain** de la France de 1795 à 1799 : pouvoir exécutif partagé entre **cinq directeurs**, législatif entre deux assemblées. Censitaire, modéré, mais structurellement instable — vit de coups d'État successifs. Renversé par Bonaparte le 18 brumaire an VIII.`
+    },
+    {
+      terme: 'Brumaire',
+      definition: `**Mois du calendrier révolutionnaire** qui désigne, par métonymie, le **coup d'État du 18 brumaire an VIII** (9 novembre 1799) par lequel **Bonaparte** renverse le Directoire. Marque la fin politique de la Révolution et l'ouverture du Consulat puis de l'Empire.`
+    }
   ]
 
 });

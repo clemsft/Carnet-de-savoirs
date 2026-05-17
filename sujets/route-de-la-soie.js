@@ -351,6 +351,45 @@ Aujourd\'hui, la Chine relance le concept, sous le nom de **« Nouvelles Routes 
       correcte: 1,
       explication: `Plusieurs causes convergent : peste noire, fragmentation de l\'empire mongol, repli de la Chine Ming, et surtout ouverture des routes maritimes européennes (Bartolomeu Dias 1488, Vasco de Gama 1498). La mondialisation maritime déclasse en un demi-siècle ce qui s\'était construit sur quinze.`
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Caravansérail',
+      definition: `Auberge fortifiée jalonnant les routes commerciales d'Asie centrale et du Moyen-Orient. Offre aux caravanes un abri pour la nuit, un point d'eau, un marché. Chaînons indispensables de la circulation marchande sur de très longues distances.`
+    },
+    {
+      terme: 'Sériciculture',
+      definition: `Élevage du ver à soie (*Bombyx mori*) nourri exclusivement de feuilles de mûrier, en vue de la production de **soie**. Connue en Chine depuis le IIIᵉ millénaire av. J.-C., elle y reste un monopole jalousement gardé jusqu'au VIᵉ siècle ap. J.-C.`
+    },
+    {
+      terme: 'Sogdiens',
+      definition: `Peuple iranien d'Asie centrale (région de **Samarcande** et Boukhara), marchands dominants des routes terrestres pendant près de mille ans. Leur langue est la *lingua franca* du commerce intercontinental jusqu'au IXᵉ siècle.`
+    },
+    {
+      terme: 'Oasis',
+      definition: `Îlot de végétation et d'habitation au cœur d'un désert, rendu possible par une source ou un fleuve souterrain. Sur la Route de la Soie, les oasis (Samarcande, Kachgar, Dunhuang) sont des **villes-relais** indispensables où les marchandises s'échangent à chaque étape.`
+    },
+    {
+      terme: 'Pax Mongolica',
+      definition: `Période de paix imposée par l'**empire mongol** (mi-XIIIᵉ — mi-XIVᵉ siècles) sur 8 000 km d'Eurasie. Sécurise les routes terrestres et rend possible des voyages directs comme celui de [[marco-polo]] entre la Méditerranée et la Chine.`
+    },
+    {
+      terme: 'Bouddhisme',
+      definition: `Tradition religieuse et philosophique née en **Inde** au Vᵉ siècle av. J.-C. autour de l'enseignement du Bouddha. Diffusée vers la **Chine** via les routes du Tarim aux Iᵉʳ-IIIᵉ siècles, elle y fusionne avec le taoïsme et façonne durablement la culture est-asiatique.`
+    },
+    {
+      terme: 'Compactification',
+      definition: `Ici sans rapport mathématique : compactification du temps logistique d'une caravane via les **relais d'oasis**. Aucune caravane ne fait le trajet complet de Xi'an à Antioche ; les marchandises sont achetées et revendues à chaque grand carrefour, prenant de la valeur à chaque escale.`
+    },
+    {
+      terme: 'Peste noire',
+      definition: `Pandémie de **peste bubonique** (1346-1353) propagée depuis les steppes mongoles par les puces des rats noirs des routes commerciales. Tue **un tiers à la moitié** de la population européenne en cinq ans. Brise les flux marchands et contribue au déclin de la route terrestre.`
+    },
+    {
+      terme: 'Quasar du commerce',
+      definition: `Métaphore pour ces **carrefours marchands** (Samarcande, Boukhara, Bagdad) qui concentrent flux, taxes et innovations. La plus-value entre comptoirs préfigure, à plusieurs siècles de distance, les mécanismes du [[capitalisme]] marchand de Venise et de Gênes.`
+    }
   ]
 
 });

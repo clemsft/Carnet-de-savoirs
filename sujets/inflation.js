@@ -426,6 +426,53 @@ Cet épisode a ressuscité un débat ancien : et si la *résistance* à l\'infla
       correcte: 1,
       explication: 'Les deux grandes banques centrales visent 2 % d\'inflation annuelle. Cette cible est jugée assez basse pour préserver la valeur de la monnaie, et assez haute pour garder une marge de sécurité face à la déflation — bien plus difficile à enrayer, comme l\'a montré le cas japonais.'
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Inflation',
+      definition: `Hausse **générale et durable** du niveau des prix dans une économie. Une flambée ponctuelle ou la seule hausse d'un produit isolé ne suffit pas — il faut un mouvement étendu et persistant. Érode mécaniquement la valeur de la monnaie.`
+    },
+    {
+      terme: 'IPC',
+      definition: `**Indice des Prix à la Consommation** : mesure standard de l'inflation, calculée à partir d'un *panier de biens* représentatif pondéré selon le poids réel de chaque poste dans le budget des ménages. Relevé mensuellement par les instituts statistiques (INSEE, BLS).`
+    },
+    {
+      terme: 'Inflation par la demande',
+      definition: `Hausse des prix tirée par un **excès de demande globale** face à des capacités de production limitées. Configuration typique des booms économiques — ménages dotés de plus de pouvoir d'achat que l'économie ne peut servir.`
+    },
+    {
+      terme: 'Inflation par les coûts',
+      definition: `Hausse des prix poussée par le renchérissement des intrants — pétrole, matières premières, salaires — que les entreprises **répercutent** sur leurs prix de vente. Cas typique : les chocs pétroliers de 1973 et 1979.`
+    },
+    {
+      terme: 'Monétarisme',
+      definition: `École économique portée par **Milton Friedman** : *« l'inflation est toujours et partout un phénomène monétaire »*. Toute inflation durable résulte d'une création monétaire excessive ; la solution est une croissance modérée et stable de la masse monétaire.`
+    },
+    {
+      terme: 'Équation quantitative',
+      definition: `Formule de **Fisher** (1911) : **M · V = P · T**. La masse monétaire multipliée par sa vitesse de circulation égale les prix multipliés par le volume des transactions. Pilier théorique du monétarisme.`
+    },
+    {
+      terme: 'Hyperinflation',
+      definition: `Inflation pathologique au-delà de **50 % par mois** (seuil de Cagan). La monnaie cesse alors de remplir ses fonctions : prix refixés plusieurs fois par jour, épargne pulvérisée. Presque toujours déclenchée par le **financement monétaire** des déficits d'un État en crise.`
+    },
+    {
+      terme: 'Taux directeur',
+      definition: `Taux auquel les banques commerciales empruntent à la banque centrale. **Levier principal** des politiques anti-inflationnistes : le relever renchérit le crédit, freine l'activité et la pression sur les prix. À l'inverse, le baisser stimule l'économie.`
+    },
+    {
+      terme: 'Courbe de Phillips',
+      definition: `Relation empirique inverse entre **chômage** et **inflation** observée par A.W. Phillips (1958). Suggérait un arbitrage exploitable par le décideur — invalidée par la *stagflation* des années 1970, où les deux ont grimpé ensemble.`
+    },
+    {
+      terme: 'Stagflation',
+      definition: `Conjonction d'une **stagnation économique** (chômage élevé, croissance faible) et d'une **forte inflation**. Phénomène emblématique des années 1970 occidentales sous l'effet des chocs pétroliers — a invalidé la lecture naïve de la courbe de Phillips.`
+    },
+    {
+      terme: 'Déflation',
+      definition: `**Baisse continue et générale** des prix. Plus dangereuse que l'inflation modérée car elle encourage le report des achats et paralyse l'économie. Cas d'école : le Japon post-1990, deux décennies de stagnation malgré des taux directeurs nuls.`
+    }
   ]
 
 });

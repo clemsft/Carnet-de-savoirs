@@ -293,6 +293,41 @@ Le risque est celui du [syndrome de Kessler]{accent} — un emballement où les 
       correcte: 1,
       explication: 'Trajet long, contraintes de fenêtre orbitale, exposition prolongée aux radiations cosmiques, support de vie autonome non éprouvé, redécollage depuis Mars : autant de défis non résolus aujourd\'hui.'
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Réutilisabilité',
+      definition: `Capacité d'un lanceur orbital à **revenir** se poser intact et à voler de nouveau. Démontrée par SpaceX en **décembre 2015** avec Falcon 9. Rupture économique majeure : le coût par kilo en orbite a chuté de plusieurs ordres de grandeur.`
+    },
+    {
+      terme: 'Artemis',
+      definition: `Programme de la **NASA** visant le retour habité sur la Lune. **Artemis II** (vol circumlunaire habité) réussi en avril **2026**, premier humain au-delà de l'orbite basse depuis Apollo 17 en 1972. Premier alunissage visé pour 2028.`
+    },
+    {
+      terme: 'Starship',
+      definition: `Plus grand lanceur jamais construit, développé par **SpaceX** pour Mars. Conçu pour emporter 100 tonnes en orbite et se ravitailler en vol via d'autres Starships. Entrée en version V3 en 2026.`
+    },
+    {
+      terme: 'Orbite basse terrestre',
+      definition: `Domaine spatial situé entre ~200 et ~2 000 km d'altitude. Abrite la **Station spatiale internationale** (~400 km) et les constellations comme Starlink. Zone aujourd'hui menacée de saturation et de débris.`
+    },
+    {
+      terme: 'ILRS',
+      definition: `*International Lunar Research Station* : programme **sino-russe** d'établissement d'une base habitée au **pôle sud lunaire** avant 2030. Concurrent direct du programme Artemis américain.`
+    },
+    {
+      terme: 'Pôle sud lunaire',
+      definition: `Région exiguë combinant **cratères en ombre permanente** (où subsiste de l'eau gelée depuis des milliards d'années) et pics quasi-éternellement éclairés (idéaux pour le solaire). Enjeu géopolitique central de la nouvelle course lunaire.`
+    },
+    {
+      terme: 'Syndrome de Kessler',
+      definition: `Scénario théorisé par Donald Kessler en 1978 : si la densité de **débris orbitaux** dépasse un seuil critique, les collisions s'enchaînent en cascade, rendant certaines orbites inutilisables pour des décennies.`
+    },
+    {
+      terme: 'Accords Artemis',
+      definition: `Cadre diplomatique signé par une cinquantaine de pays pour encadrer l'exploration lunaire (utilisation des ressources, zones de sécurité, transparence). La **Chine** et la **Russie** n'y participent pas.`
+    }
   ]
 
 });

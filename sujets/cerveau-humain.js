@@ -287,6 +287,45 @@ Et le **libre arbitre** ? Les expériences classiques de **Benjamin Libet** (198
       correcte: 1,
       explication: 'On peut décrire mécaniquement le fonctionnement neuronal (problèmes "faciles"). Mais expliquer pourquoi cette activité produit une expérience subjective ressentie (le "qualia" du rouge, la douleur réellement ressentie) reste un mystère philosophique majeur. Le débat entre neurosciences et philosophie est ouvert.'
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Neurone',
+      definition: `Cellule nerveuse spécialisée dans la transmission d'information. Comporte un corps cellulaire, des **dendrites** réceptrices et un **axone** émetteur unique. Le cerveau humain en compte environ **86 milliards**.`
+    },
+    {
+      terme: 'Synapse',
+      definition: `Point de contact entre deux neurones où le signal électrique se convertit en signal **chimique** via la libération de neurotransmetteurs. Lieu privilégié de la **plasticité** et donc de l'apprentissage.`
+    },
+    {
+      terme: 'Potentiel d\'action',
+      definition: `Onde électrique brève parcourant l'axone d'un neurone activé, à une vitesse pouvant atteindre **120 m/s** sur les axones les plus myélinisés. Unité élémentaire de la communication nerveuse.`
+    },
+    {
+      terme: 'Cortex cérébral',
+      definition: `Couche externe plissée du cerveau, de **2 à 4 mm** d'épaisseur, qui porte les fonctions cognitives supérieures (raisonnement, langage, conscience). Surface dépliée d'environ 2 600 cm² chez l'humain.`
+    },
+    {
+      terme: 'Système limbique',
+      definition: `Ensemble de structures cérébrales (**amygdale**, **hippocampe**, **hypothalamus**) responsables des émotions, de la mémoire affective et de l'homéostasie (faim, soif, température).`
+    },
+    {
+      terme: 'Plasticité cérébrale',
+      definition: `Capacité du cerveau à se **reconfigurer** tout au long de la vie : renforcement ou affaiblissement synaptique, réorganisation après lésion, **neurogenèse** adulte dans l'hippocampe. *Neurons that fire together, wire together* (Hebb, 1949).`
+    },
+    {
+      terme: 'Dopamine',
+      definition: `Neurotransmetteur central de la **motivation**, de l'anticipation de récompense et du contrôle moteur. Sa mort sélective dans la *substantia nigra* cause la maladie de **Parkinson**.`
+    },
+    {
+      terme: 'Aire de Broca',
+      definition: `Région du **lobe frontal** gauche responsable du langage **moteur** (production de la parole). Lésée, elle provoque une *aphasie de Broca* : compréhension préservée mais expression laborieuse.`
+    },
+    {
+      terme: 'Problème difficile',
+      definition: `Énigme formulée par **David Chalmers** : pourquoi l'activité neuronale objective produit-elle une expérience subjective ressentie ? Le passage du physique au *qualia* reste le mystère central de la conscience.`
+    }
   ]
 
 });

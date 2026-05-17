@@ -299,6 +299,45 @@ La **volatilité** reste extrême : le Bitcoin peut perdre 30 % en une semaine. 
       correcte: 1,
       explication: 'Le GENIUS Act (Guiding and Establishing National Innovation for U.S. Stablecoins Act) impose aux stablecoins une réserve 1:1 en actifs liquides et les place sous supervision fédérale. Étape majeure d\'institutionnalisation.'
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Blockchain',
+      definition: `Registre public distribué où chaque transaction est inscrite, copiée simultanément sur des milliers d'ordinateurs et validée par consensus. Remplace la confiance dans une institution par la **confiance dans un mécanisme cryptographique**.`
+    },
+    {
+      terme: 'Bitcoin',
+      definition: `Première cryptomonnaie sans tiers de confiance, lancée en janvier 2009 par le pseudonyme **Satoshi Nakamoto**. Émission strictement plafonnée à **21 millions** d'unités, ce qui en fait, selon ses partisans, un *or numérique*.`
+    },
+    {
+      terme: 'Stablecoin',
+      definition: `Token numérique dont la valeur est **adossée 1:1 à un actif stable** (généralement le dollar, via des bons du Trésor en réserve). USDT et USDC dominent un marché de plus de 300 milliards de dollars en 2026.`
+    },
+    {
+      terme: 'CBDC',
+      definition: `*Central Bank Digital Currency* : monnaie numérique émise et garantie par une **banque centrale**. Inverse philosophique du Bitcoin — monnaie publique, traçable, sous contrôle souverain. La Chine a déployé son **e-yuan** dès 2020.`
+    },
+    {
+      terme: 'Minage',
+      definition: `Validation par calcul intensif des transactions sur une blockchain à **preuve de travail**. Pour le Bitcoin, coût énergétique d'environ 160 TWh/an — comparable à un pays moyen. Les mineurs sont rémunérés en nouvelles unités émises.`
+    },
+    {
+      terme: 'Preuve d\'enjeu',
+      definition: `Alternative au minage : les validateurs sont choisis en fonction du nombre de tokens qu'ils **immobilisent en garantie**, plutôt que de leur puissance de calcul. Ethereum y est passé en 2022, divisant sa consommation énergétique par plus de 99 %.`
+    },
+    {
+      terme: 'ETF Bitcoin',
+      definition: `Fonds indiciel coté permettant à un investisseur classique d'acheter une exposition au Bitcoin via son compte-titres ordinaire, sans manipuler de clés cryptographiques. Autorisés par la SEC en janvier 2024 — tournant institutionnel majeur.`
+    },
+    {
+      terme: 'Contrat intelligent',
+      definition: `*Smart contract* : programme déposé sur une blockchain qui s'exécute automatiquement lorsque ses conditions sont remplies. Innovation d'**Ethereum** (2015), socle de la *DeFi* et des applications décentralisées.`
+    },
+    {
+      terme: 'Pseudonymat',
+      definition: `Propriété d'une blockchain publique : les transactions sont **publiquement visibles** et associées à des adresses, mais ces adresses ne portent pas d'identité réelle. Si une adresse est reliée à une personne, tout son historique devient traçable — distinction cruciale avec l'anonymat.`
+    }
   ]
 
 });

@@ -316,6 +316,49 @@ Les défis restent immenses : coûts de construction qui dérivent (l'EPR de Fla
       correcte: 1,
       explication: `En décembre 2022, le NIF a obtenu pour la première fois un gain net énergétique (Q > 1) sur la cible, par confinement inertiel laser. Étape symbolique majeure, même si le bilan global incluant les lasers reste très déficitaire. ITER vise une voie complémentaire (confinement magnétique).`
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Fission',
+      definition: `Cassure d'un **noyau atomique lourd** (uranium 235, plutonium 239) en deux fragments plus légers, sous l'impact d'un neutron. Libère environ 200 MeV par fission et 2 à 3 neutrons supplémentaires. Principe de toutes les centrales et bombes A actuelles.`
+    },
+    {
+      terme: 'Fusion',
+      definition: `**Assemblage** de deux noyaux légers (typiquement deutérium + tritium) en un noyau plus lourd. Libère encore plus d'énergie par unité de masse que la fission. Mécanisme qui alimente le Soleil et toutes les étoiles ; objectif scientifique d'**ITER**.`
+    },
+    {
+      terme: 'Réaction en chaîne',
+      definition: `Processus auto-entretenu dans lequel chaque fission libère **2 à 3 neutrons** capables de déclencher d'autres fissions. Maintenue à exactement 1 fission par génération dans un réacteur (régime *critique*), divergente dans une bombe (*supercritique*).`
+    },
+    {
+      terme: 'Uranium 235',
+      definition: `**Isotope fissile** de l'uranium, seul présent en quantité naturelle (0,7 % de l'uranium naturel). Son enrichissement à ~4 % alimente les réacteurs civils, à ~90 % les armes. La rareté de l'U-235 explique toute la géopolitique du combustible nucléaire.`
+    },
+    {
+      terme: 'Tokamak',
+      definition: `Machine de **confinement magnétique** en forme de tore (chambre en anneau) où un plasma de fusion est piégé par des champs magnétiques intenses. Inventé en URSS dans les années 1950. ITER en est l'incarnation contemporaine à l'échelle expérimentale.`
+    },
+    {
+      terme: 'Plasma',
+      definition: `Quatrième état de la matière, après solide, liquide et gaz : gaz **totalement ionisé** où électrons et noyaux circulent librement. Apparaît au-dessus de quelques milliers de degrés. Indispensable à la fusion contrôlée, qui exige *150 millions de °C*.`
+    },
+    {
+      terme: 'Critère de Lawson',
+      definition: `Condition pour qu'une réaction de fusion produise plus d'énergie qu'elle n'en consomme : maintenir simultanément un seuil de **densité × température × temps** de confinement. Franchi pour la première fois avec gain net par le **NIF** en décembre 2022.`
+    },
+    {
+      terme: 'E = mc²',
+      definition: `Équivalence **masse-énergie** posée par *Einstein* (1905). Toute fraction de masse Δm convertie libère une énergie Δm·c² — où *c²* vaut environ 9·10¹⁶ m²/s². Fondement physique de l'énergie nucléaire : 1 g converti = 25 millions de kWh.`
+    },
+    {
+      terme: 'Énergie de liaison',
+      definition: `Énergie qui maintient les nucléons (protons et neutrons) ensemble dans un noyau. Sa courbe culmine vers le **fer 56** : on libère donc de l'énergie en cassant les noyaux plus lourds que le fer (fission) ou en assemblant les plus légers (fusion).`
+    },
+    {
+      terme: 'Liquidateur',
+      definition: `Travailleur civil ou militaire mobilisé pour décontaminer le site de **Tchernobyl** après 1986. Environ **600 000 personnes** sont passées dans la zone. Beaucoup ont reçu des doses massives de radiation et payé un lourd tribut sanitaire.`
+    }
   ]
 
 });

@@ -443,6 +443,49 @@ Enfin, les **externalités climatiques**. Le capitalisme, comme système d\'accu
       explication: 'Le capitalisme industriel des Marx et Engels reposait sur l\'usine, le charbon et le prolétariat. Le capitalisme contemporain repose sur la finance globalisée, les plateformes numériques (effets de réseau, données comme actif) et fait face à un défi inédit : le changement climatique, qui invalide l\'hypothèse implicite d\'un environnement infini.'
     }
 
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Plus-value',
+      definition: `Concept central de l'analyse marxiste : différence entre la valeur produite par le travail du salarié et la rémunération versée. Source structurelle du profit dans le capitalisme.`
+    },
+    {
+      terme: 'Main invisible',
+      definition: `Métaphore d'**Adam Smith** (*Richesse des nations*, 1776) : la poursuite par chacun de son intérêt personnel produit, sans intention collective, l'ordre économique le plus efficace via la concurrence marchande.`
+    },
+    {
+      terme: 'Accumulation du capital',
+      definition: `Dynamique propre au capitalisme : le profit n'est pas consommé mais **réinvesti** pour générer davantage de profit. Croître ou disparaître — c'est la pression structurelle qui distingue le système d'autres économies marchandes.`
+    },
+    {
+      terme: 'Salariat',
+      definition: `Rapport social où le travailleur vend sa **force de travail** contre un salaire fixé d'avance, sans posséder ni l'outil de production ni le produit de son travail. Un des quatre piliers du capitalisme.`
+    },
+    {
+      terme: 'Éthique protestante',
+      definition: `Thèse de **Max Weber** (1905) : la théologie *calviniste* de la prédestination produit une mentalité d'**ascèse intramondaine** — travail méthodique, épargne, refus du gaspillage — qui constitue le terreau culturel du capitalisme moderne.`
+    },
+    {
+      terme: 'Keynésianisme',
+      definition: `Courant économique issu de la *Théorie générale* (1936) de **John Maynard Keynes** : quand la demande s'effondre, l'État doit dépenser pour la soutenir. Matrice intellectuelle de l'État-providence et du **New Deal**.`
+    },
+    {
+      terme: 'Néolibéralisme',
+      definition: `Doctrine économique dominante depuis le tournant **Thatcher-Reagan** (1979-1981) : dérégulation des marchés, privatisations, baisse des impôts, affaiblissement des syndicats. Reprend la main sur le compromis keynésien.`
+    },
+    {
+      terme: 'Destruction créatrice',
+      definition: `Concept de **Joseph Schumpeter** : le capitalisme se renouvelle par destruction permanente des positions acquises sous l'effet de l'innovation entrepreneuriale. Les anciennes industries cèdent la place à de nouvelles.`
+    },
+    {
+      terme: 'Financiarisation',
+      definition: `Trait dominant du capitalisme contemporain : poids croissant de la finance dans l'économie réelle, primat des arbitrages de **rentabilité boursière** à court terme sur la stratégie industrielle. Apparue avec le tournant néolibéral.`
+    },
+    {
+      terme: 'Capitalisme de plateformes',
+      definition: `Forme contemporaine où une poignée d'acteurs (Apple, Google, Amazon, Meta, Microsoft, Alibaba, Tencent) capture une part inédite de la valeur grâce aux **effets de réseau** et à l'exploitation de la donnée comme actif central.`
+    }
   ]
 
 });

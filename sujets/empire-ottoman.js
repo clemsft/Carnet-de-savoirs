@@ -274,6 +274,49 @@ L\'homme prend en 1934 le nom d\'**Atatürk** — « père des Turcs ». Il occi
       correcte: 2,
       explication: 'Le Parlement turc lui décerne en 1934 le nom d\'Atatürk : "père des Turcs". Il dirige une modernisation rapide du pays : alphabet latin, code civil suisse, calendrier grégorien, droit de vote des femmes (1934, avant la France).'
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Sultan',
+      definition: `Titre du **souverain absolu** ottoman, du mot arabe signifiant « pouvoir, autorité ». À partir de 1517, le sultan cumule la fonction de **calife**, lui conférant en théorie une autorité spirituelle sur tous les musulmans sunnites.`
+    },
+    {
+      terme: 'Calife',
+      definition: `**Successeur** du prophète Muhammad, chef spirituel et politique théorique de la communauté musulmane sunnite. Le califat, fondé en 632, fut aboli par *Atatürk* en **1924** — fin d'une institution vieille de treize siècles.`
+    },
+    {
+      terme: 'Janissaire',
+      definition: `Soldat d'élite de l'infanterie ottomane, recruté enfant par le système du *devchirmé* parmi les populations chrétiennes des Balkans, converti à l'islam et formé à Istanbul. Pendant des siècles, **principale force militaire** de l'empire.`
+    },
+    {
+      terme: 'Devchirmé',
+      definition: `*« Ramassage »* — système d'**enrôlement forcé** d'enfants chrétiens (8-12 ans) dans les Balkans, qui alimentait les janissaires et la haute administration. À la fois oppressif et paradoxalement voie d'ascension sociale pour des familles paysannes.`
+    },
+    {
+      terme: 'Millet',
+      definition: `**Communauté religieuse** non musulmane (orthodoxe, arménienne, juive) reconnue par le sultan et disposant de son propre droit civil, ses tribunaux, ses écoles. Forme de [tolérance institutionnalisée]{accent} sans équivalent dans l'Europe contemporaine.`
+    },
+    {
+      terme: 'Grand vizir',
+      definition: `**Chef du gouvernement** ottoman, équivalent d'un premier ministre. Dirige le *divan* (conseil) et exerce souvent un pouvoir réel supérieur à celui du sultan lui-même. Plusieurs grands vizirs furent d'origine chrétienne, issus du devchirmé.`
+    },
+    {
+      terme: 'Tanzimat',
+      definition: `Période de **réformes** ottomanes (1839-1876) : réorganisation administrative, modernisation du droit, éducation laïque, égalité juridique entre musulmans et non-musulmans. Tentative d'européanisation pour préserver l'empire face au déclin.`
+    },
+    {
+      terme: 'Topkapı',
+      definition: `**Palais des sultans** à Istanbul de 1465 à 1856. Labyrinthe de cours successives où se concentrent administration, harem et trésor. Symbole physique du pouvoir ottoman, abritant aujourd'hui le musée le plus visité de Turquie.`
+    },
+    {
+      terme: 'Mohács',
+      definition: `Bataille de **1526** où *Soliman le Magnifique* écrase l'armée hongroise. Le roi Louis II y meurt. La Hongrie passe sous contrôle ottoman pour 150 ans — événement traumatique encore vivant dans la mémoire nationale hongroise.`
+    },
+    {
+      terme: 'Traité de Lausanne',
+      definition: `Traité de **1923** qui annule le traité de Sèvres (1920) et reconnaît la **République de Turquie** dans ses frontières actuelles, après la victoire de *Mustafa Kemal* dans la guerre d'indépendance. Acte fondateur du Moyen-Orient post-ottoman.`
+    }
   ]
 
 });

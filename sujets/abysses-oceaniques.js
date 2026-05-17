@@ -300,6 +300,41 @@ Pourtant, le constat reste vertigineux : **plus de 80 % des fonds océaniques** 
       correcte: 1,
       explication: 'À très grande pression, le calcium peine à former des structures rigides stables. La sélection naturelle a donc favorisé les corps mous, gélatineux, comme celui du poisson-escargot des Mariannes.'
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Abysses',
+      definition: `Profondeurs océaniques situées au-delà de **1 000 m**, là où aucune lumière solaire ne pénètre. Du grec *abyssos*, « sans fond ».`
+    },
+    {
+      terme: 'Zone hadale',
+      definition: `Zone océanique au-delà de **6 000 m**, restreinte aux fosses océaniques. Doit son nom à *Hadès*, dieu grec des Enfers. Règne d'une pression écrasante et d'espèces ultra-spécialisées.`
+    },
+    {
+      terme: 'Bioluminescence',
+      definition: `Production de lumière par un organisme vivant via réaction chimique. Plus de **75 %** des espèces abyssales l'utilisent pour chasser, séduire ou se camoufler par *contre-illumination*.`
+    },
+    {
+      terme: 'Chimiosynthèse',
+      definition: `Production de matière organique à partir de l'énergie chimique (souffre, méthane), sans intervention du soleil. Base des écosystèmes des [sources hydrothermales]{accent} découvertes en 1977.`
+    },
+    {
+      terme: 'Neige marine',
+      definition: `Pluie continue de débris organiques (cadavres, déjections, plancton) tombant des couches éclairées vers le fond. Source alimentaire dominante des écosystèmes abyssaux dépourvus de photosynthèse.`
+    },
+    {
+      terme: 'Zone mésopélagique',
+      definition: `Couche océanique entre **200 et 1 000 m**, dite *zone crépusculaire* : lumière résiduelle insuffisante à la photosynthèse, mais abritant la plus grande **migration verticale** quotidienne du vivant.`
+    },
+    {
+      terme: 'Fosse des Mariannes',
+      definition: `Fosse océanique du Pacifique ouest abritant le **Challenger Deep**, point le plus profond connu de l'océan mondial (~10 984 m). Pression d'environ **1 100 atmosphères** au fond.`
+    },
+    {
+      terme: 'Nodules polymétalliques',
+      definition: `Concrétions minérales tapissant les plaines abyssales, riches en cobalt, nickel et manganèse — métaux critiques pour les batteries. Objet d'une convoitise industrielle croissante encadrée par l'Autorité internationale des fonds marins.`
+    }
   ]
 
 });

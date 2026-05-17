@@ -304,6 +304,49 @@ La frontière actuelle : les **ordinateurs quantiques**, qui exploitent superpos
       correcte: 1,
       explication: 'Sans mécanique quantique, pas de transistor, pas de semi-conducteur, donc pas d\'ordinateur ni de smartphone. Sans elle, pas de laser, pas d\'IRM, pas de GPS précis. C\'est probablement la théorie scientifique la plus utile et la mieux vérifiée jamais formulée.'
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Quantum',
+      definition: `**Paquet discret** par lequel certaines grandeurs (énergie, moment) ne peuvent s'échanger qu'en multiples entiers. Postulé par **Planck** en 1900 pour résoudre le problème du corps noir : *E = hν*. Discrétisation fondatrice de toute la théorie.`
+    },
+    {
+      terme: 'Photon',
+      definition: `**Quantum de lumière** : la lumière n'est pas seulement onde mais aussi composée de particules indivisibles. Interprétation d'**Einstein** (1905) pour expliquer l'effet photoélectrique — la découverte qui lui vaudra le Nobel 1921, pas la relativité.`
+    },
+    {
+      terme: 'Dualité onde-corpuscule',
+      definition: `Propriété fondamentale des objets quantiques qui manifestent tour à tour des comportements d'**onde** (interférences) et de **particule** (impacts ponctuels). Étendue à toute la matière par **de Broglie** en 1924.`
+    },
+    {
+      terme: 'Fonction d\'onde',
+      definition: `Objet mathématique noté **Ψ** qui contient toute l'information disponible sur un système quantique. Son **carré du module** donne la probabilité de trouver la particule dans tel ou tel état. Évolue selon l'équation de Schrödinger.`
+    },
+    {
+      terme: 'Superposition',
+      definition: `État où une particule existe **simultanément dans plusieurs états** possibles tant qu'aucune mesure n'a été effectuée. Illustré par le célèbre paradoxe du *chat de Schrödinger* — à la fois mort et vivant tant que la boîte reste fermée.`
+    },
+    {
+      terme: 'Principe d\'incertitude',
+      definition: `Énoncé par **Heisenberg** (1927) : on ne peut pas connaître simultanément avec précision la **position** *et* la **vitesse** d'une particule. Δx · Δp ≥ ℏ/2. Limite **fondamentale** de la nature elle-même, pas un défaut instrumental.`
+    },
+    {
+      terme: 'Intrication',
+      definition: `Phénomène où deux particules forment un **système indivisible** restant corrélées instantanément à distance arbitraire. Qualifiée par Einstein d'*« action fantôme »*, confirmée expérimentalement par **Aspect** en 1982. Prix Nobel 2022.`
+    },
+    {
+      terme: 'Effondrement de la fonction d\'onde',
+      definition: `Réduction brutale, lors d'une **mesure**, de la superposition d'états en un **résultat unique**. La mesure force la nature à choisir : c'est le passage du probable au défini. Mécanisme central — et toujours philosophiquement débattu.`
+    },
+    {
+      terme: 'Non-localité',
+      definition: `Propriété de la mécanique quantique selon laquelle deux systèmes intriqués restent corrélés **indépendamment de la distance** qui les sépare. Démontrée par la violation des inégalités de Bell. Coexiste paradoxalement avec la causalité relativiste.`
+    },
+    {
+      terme: 'Inégalités de Bell',
+      definition: `Critère mathématique proposé par **John Bell** en 1964 permettant de **trancher expérimentalement** entre la mécanique quantique et la thèse einsteinienne des *variables cachées*. Leur violation, vérifiée par Aspect en 1982, signe la non-localité de la nature.`
+    }
   ]
 
 });

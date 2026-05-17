@@ -263,6 +263,49 @@ Reste, au bout du compte, une leçon plus profonde : le cerveau et le corps ne s
       correcte: 1,
       explication: 'Le placebo agit fortement sur les symptômes modulés par le cerveau (douleur, humeur, sensations). Il est plus limité sur les pathologies organiques objectives (un placebo ne réduit pas une tumeur, ne ferme pas une plaie, ne tue pas un microbe).'
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Placebo',
+      definition: `Traitement chimiquement **inerte** (comprimé de sucre, injection saline) administré à la place d'un médicament actif. Du latin *placebo*, « je plairai ». Produit néanmoins un effet thérapeutique réel via le cerveau du patient.`
+    },
+    {
+      terme: 'Effet nocebo',
+      definition: `Symétrique négatif du placebo : symptôme **indésirable** produit par l'attente d'un effet désagréable. Explique une part importante des effets secondaires rapportés dans les essais cliniques chez les patients qui prennent en réalité le placebo.`
+    },
+    {
+      terme: 'Double aveugle',
+      definition: `Protocole d'essai clinique dans lequel **ni le patient ni le médecin** ne savent qui reçoit le traitement actif ou le placebo. Standard d'or pour isoler l'effet propre d'une molécule en neutralisant biais et attentes.`
+    },
+    {
+      terme: 'Opioïdes endogènes',
+      definition: `Molécules antalgiques **produites par le cerveau lui-même** (endorphines, enképhalines), chimiquement apparentées à la morphine. Leur libération sous placebo explique l'analgésie observée — bloquée par la *naloxone*, antagoniste de leurs récepteurs.`
+    },
+    {
+      terme: 'Naloxone',
+      definition: `Molécule qui bloque les **récepteurs aux opioïdes**. Utilisée en urgence contre les overdoses. Dans la recherche sur le placebo, elle **annule** l'analgésie placebo, prouvant que celle-ci passe bien par le système opioïde endogène.`
+    },
+    {
+      terme: 'Placebo ouvert',
+      definition: `Placebo administré en informant explicitement le patient qu'il s'agit d'un produit inerte. Découverte de *Ted Kaptchuk* (2010) : l'effet **persiste** sans duperie, suggérant que le rituel thérapeutique et le conditionnement comptent plus que la croyance.`
+    },
+    {
+      terme: 'Conditionnement',
+      definition: `Mécanisme psychologique par lequel un stimulus neutre (un comprimé) devient capable de déclencher une réponse biologique, par **association répétée** avec un effet réel. Théorisé par *Pavlov*, il fonde une part majeure de l'effet placebo.`
+    },
+    {
+      terme: 'Essai randomisé contrôlé',
+      definition: `Étude clinique où les patients sont répartis **au hasard** entre groupe traité et groupe placebo. La randomisation neutralise les biais de sélection et fait du dispositif l'outil principal de la médecine fondée sur les preuves.`
+    },
+    {
+      terme: 'Dopamine',
+      definition: `Neurotransmetteur central des circuits de la **récompense** et du mouvement. Sa libération mesurable dans le striatum en réponse à un placebo, démontrée chez des patients parkinsoniens, prouve que l'attente module directement la chimie cérébrale.`
+    },
+    {
+      terme: 'Esprit-corps',
+      definition: `Cadre conceptuel postulant que les états mentaux (attentes, croyances, émotions) et les processus physiologiques sont **indissociables**. L'effet placebo en est l'un des arguments empiriques les plus solides : penser un soulagement déclenche un soulagement biochimique.`
+    }
   ]
 
 });

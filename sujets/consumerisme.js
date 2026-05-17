@@ -370,6 +370,49 @@ Une question philosophique reste cependant ouverte : ces alternatives **sortent-
       correcte: 1,
       explication: 'Depuis le rapport Meadows (1972) et les travaux de Nicholas Georgescu-Roegen ou Serge Latouche, la décroissance soutient qu\'une croissance matérielle perpétuelle est incompatible avec les limites planétaires. Il ne s\'agit pas de "moins consommer un peu mieux", mais de sortir du paradigme dans lequel la consommation est la finalité de la vie économique et sociale.'
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Consumérisme',
+      definition: `Organisation sociale dans laquelle la **consommation** dépasse la satisfaction des besoins matériels pour devenir [identité]{accent}, valeur de référence et finalité collective. À distinguer du simple acte d'acheter, qui existe dans toute société.`
+    },
+    {
+      terme: 'Effet de dépendance',
+      definition: `Concept de *John Kenneth Galbraith* (*L'Ère de l'opulence*, 1958) : dans une économie d'abondance, la production ne répond pas à des besoins préexistants mais **fabrique** elle-même les besoins qu'elle prétend satisfaire, via la publicité.`
+    },
+    {
+      terme: 'Obsolescence programmée',
+      definition: `Stratégie industrielle consistant à limiter volontairement la durée de vie d'un produit pour forcer son renouvellement. Le **cartel de Phœbus** (1924), qui plafonna la durée des ampoules à 1000 heures, en est le cas fondateur.`
+    },
+    {
+      terme: 'Obsolescence psychologique',
+      definition: `Mécanisme par lequel le marketing rend un produit **démodé** alors qu'il est encore fonctionnel. Théorisée par Brooks Stevens dans les années 1950, elle joue sur la mode, les collections, le sentiment d'être *en retard*.`
+    },
+    {
+      terme: 'Distinction',
+      definition: `Concept de *Pierre Bourdieu* (*La Distinction*, 1979) : les goûts et les pratiques de consommation ne sont pas des choix libres mais des [marqueurs de classe]{accent} qui reproduisent les hiérarchies sociales.`
+    },
+    {
+      terme: 'Simulacre',
+      definition: `Concept de *Jean Baudrillard* : signe qui ne renvoie plus à une réalité mais uniquement à d'autres signes. Dans la société de consommation, on n'achète plus des objets pour leur usage mais pour ce qu'ils **signifient** dans un système clos.`
+    },
+    {
+      terme: 'Industrie culturelle',
+      definition: `Concept de l'**École de Francfort** (Adorno, Horkheimer, 1944) : production standardisée et marchande de films, musiques, divertissements qui anesthésie le sens critique et fabrique un consommateur docile.`
+    },
+    {
+      terme: 'Économie de l\'attention',
+      definition: `Cadre d'analyse selon lequel, dans un environnement saturé d'informations, la ressource rare n'est plus le bien à acquérir mais le **temps de cerveau** disponible. Théorisée par *Herbert Simon* (1971), centrale à l'ère des plateformes numériques.`
+    },
+    {
+      terme: 'Décroissance',
+      definition: `Courant intellectuel et politique (*Latouche*, *Georgescu-Roegen*, rapport **Meadows** 1972) qui soutient qu'une croissance matérielle infinie est impossible sur une planète finie et appelle à sortir du paradigme productiviste.`
+    },
+    {
+      terme: 'Homme unidimensionnel',
+      definition: `Figure théorisée par *Herbert Marcuse* (1964) : individu des sociétés industrielles avancées dont la pensée critique a été dissoute par l'abondance matérielle et le confort consumériste, incapable d'imaginer une alternative au système.`
+    }
   ]
 
 });

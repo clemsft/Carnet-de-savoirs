@@ -302,6 +302,49 @@ Mehmet II entre dans la ville et y prie à Sainte-Sophie, désormais **convertie
       correcte: 1,
       explication: 'De nombreux érudits byzantins (Bessarion, Manuel Chrysoloras, etc.) émigrent en Italie, emportant des manuscrits grecs anciens (Platon, Aristote, etc.) qui alimentent la Renaissance italienne.'
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'Romaioi',
+      definition: `Nom que se donnaient les habitants de l'Empire byzantin : **Romains**. Souligne leur conscience d'être les héritiers institutionnels directs de Rome, et non d'une civilisation distincte. Le terme « byzantin » est une invention occidentale tardive.`
+    },
+    {
+      terme: 'Basileus',
+      definition: `Titre du **souverain byzantin** à partir du VIIᵉ siècle, du grec ancien signifiant « roi ». Conçu comme [lieutenant de Dieu]{accent} sur terre, il cumule autorité politique et primauté religieuse au sein de l'Église orthodoxe.`
+    },
+    {
+      terme: 'Corpus juris civilis',
+      definition: `**Codification monumentale** du droit romain ordonnée par *Justinien* (529-534). Synthèse de mille ans de jurisprudence, elle est la base du droit civil européen moderne — du Code Napoléon aux droits germaniques.`
+    },
+    {
+      terme: 'Sainte-Sophie',
+      definition: `Cathédrale de Constantinople bâtie par Justinien (**532-537**). Sa coupole de 31 m fut une prouesse architecturale **inégalée pendant mille ans**. Devenue mosquée en 1453, musée en 1934, à nouveau mosquée en 2020.`
+    },
+    {
+      terme: 'Feu grégeois',
+      definition: `Arme incendiaire byzantine, liquide projeté par siphons qui **brûlait même sur l'eau**. Sauva deux fois Constantinople des sièges arabes (VIIᵉ-VIIIᵉ s.). Sa **formule exacte** demeure inconnue à ce jour — secret d'État jalousement gardé.`
+    },
+    {
+      terme: 'Grand Schisme',
+      definition: `Rupture de **1054** entre le pape de Rome et le patriarche de Constantinople, par excommunications réciproques. Sépare durablement le christianisme **catholique** d'Occident et **orthodoxe** d'Orient — fracture toujours active aujourd'hui.`
+    },
+    {
+      terme: 'Iconoclasme',
+      definition: `Crise religieuse byzantine (**726-843**) opposant les partisans des images saintes (**icônes**) à ceux qui les considéraient comme idolâtres. La victoire des iconodoules a fixé pour mille ans la centralité de l'icône dans la liturgie orthodoxe.`
+    },
+    {
+      terme: 'Manzikert',
+      definition: `Bataille de **1071** en Anatolie orientale où l'empereur Romain IV est défait et capturé par les **Turcs seldjoukides**. Ouvre l'Anatolie aux Turcs, prive Byzance de son principal réservoir de soldats et d'impôts. Tournant militaire majeur.`
+    },
+    {
+      terme: 'Quatrième croisade',
+      definition: `Expédition de 1202-1204 partie pour la Terre sainte mais **détournée** par les Vénitiens vers Constantinople, qu'elle pille en 1204. Trahison fondatrice qui démantèle l'empire et accentue durablement le fossé entre chrétiens d'Orient et d'Occident.`
+    },
+    {
+      terme: 'Murs théodosiens',
+      definition: `Triple ligne de **remparts** terrestres édifiée à Constantinople au début du Vᵉ siècle sous *Théodose II*. Résistent à tous les assauts pendant un millénaire — jusqu'à l'**artillerie** de Mehmet II en 1453, qui les rend obsolètes.`
+    }
   ]
 
 });

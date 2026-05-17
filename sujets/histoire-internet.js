@@ -380,6 +380,49 @@ L\'**IA générative**, surtout, redessine l\'expérience même du Web. Depuis C
       texte: 'On désigne par le mot-valise {splinternet} la tendance d\'Internet à se fragmenter en sous-réseaux nationaux contrôlés (Chine, Russie, Iran).',
       explication: 'Le terme "splinternet" (de "splinter", éclat, + "internet") décrit l\'érosion de l\'Internet ouvert mondial au profit de bulles juridictionnelles séparées par leurs lois, leurs filtres et leurs infrastructures.'
     }
+  ],
+
+  vocabulaire: [
+    {
+      terme: 'ARPANET',
+      definition: `Premier réseau à **commutation de paquets**, lancé en 1969 par la **DARPA** américaine pour interconnecter quelques centres universitaires. Ancêtre direct d'Internet, il a basculé sur [TCP/IP]{accent} le 1er janvier 1983.`
+    },
+    {
+      terme: 'Commutation de paquets',
+      definition: `Technique fondatrice des réseaux modernes : l'information est découpée en **paquets** indépendants qui empruntent chacun leur propre chemin à travers le réseau, plutôt que de monopoliser une ligne dédiée. Robuste, résiliente, économe.`
+    },
+    {
+      terme: 'TCP/IP',
+      definition: `Couple de protocoles standardisés en 1983 par **Vinton Cerf** et **Robert Kahn**. *IP* gère l'adressage unique de chaque machine, *TCP* assure la fiabilité de la transmission. Constituent la langue commune qui unifie Internet.`
+    },
+    {
+      terme: 'Web',
+      definition: `Application d'Internet inventée par **Tim Berners-Lee** au CERN (1989-1991), reposant sur trois piliers : **HTTP** (protocole de transfert), **HTML** (langage des pages), **URL** (système d'adresses). À distinguer d'Internet lui-même, le réseau sous-jacent.`
+    },
+    {
+      terme: 'PageRank',
+      definition: `Algorithme fondateur de Google (Page et Brin, 1998) qui classe une page web selon le **nombre et la qualité des liens entrants** qu'elle reçoit. Premier moteur à évaluer la pertinence par la topologie du graphe plutôt que par le seul contenu textuel.`
+    },
+    {
+      terme: 'Web 2.0',
+      definition: `Tournant des années 2004-2005 où les utilisateurs cessent d'être consommateurs passifs et deviennent **producteurs de contenu** (blogs, wikis, réseaux sociaux). La publicité ciblée fondée sur les données comportementales en devient le modèle économique dominant.`
+    },
+    {
+      terme: 'GAFAM',
+      definition: `Acronyme désignant les cinq plateformes structurantes de l'Internet contemporain : **Google, Apple, Facebook (Meta), Amazon, Microsoft**. Concentrent l'essentiel du trafic, de l'attention et des revenus publicitaires mondiaux.`
+    },
+    {
+      terme: 'Splinternet',
+      definition: `Mot-valise (*splinter* + *internet*) désignant la **fragmentation** du réseau mondial en sous-Internets nationaux contrôlés (Chine, Russie, Iran), séparés par leurs lois, leurs filtres et leurs infrastructures. Inverse de l'idéal d'un réseau universel ouvert.`
+    },
+    {
+      terme: 'DNS',
+      definition: `*Domain Name System* (1983) : annuaire distribué qui traduit les noms lisibles par les humains (*example.com*) en **adresses IP** numériques. Sans lui, Internet serait inutilisable au quotidien.`
+    },
+    {
+      terme: 'Minitel',
+      definition: `Réseau télématique grand public français (1980-2012), distribué gratuitement par les PTT. Préfiguration nationale d'un Internet de services, mais **fermé** et **centralisé** — modèle écrasé par l'ouverture du Web.`
+    }
   ]
 
 });
