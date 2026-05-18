@@ -155,7 +155,7 @@
       dailyQuiz: {},     // { date: 'YYYY-MM-DD', score, total, completed: bool }
       favorites: [],     // sujetIds
       notes: {},         // sujetId -> markdown text
-      filters: { domain: null, search: '', state: null, tag: null },
+      filters: { domain: null, search: '', state: null, tag: null, difficulty: null, duration: null, sort: 'alpha' },
       highlights: {},    // sujetId -> array of block indices marqués comme importants
       globalNotes: '',   // cahier libre transverse
       achievements: [],  // ids d'achievements débloqués
@@ -599,11 +599,21 @@
 
     main.appendChild(el('span', { class: 'eyebrow' }, 'Bibliothèque'));
     main.appendChild(el('h1', { class: 'page-title', html: 'Tous les <em>sujets</em>' }));
-    main.appendChild(el('p', { class: 'page-subtitle' },
-      sujets.length === 0
-        ? 'Aucun sujet pour l\'instant. Discutez avec Claude pour créer votre premier !'
-        : `${sujets.length} sujet${sujets.length > 1 ? 's' : ''} dans votre carnet — sélectionnez-en un pour reprendre l'apprentissage.`
-    ));
+    // Sous-titre dynamique : remplacé par compteur quand des filtres sont actifs.
+    const subtitle = el('p', { class: 'page-subtitle' });
+    main.appendChild(subtitle);
+    function setSubtitle(visibleCount) {
+      if (sujets.length === 0) {
+        subtitle.textContent = 'Aucun sujet pour l\'instant. Discutez avec Claude pour créer votre premier !';
+        return;
+      }
+      if (visibleCount != null && visibleCount !== sujets.length) {
+        subtitle.textContent = `${visibleCount} sujet${visibleCount > 1 ? 's' : ''} sur ${sujets.length} (filtrés) — sélectionnez-en un pour reprendre l'apprentissage.`;
+      } else {
+        subtitle.textContent = `${sujets.length} sujet${sujets.length > 1 ? 's' : ''} dans votre carnet — sélectionnez-en un pour reprendre l'apprentissage.`;
+      }
+    }
+    setSubtitle(null);
 
     // ---- Banner d'absence ----
     // Si la dernière activité date de 3 jours ou plus, on propose
@@ -649,6 +659,64 @@
       refresh();
     });
     main.appendChild(el('div', { class: 'biblio-controls' }, searchInput));
+
+    // Bandeau de filtres avancés et tri : difficulté, durée, sort.
+    // En selects compacts pour ne pas multiplier les chips à côté des 20+
+    // domaines (les domaines étant déjà nombreux, on évite la saturation
+    // visuelle d'une 3ᵉ et 4ᵉ rangée de chips).
+    const advWrap = el('div', { class: 'biblio-advanced' });
+
+    const diffSel = el('select', { class: 'biblio-adv-select', title: 'Filtrer par difficulté' });
+    [
+      ['',  'Toutes les difficultés'],
+      ['1', 'Initiation (★)'],
+      ['2', 'Intermédiaire (★★)'],
+      ['3', 'Avancé (★★★)']
+    ].forEach(([v, l]) => diffSel.appendChild(el('option', { value: v }, l)));
+    diffSel.value = (f.difficulty != null ? String(f.difficulty) : '');
+    diffSel.addEventListener('change', () => {
+      const v = diffSel.value;
+      state.user.filters.difficulty = v ? parseInt(v, 10) : null;
+      saveUserState();
+      refresh();
+    });
+    advWrap.appendChild(diffSel);
+
+    const durSel = el('select', { class: 'biblio-adv-select', title: 'Filtrer par durée estimée' });
+    [
+      ['',     'Toutes les durées'],
+      ['short','Court (≤ 20 min)'],
+      ['medium','Moyen (20–40 min)'],
+      ['long', 'Long (> 40 min)']
+    ].forEach(([v, l]) => durSel.appendChild(el('option', { value: v }, l)));
+    durSel.value = f.duration || '';
+    durSel.addEventListener('change', () => {
+      state.user.filters.duration = durSel.value || null;
+      saveUserState();
+      refresh();
+    });
+    advWrap.appendChild(durSel);
+
+    const sortSel = el('select', { class: 'biblio-adv-select', title: 'Trier les sujets' });
+    [
+      ['alpha',     'Tri : A → Z'],
+      ['recent',    'Tri : récents en premier'],
+      ['old',       'Tri : anciens en premier'],
+      ['duration-asc', 'Tri : durée ↑'],
+      ['duration-desc','Tri : durée ↓'],
+      ['difficulty-asc','Tri : difficulté ↑'],
+      ['difficulty-desc','Tri : difficulté ↓'],
+      ['popular',   'Tri : plus consultés']
+    ].forEach(([v, l]) => sortSel.appendChild(el('option', { value: v }, l)));
+    sortSel.value = f.sort || 'alpha';
+    sortSel.addEventListener('change', () => {
+      state.user.filters.sort = sortSel.value;
+      saveUserState();
+      refresh();
+    });
+    advWrap.appendChild(sortSel);
+
+    main.appendChild(advWrap);
 
     // Conteneur stable pour les filtres ; reconstruit à chaque changement
     // pour que les classes `.active` migrent visuellement.
@@ -735,6 +803,19 @@
           filtered = filtered.filter(s => getSujetState(s) === f.state);
         }
       }
+      if (f.difficulty) {
+        filtered = filtered.filter(s => (s.meta.difficulte || 0) === f.difficulty);
+      }
+      if (f.duration) {
+        filtered = filtered.filter(s => {
+          const d = s.meta.duree_estimee_min;
+          if (!d || typeof d !== 'number') return false;
+          if (f.duration === 'short')  return d <= 20;
+          if (f.duration === 'medium') return d > 20 && d <= 40;
+          if (f.duration === 'long')   return d > 40;
+          return true;
+        });
+      }
       if (f.search && f.search.trim()) {
         const q = normalizeForSearch(f.search.trim());
         // Recherche plein texte : titre, résumé, tags, points-clés, contenu
@@ -742,6 +823,48 @@
         // Insensible à la casse ET aux accents.
         filtered = filtered.filter(s => searchableText(s).includes(q));
       }
+
+      // Tri : alphabétique par défaut (ordre du carnet), sinon selon le mode
+      // choisi. On clone le tableau pour ne pas muter la liste-source.
+      const sortMode = f.sort || 'alpha';
+      if (sortMode === 'alpha') {
+        filtered = filtered.slice().sort((a, b) => {
+          const ta = String(a.meta.titre).replace(/<[^>]+>/g, '');
+          const tb = String(b.meta.titre).replace(/<[^>]+>/g, '');
+          return ta.localeCompare(tb, 'fr', { sensitivity: 'base' });
+        });
+      } else if (sortMode === 'recent' || sortMode === 'old') {
+        const dir = sortMode === 'recent' ? -1 : 1;
+        filtered = filtered.slice().sort((a, b) => {
+          const da = a.meta.date_maj || a.meta.date_creation || '';
+          const db = b.meta.date_maj || b.meta.date_creation || '';
+          return dir * da.localeCompare(db);
+        });
+      } else if (sortMode === 'duration-asc' || sortMode === 'duration-desc') {
+        const dir = sortMode === 'duration-asc' ? 1 : -1;
+        filtered = filtered.slice().sort((a, b) => {
+          const da = a.meta.duree_estimee_min || 9999;
+          const db = b.meta.duree_estimee_min || 9999;
+          return dir * (da - db);
+        });
+      } else if (sortMode === 'difficulty-asc' || sortMode === 'difficulty-desc') {
+        const dir = sortMode === 'difficulty-asc' ? 1 : -1;
+        filtered = filtered.slice().sort((a, b) => {
+          const da = a.meta.difficulte || 0;
+          const db = b.meta.difficulte || 0;
+          return dir * (da - db);
+        });
+      } else if (sortMode === 'popular') {
+        // Pondéré par temps passé (timeMs depuis dailyActivity). Sujets jamais
+        // ouverts en dernier (~0 ms).
+        const top = computeTopSujets(state.user.dailyActivity);
+        const timeById = {};
+        top.forEach(t => { timeById[t.id] = t.timeMs; });
+        filtered = filtered.slice().sort((a, b) =>
+          (timeById[b.meta.id] || 0) - (timeById[a.meta.id] || 0));
+      }
+
+      setSubtitle(filtered.length);
 
       if (filtered.length === 0) {
         return el('div', { class: 'empty-state' },
@@ -964,6 +1087,69 @@
     else if (tabId === 'cours') renderTabCours(tabContent, sujet, blockTarget);
     else if (tabId === 'quiz') renderTabQuiz(tabContent, sujet);
     else if (tabId === 'carte') renderTabCarte(tabContent, sujet);
+
+    // ---- Footer "Tu pourrais aussi aimer"
+    // Calcule une liste de sujets reliés au sujet courant à partir de :
+    //   - lie_a (lien éditorial fort, poids 100)
+    //   - tags partagés (poids 5 par tag commun)
+    //   - même domaine principal (poids 2)
+    // Affiche les 5 meilleurs scores. Visible sur tous les onglets.
+    renderSujetFooterRecommendations(main, sujet);
+  }
+
+  function renderSujetFooterRecommendations(container, sujet) {
+    const myId = sujet.meta.id;
+    const myTags = new Set(sujet.meta.tags || []);
+    const myDomain = (sujet.meta.domaines || [])[0];
+    const liea = new Set(sujet.meta.lie_a || []);
+
+    const scores = [];
+    state.sujetsOrder.forEach(id => {
+      if (id === myId) return;
+      const s = state.sujets[id];
+      if (!s) return;
+      let score = 0;
+      if (liea.has(id)) score += 100;
+      const otherTags = s.meta.tags || [];
+      const shared = otherTags.filter(t => myTags.has(t));
+      score += shared.length * 5;
+      const otherDom = (s.meta.domaines || [])[0];
+      if (otherDom && otherDom === myDomain) score += 2;
+      if (score > 0) scores.push({ id, score, sujet: s, shared, lieA: liea.has(id) });
+    });
+    if (scores.length === 0) return;
+    scores.sort((a, b) => b.score - a.score);
+    const top = scores.slice(0, 5);
+
+    const footer = el('div', { class: 'sujet-related' });
+    footer.appendChild(el('h3', { class: 'sujet-related-title' }, 'Tu pourrais aussi aimer'));
+    const list = el('div', { class: 'sujet-related-list' });
+    top.forEach(({ id, sujet: s, shared, lieA }) => {
+      const dom = (s.meta.domaines || ['Autre'])[0];
+      const c = domainColor(dom);
+      const card = el('a', {
+        class: 'sujet-related-card',
+        href: '#/sujet/' + encodeURIComponent(id),
+        style: { '--card-accent': c },
+        onclick: (e) => { e.preventDefault(); navigate('/sujet/' + encodeURIComponent(id)); }
+      });
+      // Raison du lien (court)
+      let reason;
+      if (lieA) reason = 'Lien direct';
+      else if (shared.length > 0) reason = shared.length === 1
+        ? 'Tag : #' + shared[0]
+        : shared.length + ' tags partagés';
+      else reason = 'Même domaine';
+      card.appendChild(el('span', { class: 'sujet-related-reason' }, reason));
+      card.appendChild(el('span', {
+        class: 'sujet-related-name',
+        html: htmlEscapeButKeepEm(s.meta.titre)
+      }));
+      card.appendChild(el('span', { class: 'sujet-related-domain' }, dom));
+      list.appendChild(card);
+    });
+    footer.appendChild(list);
+    container.appendChild(footer);
   }
 
   function htmlEscapeButKeepEm(s) {
@@ -2182,6 +2368,20 @@
         blockNodes.push(node);
       }
     });
+
+    // CTA de fin de cours : raccourci vers le quiz du sujet pour celles et
+    // ceux qui ont fini de lire et veulent vérifier tout de suite. Apparaît
+    // uniquement si le sujet a un quiz (la plupart en ont, mais pas tous).
+    if (Array.isArray(sujet.quiz) && sujet.quiz.length > 0) {
+      const endCta = el('div', { class: 'cours-end-cta' });
+      endCta.appendChild(el('span', { class: 'cours-end-cta-label' },
+        'Tu as fini le cours ?'));
+      endCta.appendChild(el('button', {
+        class: 'btn primary',
+        onclick: () => navigate('/sujet/' + encodeURIComponent(sujet.meta.id) + '/quiz')
+      }, 'Tester avec le quiz (' + sujet.quiz.length + ' questions) →'));
+      blocksHost.appendChild(endCta);
+    }
 
     // Suivi de progression réelle : un bloc compte comme "lu" lorsqu'il
     // a été à au moins 50 % visible dans le viewport (ou entièrement
@@ -4779,24 +4979,27 @@
   // =================================================================
 
   // Pool unique de toutes les questions disponibles avec leurs métadonnées
-  function buildQuestionPool() {
+  function buildQuestionPool(domainFilter) {
     const all = [];
     state.sujetsOrder.forEach(id => {
       const sujet = state.sujets[id];
-      if (Array.isArray(sujet.quiz)) {
-        sujet.quiz.forEach((q, qIdx) => {
-          all.push(Object.assign({}, q, {
-            _sujet: { id: id, titre: sujet.meta.titre },
-            _qIdx: qIdx
-          }));
-        });
+      if (!Array.isArray(sujet.quiz)) return;
+      if (domainFilter) {
+        const sujDomains = sujet.meta.domaines || [];
+        if (!sujDomains.includes(domainFilter)) return;
       }
+      sujet.quiz.forEach((q, qIdx) => {
+        all.push(Object.assign({}, q, {
+          _sujet: { id: id, titre: sujet.meta.titre },
+          _qIdx: qIdx
+        }));
+      });
     });
     return all;
   }
 
-  function startMixedQuiz(count) {
-    const all = buildQuestionPool();
+  function startMixedQuiz(count, domainFilter) {
+    const all = buildQuestionPool(domainFilter || null);
     if (all.length === 0) return false;
     shuffleArray(all);
     const picked = all.slice(0, Math.min(count, all.length));
@@ -4806,7 +5009,8 @@
       score: 0,
       questions: picked,
       isMixed: true,
-      mode: 'mixte'
+      mode: 'mixte',
+      _domain: domainFilter || null
     };
     return true;
   }
@@ -5014,13 +5218,34 @@
     cardMixte.appendChild(el('div', { class: 'quiz-mode-eyebrow' }, '🎲 Mixte'));
     cardMixte.appendChild(el('h3', { class: 'quiz-mode-title' }, 'Pioche aléatoire'));
     cardMixte.appendChild(el('p', { class: 'quiz-mode-desc' },
-      'Tirage au sort dans toute la bibliothèque. Choisis ta longueur.'));
+      'Tirage au sort dans toute la bibliothèque (ou un domaine choisi). Choisis ta longueur.'));
+
+    // Sélecteur de domaine optionnel : permet de cibler un domaine précis
+    // (ex. "Mixte mais uniquement Histoire") — très utile avec 20+ domaines.
+    const allMixteDomains = Array.from(new Set(sujets.flatMap(s => s.meta.domaines || [])))
+      .sort((a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' }));
+    const mixteDomSel = el('select', { class: 'quiz-mixte-domain' });
+    mixteDomSel.appendChild(el('option', { value: '' },
+      'Tous les domaines (' + totalQ + ' Q.)'));
+    allMixteDomains.forEach(d => {
+      const poolForDom = buildQuestionPool(d);
+      if (poolForDom.length === 0) return;
+      mixteDomSel.appendChild(el('option', { value: d },
+        d + ' (' + poolForDom.length + ' Q.)'));
+    });
+    cardMixte.appendChild(mixteDomSel);
+
     const mixteBtns = el('div', { class: 'quiz-mode-btn-row' });
     [['5 questions', 5], ['10 questions', 10], ['20 questions', 20]].forEach(([label, n]) => {
-      if (totalQ < n && n !== 5) return;
       mixteBtns.appendChild(el('button', {
         class: 'btn btn-secondary',
-        onclick: () => { startMixedQuiz(Math.min(n, totalQ)); rerender(); }
+        onclick: () => {
+          const dom = mixteDomSel.value || null;
+          const pool = buildQuestionPool(dom);
+          if (pool.length === 0) return;
+          const k = Math.min(n, pool.length);
+          if (startMixedQuiz(k, dom)) rerender();
+        }
       }, label));
     });
     cardMixte.appendChild(mixteBtns);
@@ -5401,9 +5626,10 @@
     const avgPct = quizScores.length === 0 ? 0 :
       Math.round(quizScores.reduce((acc, [, sc]) => acc + (sc.best / sc.total) * 100, 0) / quizScores.length);
     const favs = state.user.favorites.length;
+    const coveragePct = total === 0 ? 0 : Math.round((visited / total) * 100);
 
     main.appendChild(el('div', { class: 'stats-grid' },
-      stat(visited, 'Sujets ouverts'),
+      stat(visited + ' / ' + total, 'Sujets ouverts (' + coveragePct + ' %)'),
       stat(completed, 'Cours terminés'),
       stat(favs, 'Favoris'),
       stat(quizScores.length === 0 ? '—' : avgPct + '%', 'Score moyen aux quiz')
@@ -5520,6 +5746,63 @@
               )
             );
             return row;
+          })
+        )
+      ));
+    }
+
+    // ---- Domaines à explorer ----
+    // Pour chaque domaine, compte (sujets visités / total). Les domaines
+    // avec le taux le plus bas sont des "angles morts" — pousse l'utilisateur
+    // à diversifier ses lectures plutôt qu'à toujours retourner sur les
+    // mêmes thèmes.
+    const domStats = {};
+    sujets.forEach(s => {
+      const dom = (s.meta.domaines || ['Autre'])[0];
+      if (!domStats[dom]) domStats[dom] = { total: 0, visited: 0 };
+      domStats[dom].total++;
+      const p = state.user.progress[s.meta.id];
+      if (p && p.visited) domStats[dom].visited++;
+    });
+    const unexplored = Object.entries(domStats)
+      .map(([d, c]) => ({ domain: d, visited: c.visited, total: c.total, ratio: c.total > 0 ? c.visited / c.total : 0 }))
+      .filter(d => d.ratio < 0.5)  // au moins la moitié non vue
+      .sort((a, b) => a.ratio - b.ratio)
+      .slice(0, 4);
+    if (unexplored.length > 0 && visited > 0) {
+      main.appendChild(el('section', { class: 'profil-section' },
+        el('h3', { style: { fontStyle: 'italic', fontWeight: 400 } }, 'Domaines à explorer'),
+        el('p', { class: 'sr-section-sub' },
+          'Les domaines où ton carnet contient des sujets que tu n\'as pas encore ouverts.'),
+        el('div', { class: 'unexplored-list' },
+          ...unexplored.map(d => {
+            const c = domainColor(d.domain);
+            const remaining = d.total - d.visited;
+            // Trouve un sujet non visité de ce domaine pour proposer un point d'entrée
+            const pickable = sujets.find(s => {
+              const sd = (s.meta.domaines || ['Autre'])[0];
+              if (sd !== d.domain) return false;
+              const p = state.user.progress[s.meta.id];
+              return !p || !p.visited;
+            });
+            const item = el('div', {
+              class: 'unexplored-item',
+              style: { '--dom-color': c }
+            },
+              el('span', { class: 'unexplored-dot' }),
+              el('div', { class: 'unexplored-info' },
+                el('span', { class: 'unexplored-name' }, d.domain),
+                el('span', { class: 'unexplored-meta' },
+                  d.visited + ' / ' + d.total + ' lus · ' + remaining + ' à découvrir')
+              )
+            );
+            if (pickable) {
+              item.appendChild(el('a', {
+                class: 'btn btn-secondary unexplored-cta',
+                href: '#/sujet/' + encodeURIComponent(pickable.meta.id)
+              }, 'Commencer →'));
+            }
+            return item;
           })
         )
       ));
