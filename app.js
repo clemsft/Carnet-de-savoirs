@@ -6015,6 +6015,11 @@
     }
 
     const totalOcc = terms.reduce((s, t) => s + t.occurrences.length, 0);
+    // Domaines distincts présents dans le vocabulaire, avec compteur pour
+    // le sélecteur de filtre.
+    const allDomains = Array.from(new Set(
+      terms.flatMap(t => t.occurrences.map(o => o.domain))
+    )).sort((a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' }));
 
     const toolbar = el('div', { class: 'vocab-toolbar' });
     const searchInput = el('input', {
@@ -6024,38 +6029,141 @@
       autocomplete: 'off'
     });
     toolbar.appendChild(searchInput);
-    toolbar.appendChild(el('span', { class: 'vocab-counter' },
-      terms.length + ' termes uniques · ' + totalOcc + ' occurrences'));
+
+    // Filtre par domaine : permet de réduire la vue à un seul domaine.
+    // Le nombre de termes du domaine est affiché entre parenthèses.
+    const domSel = el('select', { class: 'vocab-domain-select' });
+    domSel.appendChild(el('option', { value: '' },
+      'Tous les domaines (' + terms.length + ')'));
+    allDomains.forEach(d => {
+      const count = terms.filter(t => t.occurrences.some(o => o.domain === d)).length;
+      domSel.appendChild(el('option', { value: d }, d + ' (' + count + ')'));
+    });
+    toolbar.appendChild(domSel);
+
+    // Tri : alphabétique (par défaut), par domaine, par nombre d'occurrences
+    // (utile pour repérer les concepts transversaux), ou aléatoire (utile
+    // pour redécouvrir des termes).
+    const sortSel = el('select', { class: 'vocab-sort-select' });
+    [
+      ['alpha',  'Tri : A → Z'],
+      ['domain', 'Tri : par domaine'],
+      ['occ',    'Tri : occurrences ↓'],
+      ['random', 'Tri : aléatoire']
+    ].forEach(([v, l]) => sortSel.appendChild(el('option', { value: v }, l)));
+    toolbar.appendChild(sortSel);
+
+    const counter = el('span', { class: 'vocab-counter' });
+    toolbar.appendChild(counter);
+
     toolbar.appendChild(el('button', {
       class: 'btn',
       onclick: () => openVocabFlashcards(terms)
     }, 'Réviser en flashcards →'));
     main.appendChild(toolbar);
 
+    // Index alphabétique cliquable : pour les 500+ termes du carnet, défiler
+    // tout l'alphabet à la souris est fatigant. L'index permet de sauter
+    // directement à une lettre. Visible seulement quand le tri est
+    // alphabétique (sinon les ancres n'auraient pas de sens).
+    const alphaIndex = el('div', { class: 'vocab-alpha-index' });
+    const lettersInUse = new Set();
+    terms.forEach(t => {
+      const first = (t.norm[0] || '').toUpperCase();
+      if (first && /[A-Z0-9]/.test(first)) lettersInUse.add(first);
+    });
+    const allLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    allLetters.forEach(l => {
+      const a = el('button', {
+        class: 'vocab-alpha-letter' + (lettersInUse.has(l) ? '' : ' is-empty'),
+        type: 'button'
+      }, l);
+      a.addEventListener('click', () => {
+        if (!lettersInUse.has(l)) return;
+        const target = grid.querySelector('[data-letter="' + l + '"]');
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      alphaIndex.appendChild(a);
+    });
+    main.appendChild(alphaIndex);
+
     const grid = el('div', { class: 'vocab-grid' });
     main.appendChild(grid);
 
-    function renderGrid(filter) {
+    function renderGrid() {
       clear(grid);
-      const q = searchNormalize(filter || '').trim();
-      const visible = !q ? terms : terms.filter(t => {
-        if (searchNormalize(t.term).indexOf(q) >= 0) return true;
-        return t.occurrences.some(o =>
-          searchNormalize(o.sourceTitle).indexOf(q) >= 0 ||
-          searchNormalize(o.domain).indexOf(q) >= 0);
-      });
+      const q = searchNormalize(searchInput.value || '').trim();
+      const dom = domSel.value;
+      const sortMode = sortSel.value;
+
+      let visible = terms;
+      if (q) {
+        visible = visible.filter(t => {
+          if (searchNormalize(t.term).indexOf(q) >= 0) return true;
+          return t.occurrences.some(o =>
+            searchNormalize(o.sourceTitle).indexOf(q) >= 0 ||
+            searchNormalize(o.domain).indexOf(q) >= 0);
+        });
+      }
+      if (dom) {
+        visible = visible.filter(t => t.occurrences.some(o => o.domain === dom));
+      }
+
+      // Tri (les termes arrivent déjà triés alphabétiquement de buildVocabIndex)
+      if (sortMode === 'domain') {
+        visible = visible.slice().sort((a, b) => {
+          const da = (a.occurrences[0] && a.occurrences[0].domain) || '';
+          const db = (b.occurrences[0] && b.occurrences[0].domain) || '';
+          return da.localeCompare(db, 'fr') || a.norm.localeCompare(b.norm);
+        });
+      } else if (sortMode === 'occ') {
+        visible = visible.slice().sort((a, b) =>
+          b.occurrences.length - a.occurrences.length ||
+          a.norm.localeCompare(b.norm));
+      } else if (sortMode === 'random') {
+        visible = visible.slice();
+        for (let i = visible.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          const tmp = visible[i]; visible[i] = visible[j]; visible[j] = tmp;
+        }
+      }
+      // sinon mode 'alpha' : déjà trié dans buildVocabIndex
+
+      counter.textContent = visible.length === terms.length
+        ? terms.length + ' termes · ' + totalOcc + ' occurrences'
+        : visible.length + ' / ' + terms.length + ' termes';
+
+      // L'index alphabétique n'a de sens qu'en tri alphabétique.
+      alphaIndex.classList.toggle('is-hidden', sortMode !== 'alpha');
+
       if (visible.length === 0) {
         grid.appendChild(el('p', { class: 'vocab-empty' }, 'Aucun terme ne correspond à ce filtre.'));
         return;
       }
-      visible.forEach(t => grid.appendChild(makeVocabCard(t)));
+
+      // Pose des ancres data-letter sur la première carte de chaque lettre
+      // (seulement en tri alpha). Permet le scrollIntoView depuis l'index.
+      let lastLetter = '';
+      visible.forEach(t => {
+        const card = makeVocabCard(t);
+        if (sortMode === 'alpha') {
+          const letter = (t.norm[0] || '').toUpperCase();
+          if (letter !== lastLetter && /[A-Z0-9]/.test(letter)) {
+            card.setAttribute('data-letter', letter);
+            lastLetter = letter;
+          }
+        }
+        grid.appendChild(card);
+      });
     }
     let inputDebounce = null;
     searchInput.addEventListener('input', () => {
       if (inputDebounce) clearTimeout(inputDebounce);
-      inputDebounce = setTimeout(() => renderGrid(searchInput.value), 80);
+      inputDebounce = setTimeout(renderGrid, 80);
     });
-    renderGrid('');
+    domSel.addEventListener('change', renderGrid);
+    sortSel.addEventListener('change', renderGrid);
+    renderGrid();
   }
 
   function makeVocabCard(termData) {
