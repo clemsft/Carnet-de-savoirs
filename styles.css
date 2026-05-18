@@ -2986,6 +2986,84 @@ body.globe-fullscreen-active { overflow: hidden; }
   text-align: right;
 }
 
+/* Toolbar Mes Notes : toggle aperçu, export, stats */
+.notes-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin: 1rem 0 1.2rem;
+  flex-wrap: wrap;
+}
+.notes-stats {
+  margin-left: auto;
+  font-size: 0.82rem;
+  color: var(--text-faint);
+  font-style: italic;
+}
+.notes-preview {
+  min-height: 60vh;
+  padding: 1.2rem 1.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+.notes-preview p { margin: 0 0 1em; }
+.notes-preview-empty {
+  color: var(--text-faint);
+  font-style: italic;
+  text-align: center;
+  padding: 3rem 0;
+}
+
+/* Section "Notes attachées à des sujets" — agrège toutes les notes
+   saisies depuis les fiches sujets en une vue centralisée. */
+.notes-attached {
+  margin-top: 3rem;
+}
+.notes-attached-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 0.7rem;
+}
+.notes-attached-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.9rem 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--card-accent, var(--accent));
+  border-radius: var(--r);
+  text-decoration: none;
+  color: var(--text);
+  transition: transform 0.15s, border-color 0.15s;
+}
+.notes-attached-card:hover {
+  transform: translateY(-1px);
+  border-color: var(--card-accent, var(--accent));
+}
+.notes-attached-domain {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--card-accent, var(--text-faint));
+  font-style: italic;
+}
+.notes-attached-title {
+  font-family: var(--f-display, Georgia, serif);
+  font-size: 1.02rem;
+  color: var(--text);
+}
+.notes-attached-title em { color: var(--card-accent, var(--accent)); }
+.notes-attached-preview {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
 /* ===================================================================
    HEATMAP D'ACTIVITÉ (page profil)
    =================================================================== */
@@ -3266,6 +3344,23 @@ body.overlay-active { overflow: hidden; }
   font-style: italic;
   font-family: var(--f-display);
   letter-spacing: 0.06em;
+}
+
+/* Barre de progression du diaporama : positionnée tout en haut de l'overlay,
+   se remplit progressivement à mesure qu'on avance dans le parcours. */
+.presentation-progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.06);
+  z-index: 5;
+}
+.presentation-progress-fill {
+  height: 100%;
+  background: var(--pres-accent, var(--accent));
+  transition: width 250ms ease-out;
 }
 
 .presentation-slide {

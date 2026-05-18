@@ -1,14 +1,15 @@
 /* ===================================================================
-   PARCOURS — Du cosmos à la conscience
+   PARCOURS — Du cosmos à la civilisation
    ===================================================================
-   Six étapes pour traverser l'histoire de l'univers, depuis le Big
-   Bang jusqu'à un cerveau qui se demande d'où il vient.
+   Huit étapes pour traverser l'histoire de l'univers, depuis le Big
+   Bang jusqu'aux premières cités humaines. L'ID `du-cosmos-a-lhomme`
+   est conservé pour ne pas casser les bookmarks et l'état persistant.
    =================================================================== */
 
 window.CarnetDeSavoirs.registerParcours({
   meta: {
     id: 'du-cosmos-a-lhomme',
-    titre: 'Du <em>cosmos</em> à la conscience',
+    titre: 'Du <em>cosmos</em> à la civilisation',
     domaine: 'Astrophysique',
     description: `La plus longue histoire qu'on puisse raconter. 13,8 milliards d'années en huit étapes : l'**univers primordial** se déploie, certaines régions s'effondrent en **trous noirs**, l'**espace-temps** se laisse modeler par la gravité, la matière s'organise en **atomes** qui apprennent à se lier, la **photosynthèse** allume la biosphère, l'**évolution** produit le vivant complexe, finit par fabriquer un **cerveau** capable de tout reconstituer en pensée, et celui-ci se met à **planter du blé** pour fonder la civilisation.`,
     duree_estimee_min: 270

@@ -425,14 +425,23 @@
       .replace(/>/g, '&gt;');
 
     // Inline transformations
-    // [[slug]] -> lien vers une fiche (si le sujet existe) ou marqueur grisé
-    s = s.replace(/\[\[([a-z0-9-]+)\]\]/g, (_, slug) => {
+    // [[slug]] -> lien vers une fiche (si le sujet existe) ou marqueur grisé.
+    // [[slug|alias]] -> idem, mais le texte affiché est l'alias plutôt que
+    // le titre de la fiche cible. Permet d'écrire des phrases fluides du
+    // type "voir [[epopee|épiques]]".
+    s = s.replace(/\[\[([a-z0-9-]+)(?:\|([^\]]+))?\]\]/g, (_, slug, alias) => {
       const target = state.sujets[slug];
+      // Échappe l'alias contre l'injection HTML (le slug est déjà restreint
+      // au pattern [a-z0-9-]+ donc safe par construction).
+      const escAlias = alias
+        ? alias.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        : null;
       if (target && target.meta) {
-        const label = String(target.meta.titre || slug).replace(/<[^>]+>/g, '');
+        const baseLabel = String(target.meta.titre || slug).replace(/<[^>]+>/g, '');
+        const label = escAlias || baseLabel;
         return `<a class="sujet-link" href="#/sujet/${encodeURIComponent(slug)}">${label}</a>`;
       }
-      return `<span class="sujet-link sujet-link-broken" title="Sujet « ${slug} » non encore disponible dans le carnet">${slug}</span>`;
+      return `<span class="sujet-link sujet-link-broken" title="Sujet « ${slug} » non encore disponible dans le carnet">${escAlias || slug}</span>`;
     });
     s = s.replace(/\[([^\]]+)\]\{accent\}/g, '<em class="term">$1</em>');
     s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
@@ -4125,18 +4134,25 @@
     // afin de pouvoir naviguer précisément vers ce passage.
     const citations = []; // { source, target, blockIdx, blockTitle, snippet }
     sujets.forEach(s => {
-      const re = /\[\[([a-z0-9-]+)\]\]/g;
+      // Regex reconnaît [[slug]] ET [[slug|alias]] — groupe 1 = slug,
+      // groupe 2 = alias optionnel (ignoré pour la construction du graph,
+      // pertinent pour le nettoyage de snippet ci-dessous).
+      const re = /\[\[([a-z0-9-]+)(?:\|[^\]]+)?\]\]/g;
       // Dédoublonnage AU NIVEAU DU SUJET : si un même slug est cité plusieurs
       // fois dans le même bloc (par ex. dans plusieurs champs d'un widget),
       // on n'enregistre qu'une seule citation pour ce couple (bloc, target).
       const seenInSujet = new Set();
       function makeSnippet(text, target) {
-        const marker = '[[' + target + ']]';
-        const idx = text.indexOf(marker);
-        if (idx < 0) return '';
+        // Recherche d'un marker pouvant être [[target]] ou [[target|alias]].
+        // On utilise un regex avec lookahead pour avoir la longueur réelle.
+        const markerRe = new RegExp('\\[\\[' + target.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?:\\|[^\\]]+)?\\]\\]');
+        const m = markerRe.exec(text);
+        if (!m) return '';
+        const idx = m.index;
+        const markerLen = m[0].length;
         const radius = 110;
         let start = Math.max(0, idx - radius);
-        let end = Math.min(text.length, idx + marker.length + radius);
+        let end = Math.min(text.length, idx + markerLen + radius);
         // Recale aux frontières de mot pour éviter les coupures au milieu
         if (start > 0) {
           const sp = text.indexOf(' ', start);
@@ -4144,12 +4160,13 @@
         }
         if (end < text.length) {
           const sp = text.lastIndexOf(' ', end);
-          if (sp > idx + marker.length) end = sp;
+          if (sp > idx + markerLen) end = sp;
         }
         let snip = text.slice(start, end);
-        // Nettoyage léger : [[slug]] → "slug lisible", retire **, *, `
+        // Nettoyage léger : [[slug]] → "slug lisible" (ou alias si présent),
+        // retire **, *, `
         snip = snip
-          .replace(/\[\[([a-z0-9-]+)\]\]/g, (_, sl) => sl.replace(/-/g, ' '))
+          .replace(/\[\[([a-z0-9-]+)(?:\|([^\]]+))?\]\]/g, (_, sl, alias) => alias || sl.replace(/-/g, ' '))
           .replace(/\*\*([^*]+)\*\*/g, '$1')
           .replace(/\*([^*]+)\*/g, '$1')
           .replace(/`([^`]+)`/g, '$1')
@@ -5439,29 +5456,132 @@
     main.appendChild(el('span', { class: 'eyebrow' }, 'Cahier libre'));
     main.appendChild(el('h1', { class: 'page-title', html: 'Mes <em>notes</em>' }));
     main.appendChild(el('p', { class: 'page-subtitle' },
-      'Cahier transverse pour les idées qui ne s\'attachent à aucun sujet précis : fil rouge, brouillons, références à creuser. Sauvegarde automatique.'));
+      'Cahier transverse pour les idées qui ne s\'attachent à aucun sujet précis : fil rouge, brouillons, références à creuser. Sauvegarde automatique. Le markdown-lite est supporté (**gras**, *italique*, [[slug]] pour citer un sujet).'));
 
     const notes = state.user.globalNotes || '';
+    let isPreview = false;
+
+    // Toolbar : toggle édition/aperçu + bouton export + stats
+    const toolbar = el('div', { class: 'notes-toolbar' });
+    const toggleBtn = el('button', { class: 'btn btn-secondary' }, 'Aperçu du rendu →');
+    const exportBtn = el('button', {
+      class: 'btn btn-secondary',
+      onclick: () => {
+        const blob = new Blob([state.user.globalNotes || ''], { type: 'text/markdown;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'notes-carnet-' + dateKey(new Date()) + '.md';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+    }, 'Exporter en .md');
+    const statsSpan = el('span', { class: 'notes-stats' });
+    toolbar.appendChild(toggleBtn);
+    toolbar.appendChild(exportBtn);
+    toolbar.appendChild(statsSpan);
+    main.appendChild(toolbar);
+
+    function updateStats(val) {
+      const v = val || '';
+      const chars = v.length;
+      const words = v.trim() === '' ? 0 : v.trim().split(/\s+/).length;
+      const lines = v === '' ? 0 : v.split('\n').length;
+      statsSpan.textContent = words + ' mots · ' + chars + ' car. · ' + lines + ' lignes';
+    }
+
+    const editWrap = el('div', { class: 'notes-edit-wrap' });
     const status = el('div', { class: 'notes-status' },
       notes ? 'Sauvegardé' : 'Tes notes seront sauvegardées automatiquement.');
     const textarea = el('textarea', {
       class: 'notes-area',
-      placeholder: 'Tes pensées libres, idées qui traversent plusieurs sujets, projets futurs…',
+      placeholder: 'Tes pensées libres, idées qui traversent plusieurs sujets, projets futurs…\n\nMarkdown-lite : **gras**, *italique*, [[slug]] pour citer un sujet.',
       style: { minHeight: '60vh', fontSize: '1rem' }
     });
     textarea.value = notes;
+    updateStats(notes);
     let saveTimer = null;
     textarea.addEventListener('input', () => {
       state.user.globalNotes = textarea.value;
       status.textContent = 'Saisie en cours…';
+      updateStats(textarea.value);
       clearTimeout(saveTimer);
       saveTimer = setTimeout(() => {
         saveUserState();
         status.textContent = 'Sauvegardé · ' + new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
       }, 600);
     });
-    main.appendChild(textarea);
-    main.appendChild(status);
+    editWrap.appendChild(textarea);
+    editWrap.appendChild(status);
+
+    // Mode aperçu : rend le markdown-lite + interprète [[slug]] comme dans
+    // les sujets (liens cliquables vers les fiches existantes).
+    const preview = el('div', { class: 'notes-preview' });
+    preview.style.display = 'none';
+
+    function refreshPreview() {
+      const val = state.user.globalNotes || '';
+      if (!val.trim()) {
+        preview.innerHTML = '<p class="notes-preview-empty">Aucune note à prévisualiser pour l\'instant.</p>';
+      } else {
+        preview.innerHTML = md(val);
+      }
+    }
+    toggleBtn.addEventListener('click', () => {
+      isPreview = !isPreview;
+      if (isPreview) {
+        refreshPreview();
+        editWrap.style.display = 'none';
+        preview.style.display = '';
+        toggleBtn.textContent = '← Retour à l\'édition';
+      } else {
+        editWrap.style.display = '';
+        preview.style.display = 'none';
+        toggleBtn.textContent = 'Aperçu du rendu →';
+      }
+    });
+
+    main.appendChild(editWrap);
+    main.appendChild(preview);
+
+    // ---- Section "Notes attachées à des sujets" ----
+    // state.user.notes[sujetId] contient les notes saisies depuis l'onglet
+    // Résumé de chaque fiche sujet. Ici on les regroupe en un seul endroit
+    // pour qu'on puisse les retrouver d'un coup d'œil.
+    const sujetNotes = Object.entries(state.user.notes || {})
+      .filter(([id, txt]) => txt && txt.trim() && state.user.sujets ? state.sujets[id] : state.sujets[id])
+      .filter(([id]) => state.sujets[id]);
+
+    if (sujetNotes.length > 0) {
+      const sec = el('section', { class: 'profil-section notes-attached' });
+      sec.appendChild(el('h3', { style: { fontStyle: 'italic', fontWeight: 400 } },
+        'Notes attachées à des sujets (' + sujetNotes.length + ')'));
+      sec.appendChild(el('p', { class: 'sr-section-sub' },
+        'Notes saisies depuis l\'onglet Résumé de chaque fiche. Cliquer pour rouvrir le sujet.'));
+      const list = el('div', { class: 'notes-attached-list' });
+      sujetNotes
+        .sort(([a], [b]) => a.localeCompare(b))
+        .forEach(([id, txt]) => {
+          const s = state.sujets[id];
+          const dom = (s.meta.domaines || ['Autre'])[0];
+          const c = domainColor(dom);
+          const cleanTitre = String(s.meta.titre).replace(/<[^>]+>/g, '');
+          // Aperçu : 200 premiers caractères
+          const preview = txt.length > 200 ? txt.slice(0, 197).trim() + '…' : txt.trim();
+          const card = el('a', {
+            class: 'notes-attached-card',
+            href: '#/sujet/' + encodeURIComponent(id),
+            style: { '--card-accent': c }
+          },
+            el('span', { class: 'notes-attached-domain' }, dom),
+            el('span', { class: 'notes-attached-title', html: htmlEscapeButKeepEm(s.meta.titre) }),
+            el('span', { class: 'notes-attached-preview' }, preview)
+          );
+          list.appendChild(card);
+        });
+      sec.appendChild(list);
+      main.appendChild(sec);
+    }
   }
 
   // Mini calendrier du mois courant — zoom détaillé sur la heatmap
@@ -6128,23 +6248,26 @@
   const BACKLINKS_INDEX = { built: false, byTarget: {} };
 
   function backlinksMakeSnippet(text, target) {
-    const marker = '[[' + target + ']]';
-    const idx = text.indexOf(marker);
-    if (idx < 0) return '';
+    // Marker accepte [[target]] OU [[target|alias]] (longueur variable)
+    const markerRe = new RegExp('\\[\\[' + target.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?:\\|[^\\]]+)?\\]\\]');
+    const m = markerRe.exec(text);
+    if (!m) return '';
+    const idx = m.index;
+    const markerLen = m[0].length;
     const radius = 110;
     let start = Math.max(0, idx - radius);
-    let end = Math.min(text.length, idx + marker.length + radius);
+    let end = Math.min(text.length, idx + markerLen + radius);
     if (start > 0) {
       const sp = text.indexOf(' ', start);
       if (sp >= 0 && sp < idx) start = sp + 1;
     }
     if (end < text.length) {
       const sp = text.lastIndexOf(' ', end);
-      if (sp > idx + marker.length) end = sp;
+      if (sp > idx + markerLen) end = sp;
     }
     let snip = text.slice(start, end);
     snip = snip
-      .replace(/\[\[([a-z0-9-]+)\]\]/g, (_, sl) => sl.replace(/-/g, ' '))
+      .replace(/\[\[([a-z0-9-]+)(?:\|([^\]]+))?\]\]/g, (_, sl, alias) => alias || sl.replace(/-/g, ' '))
       .replace(/\*\*([^*]+)\*\*/g, '$1')
       .replace(/(?<!\*)\*([^*\n]+)\*(?!\*)/g, '$1')
       .replace(/`([^`]+)`/g, '$1')
@@ -6179,8 +6302,9 @@
         addEntry(target, { sourceId, via: 'lie_a' });
       });
 
-      // 2. [[slug]] dans le contenu
-      const re = /\[\[([a-z0-9-]+)\]\]/g;
+      // 2. [[slug]] (et [[slug|alias]]) dans le contenu — l'alias ne sert
+      // qu'à l'affichage en md(), pas à la construction de l'index.
+      const re = /\[\[([a-z0-9-]+)(?:\|[^\]]+)?\]\]/g;
       function recordHits(text, blockIdx, blockTitle) {
         if (!text) return;
         re.lastIndex = 0;
@@ -6630,7 +6754,7 @@
 
   function searchStripMarkdown(s) {
     return String(s || '')
-      .replace(/\[\[([a-z0-9-]+)\]\]/g, (_, sl) => sl.replace(/-/g, ' '))
+      .replace(/\[\[([a-z0-9-]+)(?:\|([^\]]+))?\]\]/g, (_, sl, alias) => alias || sl.replace(/-/g, ' '))
       .replace(/\[([^\]]+)\]\{accent\}/g, '$1')
       .replace(/\*\*([^*]+)\*\*/g, '$1')
       .replace(/(?<!\*)\*([^*\n]+)\*(?!\*)/g, '$1')
@@ -7117,16 +7241,29 @@
   function openParcoursPresentation(parcours) {
     if (!parcours || !Array.isArray(parcours.etapes) || parcours.etapes.length === 0) return;
     const etapes = parcours.etapes;
+    // Démarre à l'étape courante si l'utilisateur a un parcours actif
+    // correspondant — autrement repart de 0.
     let idx = 0;
+    const active = getActiveParcours();
+    if (active && active.parcours && active.parcours.meta.id === parcours.meta.id &&
+        typeof active.etape === 'number' && active.etape >= 0 && active.etape < etapes.length) {
+      idx = active.etape;
+    }
     const accent = domainColor(parcours.meta.domaine || 'Atelier');
 
     const overlay = el('div', { class: 'parcours-pres-overlay' });
     overlay.style.setProperty('--pres-accent', accent);
     const closeBtn = el('button', { class: 'presentation-close', title: 'Quitter (Esc)' }, '✕');
     const counter = el('div', { class: 'presentation-counter' });
+    // Barre de progression en haut — indique visuellement où on en est
+    // dans le parcours, mise à jour à chaque slide.
+    const progressBar = el('div', { class: 'presentation-progress' });
+    const progressFill = el('div', { class: 'presentation-progress-fill' });
+    progressBar.appendChild(progressFill);
     const slide = el('div', { class: 'parcours-pres-slide' });
     const prevBtn = el('button', { class: 'presentation-nav presentation-prev', title: 'Précédent (←)' }, '‹');
     const nextBtn = el('button', { class: 'presentation-nav presentation-next', title: 'Suivant (→)' }, '›');
+    overlay.appendChild(progressBar);
     overlay.appendChild(closeBtn);
     overlay.appendChild(counter);
     overlay.appendChild(prevBtn);
@@ -7168,18 +7305,27 @@
       slide.innerHTML = html;
       prevBtn.disabled = idx === 0;
       nextBtn.disabled = idx === etapes.length - 1;
+      // Met à jour la barre de progression : largeur proportionnelle à
+      // l'avancement dans le parcours. Inclut l'étape courante (idx+1 sur N).
+      const pct = ((idx + 1) / etapes.length) * 100;
+      progressFill.style.width = pct.toFixed(1) + '%';
     }
     function next() { if (idx < etapes.length - 1) { idx++; render(); } }
     function prev() { if (idx > 0) { idx--; render(); } }
+    function first() { if (idx !== 0) { idx = 0; render(); } }
+    function last() { if (idx !== etapes.length - 1) { idx = etapes.length - 1; render(); } }
     function close() {
       if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
       document.removeEventListener('keydown', onKey);
       document.body.classList.remove('overlay-active');
     }
     function onKey(e) {
-      if (e.key === 'Escape') { close(); e.preventDefault(); }
-      else if (e.key === 'ArrowLeft')  { prev(); e.preventDefault(); }
-      else if (e.key === 'ArrowRight') { next(); e.preventDefault(); }
+      if (e.key === 'Escape')          { close(); e.preventDefault(); }
+      else if (e.key === 'ArrowLeft' || e.key === 'PageUp')   { prev();  e.preventDefault(); }
+      else if (e.key === 'ArrowRight' || e.key === 'PageDown' ||
+               e.key === ' ' || e.key === 'Enter')            { next();  e.preventDefault(); }
+      else if (e.key === 'Home')                              { first(); e.preventDefault(); }
+      else if (e.key === 'End')                               { last();  e.preventDefault(); }
     }
     closeBtn.addEventListener('click', close);
     prevBtn.addEventListener('click', prev);
