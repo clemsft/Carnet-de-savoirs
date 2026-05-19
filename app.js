@@ -1,4 +1,4 @@
-/* ===================================================================
+﻿/* ===================================================================
    CARNET DE SAVOIRS — Cœur de l'application
    ===================================================================
    Single-file vanilla JS. Aucune dépendance externe. Aucun build step.
@@ -10,6 +10,11 @@
   'use strict';
 
   const CDS = (window.CarnetDeSavoirs = {});
+
+  // Version de l'application, bumpée automatiquement par Snapshot.bat
+  // (cf. Update-Cache-Version.ps1, section APP_VERSION). Affichée en bas
+  // de la sidebar pour signaler chaque mise à jour à l'utilisateur.
+  const APP_VERSION = 'v1.2';
 
   // =================================================================
   // STATE
@@ -448,9 +453,54 @@
     s = s.replace(/(?<!\*)\*([^*\n]+)\*(?!\*)/g, '<em>$1</em>');
     s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
 
-    // Paragraphes (séparés par lignes vides)
-    const paras = s.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
-    return paras.map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+    // Parsing ligne par ligne pour gérer les titres (# h2) et sous-titres
+    // (## h3) en plus des paragraphes séparés par lignes vides. Les titres
+    // brisent la séquence de paragraphe et constituent leur propre bloc.
+    // Une ligne `- foo` initie une puce ; les puces consécutives sont
+    // regroupées dans un même <ul>.
+    const lines = s.split('\n');
+    const blocks = [];
+    let paraBuf = [];
+    let listBuf = [];
+    function flushPara() {
+      if (paraBuf.length) {
+        const para = paraBuf.join('<br>').trim();
+        if (para) blocks.push('<p>' + para + '</p>');
+        paraBuf = [];
+      }
+    }
+    function flushList() {
+      if (listBuf.length) {
+        blocks.push('<ul class="md-list">' +
+          listBuf.map(item => '<li>' + item + '</li>').join('') + '</ul>');
+        listBuf = [];
+      }
+    }
+    function flushAll() { flushPara(); flushList(); }
+    for (let i = 0; i < lines.length; i++) {
+      const ln = lines[i];
+      const t = ln.trim();
+      const mH2 = /^##\s+(.+)$/.exec(t);
+      const mH1 = /^#\s+(.+)$/.exec(t);
+      const mLi = /^[-*]\s+(.+)$/.exec(t);
+      if (mH2) {
+        flushAll();
+        blocks.push('<h3 class="md-h3">' + mH2[1] + '</h3>');
+      } else if (mH1) {
+        flushAll();
+        blocks.push('<h2 class="md-h2">' + mH1[1] + '</h2>');
+      } else if (mLi) {
+        flushPara();
+        listBuf.push(mLi[1]);
+      } else if (t === '') {
+        flushAll();
+      } else {
+        flushList();
+        paraBuf.push(ln);
+      }
+    }
+    flushAll();
+    return blocks.join('');
   }
 
   // =================================================================
@@ -495,7 +545,7 @@
         navLink('notes', activeView, 'Mes notes', ICONS.notes, '/notes'),
         navLink('profil', activeView, 'Mon profil', ICONS.profile, '/profil')
       ),
-      el('div', { class: 'sidebar-footer', html: 'v1.0 — construit avec ✦ et Claude' })
+      el('div', { class: 'sidebar-footer', html: APP_VERSION + ' — construit avec ✦ et Claude' })
     );
 
     const main = el('main', { class: 'main', id: 'main-content' });
@@ -1640,7 +1690,46 @@
           });
         });
         return Object.keys(totalByDomain).some(d => totalByDomain[d] >= 2 && perfectByDomain[d] === totalByDomain[d]);
-      } }
+      } },
+    // ----- Nouveaux succès -----
+    // Récompensent des facettes encore non couvertes : volume de sujets
+    // visités, longueur de cours, prise de notes, surlignage et fidélité.
+    { id: 'bibliothecaire', label: 'Bibliothécaire',     desc: '30 sujets différents ouverts au moins une fois.',
+      check: () => Object.values(state.user.progress || {}).filter(p => p && p.visited).length >= 30 },
+    { id: 'polyhistor',     label: 'Polyhistor',          desc: '10 domaines différents explorés.',
+      check: () => {
+        const visited = Object.keys(state.user.progress || {}).filter(id => state.user.progress[id].visited);
+        const domains = new Set();
+        visited.forEach(id => {
+          const s = state.sujets[id];
+          if (s) (s.meta.domaines || []).forEach(d => domains.add(d));
+        });
+        return domains.size >= 10;
+      } },
+    { id: 'longue-traite',  label: 'Longue traite',       desc: 'Lire intégralement un cours de 12 blocs ou plus.',
+      check: () => {
+        const prog = state.user.progress || {};
+        return Object.keys(prog).some(id => {
+          const s = state.sujets[id];
+          return s && Array.isArray(s.cours) && s.cours.length >= 12
+            && (prog[id].courseProgress || 0) >= 100;
+        });
+      } },
+    { id: 'cahier-rempli',  label: 'Cahier bien rempli',  desc: '500 mots écrits dans le cahier libre transverse.',
+      check: () => {
+        const n = state.user.globalNotes || '';
+        const words = n.trim() === '' ? 0 : n.trim().split(/\s+/).length;
+        return words >= 500;
+      } },
+    { id: 'annotateur',     label: 'Annotateur',          desc: '10 blocs surlignés à travers le carnet.',
+      check: () => {
+        const h = state.user.highlights || {};
+        let n = 0;
+        Object.values(h).forEach(arr => { if (Array.isArray(arr)) n += arr.length; });
+        return n >= 10;
+      } },
+    { id: 'centenaire',     label: 'Cent jours',          desc: '100 jours d\'activité distincts dans le carnet.',
+      check: () => Object.keys(state.user.dailyActivity || {}).length >= 100 }
   ];
 
   function checkAchievements() {
@@ -5367,7 +5456,10 @@
           disabled: stillToReview === 0 || undefined,
           onclick: () => { state.quizSession = null; if (startReviewQuiz(Math.min(10, stillToReview))) rerender(); }
         }, 'Continuer la révision'),
-        el('a', { class: 'btn btn-secondary', href: '#/quiz-mixte' }, 'Retour au hub')
+        el('button', {
+          class: 'btn btn-secondary',
+          onclick: () => { state.quizSession = null; rerender(); }
+        }, 'Retour au hub')
       )
     ));
   }
@@ -5407,7 +5499,10 @@
       el('div', { class: 'verdict' }, verdict),
       el('div', { class: 'best-score' }, 'Reviens demain pour le prochain quiz quotidien.'),
       el('div', { class: 'btn-row' },
-        el('a', { class: 'btn btn-secondary', href: '#/quiz-mixte' }, 'Retour au hub')
+        el('button', {
+          class: 'btn btn-secondary',
+          onclick: () => { state.quizSession = null; rerender(); }
+        }, 'Retour au hub')
       )
     ));
   }
@@ -5443,7 +5538,10 @@
             rerender();
           }
         }, 'Recommencer'),
-        el('a', { class: 'btn btn-secondary', href: '#/quiz-mixte' }, 'Retour au hub')
+        el('button', {
+          class: 'btn btn-secondary',
+          onclick: () => { state.quizSession = null; rerender(); }
+        }, 'Retour au hub')
       )
     ));
   }
@@ -5456,7 +5554,7 @@
     main.appendChild(el('span', { class: 'eyebrow' }, 'Cahier libre'));
     main.appendChild(el('h1', { class: 'page-title', html: 'Mes <em>notes</em>' }));
     main.appendChild(el('p', { class: 'page-subtitle' },
-      'Cahier transverse pour les idées qui ne s\'attachent à aucun sujet précis : fil rouge, brouillons, références à creuser. Sauvegarde automatique. Le markdown-lite est supporté (**gras**, *italique*, [[slug]] pour citer un sujet).'));
+      'Cahier transverse pour les idées qui ne s\'attachent à aucun sujet précis : fil rouge, brouillons, références à creuser. Sauvegarde automatique. Utilise la barre d\'outils ci-dessous pour mettre en forme — pas besoin de connaître le markdown.'));
 
     const notes = state.user.globalNotes || '';
     let isPreview = false;
@@ -5495,7 +5593,7 @@
       notes ? 'Sauvegardé' : 'Tes notes seront sauvegardées automatiquement.');
     const textarea = el('textarea', {
       class: 'notes-area',
-      placeholder: 'Tes pensées libres, idées qui traversent plusieurs sujets, projets futurs…\n\nMarkdown-lite : **gras**, *italique*, [[slug]] pour citer un sujet.',
+      placeholder: 'Tes pensées libres, idées qui traversent plusieurs sujets, projets futurs…\n\nUtilise les boutons ci-dessus pour mettre en forme (titres, gras, italique, liste, citer un sujet).',
       style: { minHeight: '60vh', fontSize: '1rem' }
     });
     textarea.value = notes;
@@ -5511,6 +5609,86 @@
         status.textContent = 'Sauvegardé · ' + new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
       }, 600);
     });
+
+    // ---- Barre d'outils de mise en forme ----
+    // Permet d'insérer titres, gras, italique, listes et liens vers des
+    // sujets sans connaître la syntaxe markdown. Les boutons agissent
+    // directement sur la sélection ou la ligne courante du textarea.
+    function wrapSelection(before, after, placeholder) {
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const selected = textarea.value.substring(start, end);
+      const inner = selected || placeholder;
+      textarea.value = textarea.value.substring(0, start) + before + inner + after + textarea.value.substring(end);
+      if (!selected) {
+        textarea.selectionStart = start + before.length;
+        textarea.selectionEnd = start + before.length + inner.length;
+      } else {
+        textarea.selectionStart = textarea.selectionEnd = start + before.length + inner.length + after.length;
+      }
+      textarea.focus();
+      textarea.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    function prefixCurrentLine(prefix, placeholder) {
+      const value = textarea.value;
+      const start = textarea.selectionStart;
+      const lineStart = value.lastIndexOf('\n', start - 1) + 1;
+      const nextLineBreak = value.indexOf('\n', start);
+      const lineEnd = nextLineBreak === -1 ? value.length : nextLineBreak;
+      const currentLine = value.substring(lineStart, lineEnd);
+      // Si la ligne porte déjà ce préfixe exact, on bascule (retire)
+      if (currentLine.startsWith(prefix)) {
+        const stripped = currentLine.substring(prefix.length);
+        textarea.value = value.substring(0, lineStart) + stripped + value.substring(lineEnd);
+        textarea.selectionStart = textarea.selectionEnd = Math.max(lineStart, start - prefix.length);
+      } else {
+        // Retire un autre préfixe titre éventuel pour ne pas cumuler "## # "
+        const cleaned = currentLine.replace(/^(##?\s+|[-*]\s+)/, '');
+        const body = cleaned.trim() === '' ? placeholder : cleaned;
+        textarea.value = value.substring(0, lineStart) + prefix + body + value.substring(lineEnd);
+        if (cleaned.trim() === '') {
+          textarea.selectionStart = lineStart + prefix.length;
+          textarea.selectionEnd = lineStart + prefix.length + body.length;
+        } else {
+          textarea.selectionStart = textarea.selectionEnd = start + (prefix.length - (currentLine.length - cleaned.length));
+        }
+      }
+      textarea.focus();
+      textarea.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    function makeFormatBtn(label, title, action) {
+      const b = el('button', { class: 'notes-fmt-btn', type: 'button', title: title }, label);
+      b.addEventListener('click', (e) => { e.preventDefault(); action(); });
+      return b;
+    }
+    const fmtBar = el('div', { class: 'notes-format-bar' },
+      makeFormatBtn('Titre', 'Titre principal (Ctrl+1)',
+        () => prefixCurrentLine('# ', 'Mon titre')),
+      makeFormatBtn('Sous-titre', 'Sous-titre (Ctrl+2)',
+        () => prefixCurrentLine('## ', 'Mon sous-titre')),
+      el('span', { class: 'notes-fmt-sep' }),
+      makeFormatBtn('Gras', 'Gras (Ctrl+B)',
+        () => wrapSelection('**', '**', 'texte en gras')),
+      makeFormatBtn('Italique', 'Italique (Ctrl+I)',
+        () => wrapSelection('*', '*', 'texte en italique')),
+      el('span', { class: 'notes-fmt-sep' }),
+      makeFormatBtn('Liste', 'Puce de liste',
+        () => prefixCurrentLine('- ', 'élément de liste')),
+      makeFormatBtn('Citer un sujet', 'Insère un lien vers une fiche du carnet ([[slug]])',
+        () => wrapSelection('[[', ']]', 'slug-du-sujet'))
+    );
+
+    // Raccourcis clavier classiques : Ctrl+B / Ctrl+I / Ctrl+1 / Ctrl+2
+    textarea.addEventListener('keydown', (e) => {
+      if (!(e.ctrlKey || e.metaKey)) return;
+      const k = e.key.toLowerCase();
+      if (k === 'b') { e.preventDefault(); wrapSelection('**', '**', 'texte en gras'); }
+      else if (k === 'i') { e.preventDefault(); wrapSelection('*', '*', 'texte en italique'); }
+      else if (k === '1') { e.preventDefault(); prefixCurrentLine('# ', 'Mon titre'); }
+      else if (k === '2') { e.preventDefault(); prefixCurrentLine('## ', 'Mon sous-titre'); }
+    });
+
+    editWrap.appendChild(fmtBar);
     editWrap.appendChild(textarea);
     editWrap.appendChild(status);
 
@@ -6463,10 +6641,49 @@
     const counter = el('span', { class: 'vocab-counter' });
     toolbar.appendChild(counter);
 
-    toolbar.appendChild(el('button', {
-      class: 'btn',
-      onclick: () => openVocabFlashcards(terms)
-    }, 'Réviser en flashcards →'));
+    // Le bouton flashcards reprend exactement les filtres actifs de la grille
+    // (recherche + domaine) pour permettre de réviser uniquement un domaine.
+    // Le libellé s'adapte au filtre : "Réviser 23 termes d'Histoire →".
+    const flashBtn = el('button', { class: 'btn' }, 'Réviser en flashcards →');
+    function computeVisibleTerms() {
+      const q = searchNormalize(searchInput.value || '').trim();
+      const dom = domSel.value;
+      let visible = terms;
+      if (q) {
+        visible = visible.filter(t => {
+          if (searchNormalize(t.term).indexOf(q) >= 0) return true;
+          return t.occurrences.some(o =>
+            searchNormalize(o.sourceTitle).indexOf(q) >= 0 ||
+            searchNormalize(o.domain).indexOf(q) >= 0);
+        });
+      }
+      if (dom) {
+        visible = visible.filter(t => t.occurrences.some(o => o.domain === dom));
+      }
+      return visible;
+    }
+    function updateFlashBtnLabel() {
+      const dom = domSel.value;
+      const q = (searchInput.value || '').trim();
+      const visible = computeVisibleTerms();
+      if (dom && !q) {
+        flashBtn.textContent = 'Réviser ' + visible.length + ' terme' +
+          (visible.length > 1 ? 's' : '') + ' de ' + dom + ' →';
+      } else if (q || dom) {
+        flashBtn.textContent = 'Réviser ' + visible.length + ' terme' +
+          (visible.length > 1 ? 's' : '') + ' filtré' + (visible.length > 1 ? 's' : '') + ' →';
+      } else {
+        flashBtn.textContent = 'Réviser en flashcards →';
+      }
+      flashBtn.disabled = visible.length === 0;
+    }
+    flashBtn.addEventListener('click', () => {
+      const visible = computeVisibleTerms();
+      if (visible.length === 0) return;
+      const dom = domSel.value || null;
+      openVocabFlashcards(visible, dom);
+    });
+    toolbar.appendChild(flashBtn);
     main.appendChild(toolbar);
 
     // Index alphabétique cliquable : pour les 500+ termes du carnet, défiler
@@ -6566,11 +6783,12 @@
     let inputDebounce = null;
     searchInput.addEventListener('input', () => {
       if (inputDebounce) clearTimeout(inputDebounce);
-      inputDebounce = setTimeout(renderGrid, 80);
+      inputDebounce = setTimeout(() => { renderGrid(); updateFlashBtnLabel(); }, 80);
     });
-    domSel.addEventListener('change', renderGrid);
+    domSel.addEventListener('change', () => { renderGrid(); updateFlashBtnLabel(); });
     sortSel.addEventListener('change', renderGrid);
     renderGrid();
+    updateFlashBtnLabel();
   }
 
   function makeVocabCard(termData) {
@@ -6666,7 +6884,9 @@
   // ---- Mode flashcards du vocabulaire global ----
   // Mêmes contrôles que openFlashcardsMode (sujet) : ← → flèches, espace
   // pour retourner, Echap pour quitter.
-  function openVocabFlashcards(terms) {
+  // domainLabel : nom du domaine en cours de révision (null = tous domaines).
+  // Affiché sous forme d'une pastille colorée en haut de l'overlay.
+  function openVocabFlashcards(terms, domainLabel) {
     if (!terms || !terms.length) return;
     // Mélange pour ne pas toujours commencer par les premiers alphabétiques
     const deck = terms.slice();
@@ -6678,6 +6898,15 @@
 
     const overlay = el('div', { class: 'flashcards-overlay vocab-flashcards' });
     const closeBtn = el('button', { class: 'flashcard-close', title: 'Quitter (Esc)' }, '✕');
+    // Pastille de filtre : visible uniquement quand un domaine est sélectionné.
+    // Permet de signaler clairement le sous-ensemble en cours de révision.
+    let filterChip = null;
+    if (domainLabel) {
+      filterChip = el('div', {
+        class: 'flashcard-filter-chip',
+        style: { '--chip-accent': domainColor(domainLabel) }
+      }, 'Domaine : ' + domainLabel);
+    }
     const counter = el('div', { class: 'flashcard-counter' });
     const card = el('div', { class: 'flashcard', title: 'Cliquer pour révéler' });
     const cardInner = el('div', { class: 'flashcard-inner' });
@@ -6695,6 +6924,7 @@
       'Espace/Entrée pour retourner · ← → pour naviguer · Esc pour quitter');
 
     overlay.appendChild(closeBtn);
+    if (filterChip) overlay.appendChild(filterChip);
     overlay.appendChild(counter);
     overlay.appendChild(card);
     overlay.appendChild(controls);
@@ -8218,7 +8448,6 @@
     btnLong.addEventListener('click', () => switchTo('long'));
     btnCourt.addEventListener('click', () => switchTo('court'));
 
-    // Init : mode Long par défaut, montre l'échelle cosmique complète.
     render(currentMode, '');
     renderMiniMap();
     domSel.addEventListener('change', () => {

@@ -3000,6 +3000,90 @@ body.globe-fullscreen-active { overflow: hidden; }
   color: var(--text-faint);
   font-style: italic;
 }
+
+/* Barre d'outils de mise en forme — boutons accessibles au-dessus du
+   textarea pour insérer titres / gras / italique / listes / liens sujet
+   sans connaître la syntaxe markdown. Volontairement sobre pour ne pas
+   surcharger la page. */
+.notes-format-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  padding: 0.45rem 0.55rem;
+  margin-bottom: 0.4rem;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-bottom: none;
+  border-radius: var(--r) var(--r) 0 0;
+}
+.notes-fmt-btn {
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-soft);
+  font-family: var(--f-display);
+  font-size: 0.85rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: var(--r-sm, 6px);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.notes-fmt-btn:hover {
+  background: var(--accent-soft, rgba(255,255,255,0.06));
+  color: var(--text);
+  border-color: var(--line);
+}
+.notes-fmt-btn:active { transform: translateY(1px); }
+.notes-fmt-sep {
+  display: inline-block;
+  width: 1px;
+  height: 1.1rem;
+  background: var(--line);
+  margin: 0 0.25rem;
+}
+/* La barre d'outils colle naturellement au textarea grâce au margin-bottom
+   nul et aux bords arrondis qui se rejoignent. */
+.notes-format-bar + .notes-area {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  margin-top: 0;
+}
+
+/* Rendu des titres et listes en mode aperçu (et partout où md() est
+   employé). Hiérarchie plus discrète que les titres de page pour ne pas
+   concurrencer la maquette principale. */
+.notes-preview h2.md-h2,
+.md-h2 {
+  font-family: var(--f-display);
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 1.4em 0 0.5em;
+  line-height: 1.25;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 0.3em;
+}
+.notes-preview h3.md-h3,
+.md-h3 {
+  font-family: var(--f-display);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-soft);
+  margin: 1.1em 0 0.4em;
+  line-height: 1.3;
+}
+.md-list {
+  margin: 0.4em 0 1em;
+  padding-left: 1.4em;
+}
+.md-list li {
+  margin-bottom: 0.3em;
+  line-height: 1.55;
+}
+/* Premier titre sans marge supérieure pour ne pas créer de trou en haut
+   du bloc d'aperçu. */
+.notes-preview > .md-h2:first-child,
+.notes-preview > .md-h3:first-child { margin-top: 0; }
 .notes-preview {
   min-height: 60vh;
   padding: 1.2rem 1.5rem;
@@ -3158,10 +3242,41 @@ body.reading-mode #app {
 }
 body.reading-mode .sidebar { display: none; }
 body.reading-mode .main {
-  max-width: 760px;
-  padding: 3rem 2rem 5rem;
+  max-width: 960px;
+  padding: 3rem 2.4rem 5rem;
 }
 body.reading-mode .sujet-header { padding-bottom: 1.4rem; margin-bottom: 1.8rem; }
+
+/* En mode lecture, on masque la TOC pour libérer toute la largeur au
+   contenu et simplifier la mise en page. La navigation se fait alors
+   par défilement et par les onglets du sujet (1-4) plutôt que par
+   l'ancrage par bloc. */
+body.reading-mode .cours-layout {
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+body.reading-mode .cours-toc {
+  display: none;
+}
+
+/* Texte de cours plus respirant : taille légèrement augmentée et
+   interligne plus généreux pour un confort de lecture longue. */
+body.reading-mode .course-block {
+  font-size: 1.06rem;
+  line-height: 1.78;
+  margin-bottom: 2.4rem;
+}
+body.reading-mode .course-block p {
+  line-height: inherit;
+}
+body.reading-mode .course-block h3 {
+  font-size: 1.5rem;
+  margin-top: 2.6rem;
+}
+/* Encadrés un peu plus présents pour ne pas se perdre dans le flot. */
+body.reading-mode .course-block.encadre {
+  padding: 1.5rem 1.8rem;
+}
 
 /* ===================================================================
    LIENS INTER-SUJETS [[slug]] dans le markdown
@@ -3226,6 +3341,29 @@ body.overlay-active { overflow: hidden; }
   font-family: var(--f-display);
   margin-bottom: 1.8rem;
   text-align: center;
+}
+
+/* Pastille indiquant un filtre actif dans les flashcards du vocabulaire
+   (par exemple "Domaine : Histoire"). La couleur d'accent reprend la
+   couleur du domaine via la variable --chip-accent. */
+.flashcard-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.9rem;
+  margin-bottom: 0.8rem;
+  border-radius: 999px;
+  border: 1px solid var(--chip-accent, var(--line-strong));
+  background: color-mix(in srgb, var(--chip-accent, var(--accent)) 12%, transparent);
+  color: var(--text-soft);
+  font-family: var(--f-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+}
+.flashcard-filter-chip::before {
+  content: '●';
+  color: var(--chip-accent, var(--accent));
+  font-size: 0.7rem;
 }
 
 .flashcard {

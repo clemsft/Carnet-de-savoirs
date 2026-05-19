@@ -48,3 +48,24 @@ if (Test-Path 'index.html') {
     Write-Host "  [SKIP] index.html : aucun script/style local trouve"
   }
 }
+
+# ---- 3. app.js : APP_VERSION incrementee a chaque snapshot ----
+# Le numero affiche en bas de la sidebar passe de v1.0 a v1.1 a v1.2 etc.
+# pour signaler visuellement chaque mise a jour. Apres v1.99 le compteur
+# bascule sur v2.0 et ainsi de suite.
+if (Test-Path 'app.js') {
+  $appJs = Get-Content 'app.js' -Raw -Encoding UTF8
+  $pattern = "const APP_VERSION = 'v(\d+)\.(\d+)';"
+  $appMatch = [regex]::Match($appJs, $pattern)
+  if ($appMatch.Success) {
+    $major = [int]$appMatch.Groups[1].Value
+    $minor = [int]$appMatch.Groups[2].Value + 1
+    if ($minor -ge 100) { $major += 1; $minor = 0 }
+    $newVer = "const APP_VERSION = 'v$major.$minor';"
+    $new = [regex]::Replace($appJs, $pattern, $newVer)
+    Set-Content 'app.js' -Value $new -NoNewline -Encoding UTF8
+    Write-Host "  [OK] app.js -> APP_VERSION = v$major.$minor"
+  } else {
+    Write-Host "  [SKIP] app.js : pattern APP_VERSION introuvable"
+  }
+}
