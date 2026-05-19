@@ -5558,3 +5558,307 @@ body.overlay-active { overflow: hidden; }
 /* En plein écran sidebar / topbar masqués — on garde la cohérence si jamais
    l'utilisateur passe la timeline en fullscreen via la barre globale du
    navigateur (F11) */
+
+
+/* ============================================================
+   WIDGET SelecteurValeurs — MODE COMPARATEUR
+   ============================================================
+   Bouton primaire : highlight accent. Bouton secondaire (Maj+clic) :
+   variante secondaire. Quand les deux sont sélectionnés, l'affichage
+   passe en deux cartes côte à côte avec un bloc delta au milieu. */
+
+.w-selector-buttons button.is-primary {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.w-selector-buttons button.is-secondary {
+  background: color-mix(in oklab, var(--accent) 18%, transparent);
+  border-color: color-mix(in oklab, var(--accent) 60%, var(--text-faint));
+  color: var(--text);
+  outline: 1px dashed color-mix(in oklab, var(--accent) 50%, transparent);
+  outline-offset: -3px;
+}
+.w-selector-compare {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 0.8rem;
+  margin-top: 1rem;
+  align-items: stretch;
+}
+@media (max-width: 600px) {
+  .w-selector-compare {
+    grid-template-columns: 1fr;
+  }
+}
+.w-compare-card {
+  background: var(--bg-deep);
+  border: 1px solid var(--line);
+  padding: 0.9rem 1rem;
+  border-radius: var(--r);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.w-compare-card-a { border-left: 3px solid var(--accent); }
+.w-compare-card-b { border-right: 3px solid color-mix(in oklab, var(--accent) 60%, var(--text-faint)); }
+.w-compare-label {
+  font-family: var(--f-display);
+  font-style: italic;
+  font-size: 0.85rem;
+  color: var(--text-faint);
+}
+.w-compare-value {
+  font-family: var(--f-display);
+  font-size: 1.35rem;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.2;
+}
+.w-compare-desc {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  line-height: 1.45;
+}
+.w-compare-delta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 0.4rem 0.8rem;
+  font-family: var(--f-display);
+}
+.w-compare-delta-label {
+  font-style: italic;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.w-compare-delta-val {
+  font-size: 1.1rem;
+  color: var(--accent);
+  font-weight: 500;
+}
+.w-compare-delta-ratio {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  font-style: italic;
+}
+.w-compare-delta-arrow {
+  color: var(--accent);
+  font-size: 1.2rem;
+}
+.w-selector-hint {
+  margin-top: 0.7rem;
+  font-size: 0.78rem;
+  font-style: italic;
+  color: var(--text-faint);
+}
+
+/* ============================================================
+   WIDGET CurseurParametrique — MARQUEURS DE SEUIL + PRESETS
+   ============================================================ */
+
+.w-slider-wrap {
+  position: relative;
+  margin: 0.4rem 0 0.6rem;
+}
+.w-slider-track {
+  position: absolute;
+  left: 0; right: 0;
+  top: 0;
+  height: 28px; /* matche la hauteur visuelle du range */
+  pointer-events: none;
+}
+.w-slider-marker {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--marker-color, var(--text-faint));
+  transform: translateX(-50%);
+  opacity: 0.55;
+}
+.w-slider-marker::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--marker-color, var(--text-faint));
+}
+.w-slider-marker-label {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 0.4rem;
+  font-family: var(--f-display);
+  font-style: italic;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+.w-slider-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+  margin: 0.9rem 0 0.4rem;
+}
+.w-slider-presets-label {
+  font-family: var(--f-display);
+  font-style: italic;
+  font-size: 0.78rem;
+  color: var(--text-faint);
+  margin-right: 0.3rem;
+}
+.w-slider-preset {
+  background: transparent;
+  border: 1px solid var(--line-strong);
+  color: var(--text-dim);
+  font-family: var(--f-display);
+  font-size: 0.82rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+.w-slider-preset:hover {
+  color: var(--text);
+  border-color: var(--accent);
+}
+.w-slider-preset.is-active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ============================================================
+   WIDGET Equation — MODE MANIPULABLE
+   ============================================================ */
+
+.w-equation-controls {
+  margin-top: 1.2rem;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.w-equation-var {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.w-equation-var-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.w-equation-var-label {
+  font-family: var(--f-display);
+  color: var(--text-soft);
+}
+.w-equation-var-name {
+  font-style: italic;
+  color: var(--text);
+}
+.w-equation-var-unit {
+  font-size: 0.8rem;
+  color: var(--text-faint);
+  margin-left: 0.4rem;
+}
+.w-equation-var-value {
+  font-family: var(--f-display);
+  font-size: 1rem;
+  color: var(--accent);
+  font-weight: 500;
+}
+.w-equation-range {
+  width: 100%;
+}
+.w-equation-note {
+  margin-top: 0.6rem;
+  font-style: italic;
+  font-size: 0.85rem;
+  color: var(--text-faint);
+  text-align: center;
+}
+
+/* ============================================================
+   WIDGET TableauComparatif
+   ============================================================
+   Tableau triable, surlignage des extrêmes (max/min) pour les
+   colonnes numériques. */
+
+.w-tableau-wrap {
+  overflow-x: auto;
+  margin: 1.2rem 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--bg-card);
+}
+.w-tableau {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+.w-tableau th,
+.w-tableau td {
+  padding: 0.7rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+}
+.w-tableau th.is-num,
+.w-tableau td.is-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.w-tableau-th {
+  background: color-mix(in oklab, var(--accent) 6%, var(--bg-card));
+  font-family: var(--f-display);
+  font-style: italic;
+  color: var(--text-soft);
+  cursor: pointer;
+  user-select: none;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background 0.18s, color 0.18s;
+}
+.w-tableau-th:hover {
+  background: var(--accent-soft);
+  color: var(--text);
+}
+.w-tableau-th.is-sorted {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+.w-tableau-th-arrow {
+  color: var(--accent);
+  margin-left: 0.2rem;
+}
+.w-tableau-th-unite {
+  font-size: 0.75rem;
+  color: var(--text-faint);
+  font-style: italic;
+  margin-left: 0.4rem;
+  text-transform: none;
+}
+.w-tableau tbody tr:hover {
+  background: color-mix(in oklab, var(--accent) 4%, transparent);
+}
+.w-tableau tbody tr:last-child td { border-bottom: none; }
+.w-tableau td.is-max {
+  color: var(--ok, #5fb878);
+  font-weight: 500;
+}
+.w-tableau td.is-min {
+  color: var(--text-faint);
+}

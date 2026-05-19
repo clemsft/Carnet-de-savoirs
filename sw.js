@@ -17,7 +17,7 @@
  * file://, ce fichier dort.
  */
 
-const VERSION = '202605192349';
+const VERSION = '202605200137';
 const CACHE_LOCAL = 'carnet-local-' + VERSION;
 const CACHE_EXTERNAL = 'carnet-external-' + VERSION;
 

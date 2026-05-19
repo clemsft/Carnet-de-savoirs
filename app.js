@@ -14,7 +14,7 @@
   // Version de l'application, bumpée automatiquement par Snapshot.bat
   // (cf. Update-Cache-Version.ps1, section APP_VERSION). Affichée en bas
   // de la sidebar pour signaler chaque mise à jour à l'utilisateur.
-  const APP_VERSION = 'v1.3';
+  const APP_VERSION = 'v1.4';
 
   // =================================================================
   // STATE
@@ -2782,37 +2782,115 @@
          unite: "km/s",
          indexInitial: 0
        }
+       Clic simple = sélection primaire. Maj+clic = ajoute une option
+       en comparaison. Quand deux options sont sélectionnées, l'affichage
+       passe en mode comparateur : deux cartes côte à côte avec le delta
+       et le ratio (si numérique). Backward-compatible : tant qu'aucune
+       option n'est ajoutée en comparaison, le rendu est identique à
+       l'ancienne version.
     */
     SelecteurValeurs(params) {
       const opts = params.options || [];
-      let active = params.indexInitial || 0;
-      const value = el('span', { class: 'w-value' });
-      const desc = el('span', { class: 'w-desc' });
+      let primary = params.indexInitial || 0;
+      let secondary = -1;
+      // Le comparateur n'a de sens que pour des valeurs numériques (où
+      // l'écart et le ratio se calculent). Pour des valeurs textuelles,
+      // on se replie sur l'ancien comportement mono-sélection.
+      const isComparable = opts.length > 1
+        && opts.every(o => typeof o.valeur === 'number' && isFinite(o.valeur));
+
       const buttons = el('div', { class: 'w-selector-buttons' });
+      const single = el('div', { class: 'w-selector-output' });
+      const singleValue = el('span', { class: 'w-value' });
+      const singleDesc = el('span', { class: 'w-desc' });
+      single.appendChild(singleValue);
+      single.appendChild(singleDesc);
+      const compareWrap = el('div', { class: 'w-selector-compare' });
+      const hint = isComparable
+        ? el('div', { class: 'w-selector-hint' },
+            'Maj + clic pour comparer avec une autre option')
+        : null;
 
-      function update(i) {
-        active = i;
-        const o = opts[i];
-        Array.from(buttons.children).forEach((b, j) => b.classList.toggle('active', j === i));
-        const v = o.valeur;
-        const formatted = (typeof v === 'number')
-          ? (v >= 1000 ? v.toLocaleString('fr-FR').replace(/,/g, ' ') : String(v).replace('.', ','))
-          : v;
-        value.textContent = formatted + (params.unite ? ' ' + params.unite : '');
-        desc.textContent = o.description || '';
+      // Markdown-lite interprété pour la description (gras, italique,
+      // [[slug]] vers fiche, etc.). On retire l'enveloppe <p> initiale
+      // pour rester sur une seule ligne en mode simple.
+      function renderInline(text) {
+        return md(text || '').replace(/^<p>|<\/p>$/g, '');
       }
-
+      function formatVal(v) {
+        if (typeof v === 'number') {
+          return (Math.abs(v) >= 1000)
+            ? v.toLocaleString('fr-FR').replace(/,/g, ' ')
+            : String(v).replace('.', ',');
+        }
+        return v;
+      }
+      function withUnit(v) {
+        return formatVal(v) + (params.unite ? ' ' + params.unite : '');
+      }
+      function update() {
+        Array.from(buttons.children).forEach((b, j) => {
+          b.classList.toggle('is-primary', j === primary);
+          b.classList.toggle('active', j === primary); // compat ancienne classe
+          b.classList.toggle('is-secondary', j === secondary);
+        });
+        const pa = opts[primary];
+        if (secondary < 0) {
+          single.style.display = '';
+          compareWrap.style.display = 'none';
+          singleValue.textContent = withUnit(pa.valeur);
+          singleDesc.innerHTML = renderInline(pa.description);
+        } else {
+          const pb = opts[secondary];
+          single.style.display = 'none';
+          compareWrap.style.display = '';
+          clear(compareWrap);
+          const cardA = el('div', { class: 'w-compare-card w-compare-card-a' },
+            el('div', { class: 'w-compare-label' }, pa.label),
+            el('div', { class: 'w-compare-value' }, withUnit(pa.valeur)),
+            pa.description ? el('div', { class: 'w-compare-desc', html: renderInline(pa.description) }) : null
+          );
+          const cardB = el('div', { class: 'w-compare-card w-compare-card-b' },
+            el('div', { class: 'w-compare-label' }, pb.label),
+            el('div', { class: 'w-compare-value' }, withUnit(pb.valeur)),
+            pb.description ? el('div', { class: 'w-compare-desc', html: renderInline(pb.description) }) : null
+          );
+          const d = pb.valeur - pa.valeur;
+          const ratio = pa.valeur !== 0 ? pb.valeur / pa.valeur : null;
+          const sign = d > 0 ? '+ ' : d < 0 ? '− ' : '';
+          const deltaText = sign + formatVal(Math.abs(d)) + (params.unite ? ' ' + params.unite : '');
+          const ratioText = (ratio !== null && isFinite(ratio) && ratio > 0)
+            ? '× ' + (ratio >= 100 ? ratio.toFixed(0) : ratio >= 10 ? ratio.toFixed(1) : ratio.toFixed(2)).replace('.', ',')
+            : '';
+          const deltaNode = el('div', { class: 'w-compare-delta' },
+            el('div', { class: 'w-compare-delta-label' }, 'écart'),
+            el('div', { class: 'w-compare-delta-val' }, deltaText),
+            ratioText ? el('div', { class: 'w-compare-delta-ratio' }, ratioText) : null
+          );
+          compareWrap.appendChild(cardA);
+          compareWrap.appendChild(deltaNode);
+          compareWrap.appendChild(cardB);
+        }
+      }
       opts.forEach((o, i) => {
-        const b = el('button', { onclick: () => update(i) }, o.label);
+        const b = el('button', { type: 'button' }, o.label);
+        b.addEventListener('click', (e) => {
+          // Maj+clic ne s'active que pour des valeurs numériques.
+          if (isComparable && e.shiftKey && i !== primary) {
+            secondary = (secondary === i) ? -1 : i;
+          } else {
+            primary = i;
+            secondary = -1;
+          }
+          update();
+        });
         buttons.appendChild(b);
       });
-
       const wrap = el('div', { class: 'w-selector' },
-        buttons,
-        el('div', { class: 'w-selector-output' }, value, desc)
+        buttons, single, compareWrap,
+        hint
       );
-
-      update(active);
+      update();
       return wrap;
     },
 
@@ -2823,11 +2901,16 @@
          unite: "M☉",
          seuils: [
            { jusqua: 8, titre: "...", description: "...", couleur: "#5b8def" },
-           { jusqua: 25, titre: "...", description: "...", couleur: "#ffb86c" },
-           { jusqua: Infinity, titre: "...", description: "...", couleur: "#ff6b35" }
+           ...
+         ],
+         presets: [                    // optionnel : valeurs préréglées
+           { label: 'Soleil', valeur: 1 },
+           { label: 'Géante bleue', valeur: 30 }
          ],
          degradePiste: "linear-gradient(...)"  // optionnel
        }
+       Marqueurs visibles sur la piste aux positions des seuils + presets
+       cliquables qui repositionnent le curseur instantanément.
     */
     CurseurParametrique(params) {
       const min = params.min ?? 0;
@@ -2835,6 +2918,8 @@
       const step = params.step ?? 1;
       const init = params.valeurInitiale ?? min;
       const seuils = params.seuils || [];
+      const presets = params.presets || [];
+      const span = max - min || 1;
 
       const slider = el('input', {
         type: 'range', class: 'w-range',
@@ -2848,9 +2933,48 @@
         valueLabel
       );
 
+      // Piste + marqueurs aux positions des seuils. Le slider est posé
+      // par-dessus la piste graphique. La piste sert uniquement de canevas
+      // pour afficher les marqueurs visuels (pas d'interaction propre).
+      const track = el('div', { class: 'w-slider-track' });
+      seuils.forEach((s) => {
+        if (s.jusqua == null || !isFinite(s.jusqua)) return;
+        if (s.jusqua < min || s.jusqua > max) return;
+        const pct = ((s.jusqua - min) / span) * 100;
+        const marker = el('div', {
+          class: 'w-slider-marker',
+          style: {
+            left: pct + '%',
+            '--marker-color': s.couleur || 'currentColor'
+          },
+          title: s.titre || ''
+        });
+        if (s.titre) {
+          marker.appendChild(el('span', { class: 'w-slider-marker-label' }, s.titre));
+        }
+        track.appendChild(marker);
+      });
+      const sliderWrap = el('div', { class: 'w-slider-wrap' }, track, slider);
+
       const resultTitle = el('h4');
       const resultDesc = el('p');
       const result = el('div', { class: 'w-slider-result' }, resultTitle, resultDesc);
+
+      // Boutons presets — clics rapides sur des valeurs nommées.
+      let presetRow = null;
+      if (presets.length > 0) {
+        presetRow = el('div', { class: 'w-slider-presets' });
+        presetRow.appendChild(el('span', { class: 'w-slider-presets-label' }, 'Repères :'));
+        presets.forEach(p => {
+          const b = el('button', { class: 'w-slider-preset', type: 'button' }, p.label);
+          b.addEventListener('click', () => {
+            const clamped = Math.max(min, Math.min(max, p.valeur));
+            slider.value = clamped;
+            update();
+          });
+          presetRow.appendChild(b);
+        });
+      }
 
       function update() {
         const v = parseFloat(slider.value);
@@ -2864,12 +2988,21 @@
             result.style.setProperty('--w-result-color', seuil.couleur);
           }
         }
+        // Surlignage du preset le plus proche, le cas échéant
+        if (presetRow) {
+          Array.from(presetRow.querySelectorAll('.w-slider-preset')).forEach((btn, i) => {
+            btn.classList.toggle('is-active', Math.abs(presets[i].valeur - v) < (step || 1) * 0.5);
+          });
+        }
       }
 
       slider.addEventListener('input', update);
       update();
 
-      return el('div', null, labelRow, slider, result);
+      const children = [labelRow, sliderWrap];
+      if (presetRow) children.push(presetRow);
+      children.push(result);
+      return el('div', null, ...children);
     },
 
     /* ----- GrilleCartes -----
@@ -3027,35 +3160,241 @@
        params = {
          tex: 'E = mc^2',
          legende: '...',         // [optionnel] légende sous l'équation
-         affichage: 'block'      // 'block' (défaut, gros) ou 'inline'
+         affichage: 'block',     // 'block' (défaut, gros) ou 'inline'
+
+         // ----- Mode manipulable (optionnel) -----
+         // Si `variables` est fourni, des sliders apparaissent sous
+         // l'équation. `compute` reçoit un objet {nom: valeur} et renvoie
+         // soit une chaîne (nouveau tex), soit un objet { tex, note }.
+         variables: [
+           { nom: 'm', label: 'Masse', min: 1, max: 1e30, step: 0.01,
+             init: 1, unite: 'kg' }
+         ],
+         compute: (vars) => {
+           const E = vars.m * 9e16;
+           return { tex: 'E = ' + vars.m + ' \\cdot c^2 \\approx ' +
+                    E.toExponential(2) + ' \\text{ J}' };
+         }
        }
     */
     Equation(params) {
       const wrap = el('div', { class: 'w-equation' });
       const body = el('div', { class: 'w-equation-body' });
-      const tex = String(params.tex || '');
-      if (typeof window.katex === 'undefined') {
-        body.textContent = tex;
-        wrap.appendChild(body);
-        wrap.appendChild(el('p', { class: 'block-error', style: { fontSize: '0.82rem', marginTop: '0.5rem', textAlign: 'left' } },
-          'KaTeX non chargé — vérifie ta connexion à internet pour le rendu LaTeX.'));
-      } else {
+      const initialTex = String(params.tex || '');
+      const variables = Array.isArray(params.variables) ? params.variables : [];
+      const isManipulable = variables.length > 0 && typeof params.compute === 'function';
+      const noteEl = el('div', { class: 'w-equation-note' });
+
+      function renderTex(texStr) {
+        if (typeof window.katex === 'undefined') {
+          body.textContent = texStr;
+          return;
+        }
         try {
-          window.katex.render(tex, body, {
+          clear(body);
+          window.katex.render(texStr, body, {
             displayMode: params.affichage !== 'inline',
             throwOnError: false,
             errorColor: '#fb7185',
             strict: 'ignore'
           });
         } catch (e) {
-          body.textContent = tex;
+          body.textContent = texStr;
         }
-        wrap.appendChild(body);
       }
+
+      // Rendu initial
+      renderTex(initialTex);
+      wrap.appendChild(body);
+      if (typeof window.katex === 'undefined') {
+        wrap.appendChild(el('p', { class: 'block-error', style: { fontSize: '0.82rem', marginTop: '0.5rem', textAlign: 'left' } },
+          'KaTeX non chargé — vérifie ta connexion à internet pour le rendu LaTeX.'));
+      }
+
+      // Mode manipulable : sliders pour chaque variable + recalcul live
+      if (isManipulable) {
+        const current = {};
+        variables.forEach(v => { current[v.nom] = v.init != null ? v.init : (v.min != null ? v.min : 0); });
+
+        const controlsWrap = el('div', { class: 'w-equation-controls' });
+        const rows = variables.map(v => {
+          const sliderId = 'w-eq-' + v.nom + '-' + Math.random().toString(36).slice(2, 7);
+          const valueLabel = el('span', { class: 'w-equation-var-value' });
+          const head = el('div', { class: 'w-equation-var-head' },
+            el('label', { for: sliderId, class: 'w-equation-var-label' },
+              el('span', { class: 'w-equation-var-name' }, v.label || v.nom),
+              v.unite ? el('span', { class: 'w-equation-var-unit' }, '(' + v.unite + ')') : null
+            ),
+            valueLabel
+          );
+          const slider = el('input', {
+            id: sliderId,
+            type: 'range',
+            class: 'w-range w-equation-range',
+            min: v.min != null ? v.min : 0,
+            max: v.max != null ? v.max : 100,
+            step: v.step != null ? v.step : 1,
+            value: current[v.nom]
+          });
+          slider.addEventListener('input', () => {
+            current[v.nom] = parseFloat(slider.value);
+            recompute();
+          });
+          const row = el('div', { class: 'w-equation-var' }, head, slider);
+          row._valueLabel = valueLabel;
+          row._slider = slider;
+          row._spec = v;
+          return row;
+        });
+        rows.forEach(r => controlsWrap.appendChild(r));
+
+        function formatVarValue(v, raw) {
+          const isInt = Number.isInteger(v.step != null ? v.step : 1);
+          if (typeof raw !== 'number' || !isFinite(raw)) return String(raw);
+          if (Math.abs(raw) >= 1e6 || (Math.abs(raw) < 1e-3 && raw !== 0)) {
+            return raw.toExponential(2);
+          }
+          return isInt ? raw.toFixed(0) : raw.toFixed(2).replace('.', ',');
+        }
+        function recompute() {
+          rows.forEach(r => {
+            r._valueLabel.textContent = formatVarValue(r._spec, current[r._spec.nom]) +
+              (r._spec.unite ? ' ' + r._spec.unite : '');
+          });
+          let res;
+          try { res = params.compute(current); }
+          catch (e) { res = { tex: initialTex, note: 'Erreur de calcul' }; }
+          if (typeof res === 'string') res = { tex: res };
+          if (res && res.tex) renderTex(res.tex);
+          if (res && res.note) { noteEl.textContent = res.note; noteEl.style.display = ''; }
+          else { noteEl.textContent = ''; noteEl.style.display = 'none'; }
+        }
+        wrap.appendChild(controlsWrap);
+        wrap.appendChild(noteEl);
+        recompute();
+      }
+
       if (params.legende) {
         wrap.appendChild(el('div', { class: 'w-equation-legend' }, params.legende));
       }
       return wrap;
+    },
+
+    /* ----- TableauComparatif -----
+       Comparaison tabulaire n × m. Colonnes typées (text/number), tri
+       au clic sur l'en-tête, surlignage automatique des extrêmes
+       (max et min) pour les colonnes numériques.
+       params = {
+         colonnes: [
+           { id: 'nom', label: 'Empire', type: 'text' },
+           { id: 'surface', label: 'Surface', unite: 'M km²', type: 'number' }
+         ],
+         lignes: [
+           { nom: 'Empire mongol', surface: 24 },
+           { nom: 'Empire romain', surface: 5 }
+         ],
+         surlignageExtremes: true   // optionnel, défaut true
+       }
+    */
+    TableauComparatif(params) {
+      const colonnes = Array.isArray(params.colonnes) ? params.colonnes : [];
+      const lignes = Array.isArray(params.lignes) ? params.lignes : [];
+      const surligner = params.surlignageExtremes !== false;
+      let sortCol = null;
+      let sortDir = 1; // 1 = asc, -1 = desc
+
+      // Pré-calcul des min/max par colonne numérique pour le surlignage
+      const extremes = {};
+      colonnes.forEach(c => {
+        if (c.type !== 'number') return;
+        const vals = lignes.map(l => l[c.id]).filter(v => typeof v === 'number' && isFinite(v));
+        if (vals.length === 0) return;
+        extremes[c.id] = { min: Math.min(...vals), max: Math.max(...vals) };
+      });
+
+      function formatCell(c, v) {
+        if (v == null) return '—';
+        if (c.type === 'number' && typeof v === 'number') {
+          const fmt = Math.abs(v) >= 1000
+            ? v.toLocaleString('fr-FR').replace(/,/g, ' ')
+            : String(v).replace('.', ',');
+          return fmt + (c.unite ? ' ' + c.unite : '');
+        }
+        return String(v);
+      }
+
+      const wrapTable = el('div', { class: 'w-tableau-wrap' });
+      const table = el('table', { class: 'w-tableau' });
+      const thead = el('thead');
+      const headRow = el('tr');
+      colonnes.forEach(c => {
+        const th = el('th', {
+          class: 'w-tableau-th' + (c.type === 'number' ? ' is-num' : ''),
+          'data-col': c.id
+        });
+        const labelText = c.label || c.id;
+        const labelSpan = el('span', { class: 'w-tableau-th-label' }, labelText);
+        const arrow = el('span', { class: 'w-tableau-th-arrow' }, '');
+        th.appendChild(labelSpan);
+        th.appendChild(arrow);
+        if (c.unite) th.appendChild(el('span', { class: 'w-tableau-th-unite' }, c.unite));
+        th.addEventListener('click', () => {
+          if (sortCol === c.id) { sortDir = -sortDir; }
+          else { sortCol = c.id; sortDir = c.type === 'number' ? -1 : 1; }
+          renderBody();
+        });
+        headRow.appendChild(th);
+      });
+      thead.appendChild(headRow);
+      const tbody = el('tbody');
+
+      function renderBody() {
+        clear(tbody);
+        // Met à jour les flèches de tri
+        Array.from(headRow.children).forEach(th => {
+          const colId = th.getAttribute('data-col');
+          const arrow = th.querySelector('.w-tableau-th-arrow');
+          if (!arrow) return;
+          if (colId === sortCol) {
+            arrow.textContent = sortDir > 0 ? ' ↑' : ' ↓';
+            th.classList.add('is-sorted');
+          } else {
+            arrow.textContent = '';
+            th.classList.remove('is-sorted');
+          }
+        });
+        const sorted = lignes.slice();
+        if (sortCol) {
+          const col = colonnes.find(c => c.id === sortCol);
+          sorted.sort((a, b) => {
+            const va = a[sortCol], vb = b[sortCol];
+            if (va == null && vb == null) return 0;
+            if (va == null) return 1;
+            if (vb == null) return -1;
+            if (col && col.type === 'number') return (va - vb) * sortDir;
+            return String(va).localeCompare(String(vb), 'fr') * sortDir;
+          });
+        }
+        sorted.forEach(ligne => {
+          const tr = el('tr');
+          colonnes.forEach(c => {
+            const v = ligne[c.id];
+            const td = el('td', { class: c.type === 'number' ? 'is-num' : '' });
+            if (surligner && c.type === 'number' && typeof v === 'number' && extremes[c.id]) {
+              if (v === extremes[c.id].max) td.classList.add('is-max');
+              else if (v === extremes[c.id].min) td.classList.add('is-min');
+            }
+            td.textContent = formatCell(c, v);
+            tr.appendChild(td);
+          });
+          tbody.appendChild(tr);
+        });
+      }
+      table.appendChild(thead);
+      table.appendChild(tbody);
+      wrapTable.appendChild(table);
+      renderBody();
+      return wrapTable;
     },
 
     /* ----- SchemaAnnote (image avec hotspots cliquables) -----
@@ -7133,6 +7472,20 @@
           params.methodes.forEach(m => {
             if (!m) return;
             const t = [m.titre, m.description].filter(Boolean).map(searchStripMarkdown).join(' — ');
+            if (t) entries.push({ sujetId: id, sujetTitle: cleanTitle, domain, kind: 'block-content', text: t, blockIdx: i, weight: 5 });
+          });
+        }
+        // Widget TableauComparatif : indexe chaque ligne en concaténant
+        // les valeurs textuelles des cellules pour permettre la recherche
+        // sur les entités tabulées.
+        if (Array.isArray(params.lignes) && Array.isArray(params.colonnes)) {
+          params.lignes.forEach(ligne => {
+            if (!ligne) return;
+            const t = params.colonnes
+              .map(c => ligne[c.id])
+              .filter(v => v != null && v !== '')
+              .map(v => String(v))
+              .join(' — ');
             if (t) entries.push({ sujetId: id, sujetTitle: cleanTitle, domain, kind: 'block-content', text: t, blockIdx: i, weight: 5 });
           });
         }
