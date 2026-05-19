@@ -1208,6 +1208,213 @@ input[type="range"].w-range::-moz-range-thumb {
 .w-frise-desc p:last-child { margin-bottom: 0; }
 .w-frise-desc em.term { color: var(--accent); }
 
+/* ============================================================
+   WIDGET GrilleCartes — mode RETOURNABLE
+   ============================================================
+   Les cartes avec une description deviennent flippables :
+   face avant = tag + titre, face arrière = description.
+   Pas de description = mode statique (compatibilité ascendante). */
+
+.w-grid-card-flip {
+  perspective: 1000px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  color: inherit;
+  min-height: 200px;
+  position: relative;
+}
+.w-grid-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  transition: transform 0.55s cubic-bezier(0.4, 0.2, 0.2, 1);
+  transform-style: preserve-3d;
+}
+.w-grid-card-flip.is-flipped .w-grid-card-inner {
+  transform: rotateY(180deg);
+}
+.w-grid-card-face {
+  position: absolute;
+  inset: 0;
+  background: var(--bg-deep);
+  border: 1px solid var(--line-strong);
+  padding: 1.3rem;
+  border-radius: var(--r);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transition: border-color 0.2s;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.w-grid-card-flip:hover .w-grid-card-face { border-color: var(--accent); }
+.w-grid-card-back { transform: rotateY(180deg); }
+.w-grid-card-back .w-grid-card-desc {
+  flex: 1;
+  overflow-y: auto;
+  color: var(--text-soft);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+.w-grid-card-back .w-grid-card-desc p { margin: 0 0 0.5em; }
+.w-grid-card-back .w-grid-card-desc p:last-child { margin-bottom: 0; }
+.w-grid-card-hint {
+  position: absolute;
+  bottom: 0.7rem;
+  right: 1rem;
+  font-size: 0.72rem;
+  font-style: italic;
+  color: var(--text-faint);
+  letter-spacing: 0.02em;
+}
+.w-grid-card-hint::after { content: ' ↻'; }
+.w-grid-card-flip:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: var(--r);
+}
+
+/* ============================================================
+   WIDGET ListeMethodes — mode ACCORDÉON
+   ============================================================
+   Une seule étape dépliée à la fois. Première ouverte par défaut.
+   Trick `grid-template-rows: 0fr ↔ 1fr` pour une animation propre. */
+
+.w-methods-acc {
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  overflow: hidden;
+  margin: 1.2rem 0;
+  background: var(--bg-card);
+}
+.w-method-acc {
+  border-bottom: 1px solid var(--line);
+}
+.w-method-acc:last-child { border-bottom: none; }
+.w-method-acc-head {
+  display: grid;
+  grid-template-columns: 50px 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  padding: 1rem 1.2rem;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  font-size: 1rem;
+  transition: background 0.18s;
+}
+.w-method-acc-head:hover { background: var(--accent-soft); }
+.w-method-acc.is-open .w-method-acc-head {
+  background: color-mix(in oklab, var(--accent) 8%, transparent);
+}
+.w-method-acc-num {
+  font-family: var(--f-display);
+  font-style: italic;
+  font-size: 1.6rem;
+  color: var(--accent);
+  line-height: 1;
+}
+.w-method-acc-titre {
+  font-family: var(--f-display);
+  font-weight: 500;
+  font-size: 1.08rem;
+  color: var(--text);
+}
+.w-method-acc-chevron {
+  font-family: var(--f-display);
+  font-size: 1.4rem;
+  color: var(--accent);
+  transition: transform 0.28s ease;
+  line-height: 1;
+}
+.w-method-acc.is-open .w-method-acc-chevron {
+  transform: rotate(45deg); /* + se transforme en × */
+}
+.w-method-acc-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s ease;
+}
+.w-method-acc.is-open .w-method-acc-body {
+  grid-template-rows: 1fr;
+}
+.w-method-acc-body-inner {
+  overflow: hidden;
+}
+.w-method-acc-desc {
+  padding: 0 1.2rem 1.2rem 4.5rem;
+  color: var(--text-soft);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+.w-method-acc-desc p { margin: 0 0 0.5em; }
+.w-method-acc-desc p:last-child { margin-bottom: 0; }
+.w-method-acc-head:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+/* ============================================================
+   WIDGET Frise — mode INTERACTIF
+   ============================================================
+   Tous les événements en mode compact (date + titre), un seul
+   déplié à la fois. Premier événement ouvert par défaut. */
+
+.w-frise-interactive .w-frise-item-btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+  position: relative;
+  padding: 0.4rem 0 1rem;
+  transition: opacity 0.2s;
+}
+.w-frise-interactive .w-frise-item-btn:hover .w-frise-titre {
+  color: var(--accent);
+}
+.w-frise-interactive .w-frise-item-btn .w-frise-marker {
+  transition: transform 0.25s ease, background 0.25s ease,
+              box-shadow 0.25s ease;
+}
+.w-frise-interactive .w-frise-item-btn.is-active .w-frise-marker {
+  transform: scale(1.35);
+  background: var(--accent);
+}
+.w-frise-interactive .w-frise-desc-wrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s ease, opacity 0.25s ease;
+  opacity: 0;
+  margin-top: 0;
+}
+.w-frise-interactive .w-frise-item-btn.is-active .w-frise-desc-wrap {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  margin-top: 0.4rem;
+}
+.w-frise-interactive .w-frise-desc-wrap > .w-frise-desc {
+  overflow: hidden;
+}
+.w-frise-interactive .w-frise-item-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: var(--r-sm, 6px);
+}
+
 /* Widget: Equation (KaTeX) */
 .w-equation {
   background: var(--bg-deep);

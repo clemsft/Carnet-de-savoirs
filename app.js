@@ -14,7 +14,7 @@
   // Version de l'application, bumpée automatiquement par Snapshot.bat
   // (cf. Update-Cache-Version.ps1, section APP_VERSION). Affichée en bas
   // de la sidebar pour signaler chaque mise à jour à l'utilisateur.
-  const APP_VERSION = 'v1.2';
+  const APP_VERSION = 'v1.3';
 
   // =================================================================
   // STATE
@@ -2876,37 +2876,86 @@
        params = {
          cartes: [{ tag, titre, description }, ...]
        }
+       Les cartes munies d'une `description` deviennent **retournables** :
+       face avant = tag + titre + invite à révéler, face arrière = la
+       description. Clic pour retourner. Sans description la carte reste
+       statique (compatibilité ascendante).
     */
     GrilleCartes(params) {
-      return el('div', { class: 'w-grid' },
-        ...(params.cartes || []).map(c =>
-          el('div', { class: 'w-grid-card' },
-            c.tag && el('span', { class: 'tag' }, c.tag),
-            el('h4', null, c.titre || ''),
-            el('p', null, c.description || '')
-          )
-        )
-      );
+      const cartes = params.cartes || [];
+      const grid = el('div', { class: 'w-grid' });
+      cartes.forEach(c => {
+        const hasBack = c.description && String(c.description).trim() !== '';
+        if (!hasBack) {
+          grid.appendChild(el('div', { class: 'w-grid-card w-grid-card-static' },
+            c.tag ? el('span', { class: 'tag' }, c.tag) : null,
+            el('h4', null, c.titre || '')
+          ));
+          return;
+        }
+        const card = el('button', { class: 'w-grid-card w-grid-card-flip', type: 'button' });
+        const inner = el('div', { class: 'w-grid-card-inner' });
+        const front = el('div', { class: 'w-grid-card-face w-grid-card-front' },
+          c.tag ? el('span', { class: 'tag' }, c.tag) : null,
+          el('h4', null, c.titre || ''),
+          el('span', { class: 'w-grid-card-hint' }, 'Révéler')
+        );
+        const back = el('div', { class: 'w-grid-card-face w-grid-card-back' },
+          c.tag ? el('span', { class: 'tag' }, c.tag) : null,
+          el('div', {
+            class: 'w-grid-card-desc',
+            html: md(c.description).replace(/^<p>|<\/p>$/g, '')
+          }),
+          el('span', { class: 'w-grid-card-hint' }, 'Retourner')
+        );
+        inner.appendChild(front);
+        inner.appendChild(back);
+        card.appendChild(inner);
+        card.addEventListener('click', () => card.classList.toggle('is-flipped'));
+        grid.appendChild(card);
+      });
+      return grid;
     },
 
     /* ----- ListeMethodes -----
        params = {
          methodes: [{ titre, description }, ...]
        }
+       Accordéon : une seule étape dépliée à la fois, la première par
+       défaut. Clic sur un en-tête bascule l'ouverture. Le numéro et le
+       titre restent toujours visibles ; seule la description se replie.
     */
     ListeMethodes(params) {
       const numerotation = ['i.', 'ii.', 'iii.', 'iv.', 'v.', 'vi.', 'vii.', 'viii.'];
-      return el('div', null,
-        ...(params.methodes || []).map((m, i) =>
-          el('div', { class: 'w-method' },
-            el('div', { class: 'w-method-num' }, numerotation[i] || (i + 1) + '.'),
-            el('div', { class: 'w-method-content' },
-              el('h4', null, m.titre || ''),
-              el('p', { html: md(m.description || '').replace(/^<p>|<\/p>$/g, '') })
-            )
-          )
-        )
-      );
+      const methodes = params.methodes || [];
+      const container = el('div', { class: 'w-methods-acc' });
+      const items = methodes.map((m, i) => {
+        const isOpen = i === 0;
+        const item = el('div', { class: 'w-method-acc' + (isOpen ? ' is-open' : '') });
+        const head = el('button', { class: 'w-method-acc-head', type: 'button' },
+          el('span', { class: 'w-method-acc-num' }, numerotation[i] || (i + 1) + '.'),
+          el('span', { class: 'w-method-acc-titre' }, m.titre || ''),
+          el('span', { class: 'w-method-acc-chevron', 'aria-hidden': 'true' }, '+')
+        );
+        const bodyWrap = el('div', { class: 'w-method-acc-body' });
+        const bodyInner = el('div', { class: 'w-method-acc-body-inner' });
+        bodyInner.appendChild(el('div', {
+          class: 'w-method-acc-desc',
+          html: md(m.description || '').replace(/^<p>|<\/p>$/g, '')
+        }));
+        bodyWrap.appendChild(bodyInner);
+        item.appendChild(head);
+        item.appendChild(bodyWrap);
+        head.addEventListener('click', () => {
+          const willOpen = !item.classList.contains('is-open');
+          // Ferme tous les autres, ne touche qu'à l'item cible
+          items.forEach(it => { if (it !== item) it.classList.remove('is-open'); });
+          item.classList.toggle('is-open', willOpen);
+        });
+        return item;
+      });
+      items.forEach(it => container.appendChild(it));
+      return container;
     },
 
     /* ----- Frise (timeline chronologique verticale) -----
@@ -2916,23 +2965,61 @@
            { date: '1915', titre: 'Relativité générale', description: '...' }
          ]
        }
+       Mode interactif : tous les événements compacts (date + titre), un
+       seul déplié à la fois avec sa description. Premier événement ouvert
+       par défaut. Clic ou flèches ← → pour naviguer. Plus lisible que
+       l'ancienne version "tout déployé" sur les frises de 10+ events.
     */
     Frise(params) {
       const events = params.evenements || [];
-      const wrap = el('div', { class: 'w-frise' });
-      events.forEach(ev => {
-        wrap.appendChild(el('div', { class: 'w-frise-item' },
-          el('div', { class: 'w-frise-marker' }),
-          el('div', { class: 'w-frise-content' },
-            ev.date ? el('div', { class: 'w-frise-date' }, ev.date) : null,
-            ev.titre ? el('div', { class: 'w-frise-titre' }, ev.titre) : null,
-            ev.description ? el('div', {
-              class: 'w-frise-desc',
-              html: md(ev.description).replace(/^<p>|<\/p>$/g, '')
-            }) : null
-          )
-        ));
+      const wrap = el('div', { class: 'w-frise w-frise-interactive' });
+      const items = events.map((ev, i) => {
+        const hasDesc = ev.description && String(ev.description).trim() !== '';
+        const item = el(hasDesc ? 'button' : 'div', {
+          class: 'w-frise-item' + (hasDesc ? ' w-frise-item-btn' : '') + (i === 0 && hasDesc ? ' is-active' : ''),
+          type: hasDesc ? 'button' : null
+        });
+        item.appendChild(el('div', { class: 'w-frise-marker' }));
+        const content = el('div', { class: 'w-frise-content' });
+        if (ev.date) content.appendChild(el('div', { class: 'w-frise-date' }, ev.date));
+        if (ev.titre) content.appendChild(el('div', { class: 'w-frise-titre' }, ev.titre));
+        if (hasDesc) {
+          const descWrap = el('div', { class: 'w-frise-desc-wrap' });
+          descWrap.appendChild(el('div', {
+            class: 'w-frise-desc',
+            html: md(ev.description).replace(/^<p>|<\/p>$/g, '')
+          }));
+          content.appendChild(descWrap);
+        }
+        item.appendChild(content);
+        if (hasDesc) {
+          item.addEventListener('click', () => {
+            const wasActive = item.classList.contains('is-active');
+            items.forEach(it => it.classList.remove('is-active'));
+            if (!wasActive) item.classList.add('is-active');
+          });
+        }
+        return item;
       });
+      items.forEach(it => wrap.appendChild(it));
+
+      // Navigation clavier ← → entre événements (sur l'item focusé).
+      wrap.addEventListener('keydown', (e) => {
+        if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight'
+            && e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
+        const focused = document.activeElement;
+        const buttons = items.filter(it => it.tagName === 'BUTTON');
+        const idx = buttons.indexOf(focused);
+        if (idx < 0) return;
+        e.preventDefault();
+        const dir = (e.key === 'ArrowLeft' || e.key === 'ArrowUp') ? -1 : 1;
+        const next = idx + dir;
+        if (next >= 0 && next < buttons.length) {
+          buttons[next].focus();
+          buttons[next].click();
+        }
+      });
+
       return wrap;
     },
 
