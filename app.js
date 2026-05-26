@@ -14,7 +14,7 @@
   // Version de l'application, bumpée automatiquement par Snapshot.bat
   // (cf. Update-Cache-Version.ps1, section APP_VERSION). Affichée en bas
   // de la sidebar pour signaler chaque mise à jour à l'utilisateur.
-  const APP_VERSION = 'v1.4';
+  const APP_VERSION = 'v1.5';
 
   // =================================================================
   // STATE
@@ -75,7 +75,8 @@
     search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
     parcours: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 9 6 12 12 15 18 21 18"/><circle cx="3" cy="6" r="1.5" fill="currentColor"/><circle cx="9" cy="6" r="1.5" fill="currentColor"/><circle cx="15" cy="18" r="1.5" fill="currentColor"/><circle cx="21" cy="18" r="1.5" fill="currentColor"/></svg>',
     timeline: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><circle cx="6" cy="12" r="2" fill="currentColor"/><circle cx="12" cy="12" r="2" fill="currentColor"/><circle cx="18" cy="12" r="2" fill="currentColor"/></svg>',
-    vocab: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="13" x2="13" y2="13"/></svg>'
+    vocab: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="13" x2="13" y2="13"/></svg>',
+    champion: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l3 5 6-7 6 7 3-5v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7z"/><line x1="4" y1="20" x2="20" y2="20"/></svg>'
   };
 
   // =================================================================
@@ -131,6 +132,17 @@
       if (u.dailyQuiz && u.dailyQuiz.completed && u.dailyQuiz.date) set.add(u.dailyQuiz.date);
       u.dailyQuizDates = Array.from(set);
     }
+    // 3. Initialise les structures du Mode Champion si absentes (comptes
+    //    pré-existants n'ayant jamais touché le champion).
+    if (!u.champion || typeof u.champion !== 'object') u.champion = {};
+    if (!u.champion.quatreSuite || typeof u.champion.quatreSuite !== 'object') u.champion.quatreSuite = {};
+    if (!u.champion.finale || typeof u.champion.finale !== 'object') u.champion.finale = {};
+    if (!u.champion.neufPoints || typeof u.champion.neufPoints !== 'object') {
+      u.champion.neufPoints = { wins: 0, played: 0, bestStreak: 0 };
+    }
+    if (!u.champion.faceAFace || typeof u.champion.faceAFace !== 'object') u.champion.faceAFace = {};
+    // 4. Initialise passageHighlights si absent
+    if (!u.passageHighlights || typeof u.passageHighlights !== 'object') u.passageHighlights = {};
   }
 
   function defaultUserState() {
@@ -162,6 +174,13 @@
       notes: {},         // sujetId -> markdown text
       filters: { domain: null, search: '', state: null, tag: null, difficulty: null, duration: null, sort: 'alpha' },
       highlights: {},    // sujetId -> array of block indices marqués comme importants
+      passageHighlights: {}, // sujetId -> [{ blockIdx, text, ts }] passages surlignés dans un bloc cours
+      champion: {
+        quatreSuite: {},  // sujetId -> { wins, lastSuccessTs }
+        finale: {},       // domain -> { bestScore }
+        neufPoints: { wins: 0, played: 0, bestStreak: 0 },
+        faceAFace: {}     // sujetId -> { bestScore }
+      },
       globalNotes: '',   // cahier libre transverse
       achievements: [],  // ids d'achievements débloqués
       goals: { timeMs: 30 * 60 * 1000, intensity: 10 }, // objectifs quotidiens
@@ -372,6 +391,12 @@
     }
     if (parts[0] === 'timeline') return { view: 'timeline' };
     if (parts[0] === 'vocabulaire') return { view: 'vocabulaire' };
+    if (parts[0] === 'champion') {
+      // #/champion              -> hub
+      // #/champion/{manche}     -> manche en cours (sélection ou jeu)
+      // {manche} : '4-a-la-suite' | 'finale' | '9-points' | 'face-a-face'
+      return { view: 'champion', manche: parts[1] || null };
+    }
     return { view: 'bibliotheque' };
   }
 
@@ -542,6 +567,7 @@
         navLink('parcours-liste', activeView, 'Parcours', ICONS.parcours, '/parcours'),
         navLink('vocabulaire', activeView, 'Vocabulaire', ICONS.vocab, '/vocabulaire'),
         navLink('quiz-mixte', activeView, 'Quiz mixte', ICONS.quiz, '/quiz-mixte'),
+        navLink('champion', activeView, 'Champion', ICONS.champion, '/champion'),
         navLink('notes', activeView, 'Mes notes', ICONS.notes, '/notes'),
         navLink('profil', activeView, 'Mon profil', ICONS.profile, '/profil')
       ),
@@ -1234,6 +1260,190 @@
     return arr.indexOf(blockIdx) >= 0;
   }
 
+  // ---- Helpers surlignage de passages (extraits dans un bloc cours) ----
+  // Stockage : state.user.passageHighlights[sujetId] = [{ blockIdx, text, ts }]
+  // Le texte est normalisé (espaces collapsed, trim) pour permettre la recherche
+  // dans les textNodes même si la sélection inclut des retours à la ligne.
+  function normalizePassage(text) {
+    return String(text || '').replace(/\s+/g, ' ').trim();
+  }
+  function getPassageHighlights(sujetId) {
+    const arr = (state.user.passageHighlights || {})[sujetId];
+    return Array.isArray(arr) ? arr : [];
+  }
+  function addPassageHighlight(sujetId, blockIdx, text) {
+    const cleaned = normalizePassage(text);
+    if (!cleaned || cleaned.length < 2) return false;
+    if (!state.user.passageHighlights) state.user.passageHighlights = {};
+    const arr = state.user.passageHighlights[sujetId] || [];
+    // Dédoublonnage strict
+    if (arr.some(h => h.blockIdx === blockIdx && h.text === cleaned)) return false;
+    arr.push({ blockIdx: blockIdx, text: cleaned, ts: Date.now() });
+    state.user.passageHighlights[sujetId] = arr;
+    saveUserState();
+    return true;
+  }
+  function removePassageHighlight(sujetId, blockIdx, text) {
+    const arr = getPassageHighlights(sujetId);
+    const cleaned = normalizePassage(text);
+    const i = arr.findIndex(h => h.blockIdx === blockIdx && h.text === cleaned);
+    if (i < 0) return false;
+    arr.splice(i, 1);
+    state.user.passageHighlights[sujetId] = arr;
+    saveUserState();
+    return true;
+  }
+  // Applique les surlignages sur un noeud DOM en parcourant ses textNodes.
+  // Wrappe chaque occurrence dans <mark class="passage-mark"> ; tri par
+  // longueur décroissante pour matcher d'abord les longs passages (sinon
+  // un fragment court fragmenterait un long passage).
+  function applyPassageHighlights(node, sujetId, blockIdx) {
+    const highlights = getPassageHighlights(sujetId).filter(h => h.blockIdx === blockIdx);
+    if (highlights.length === 0) return;
+    highlights.sort((a, b) => b.text.length - a.text.length);
+    highlights.forEach(h => wrapTextInNode(node, h.text));
+  }
+  // Crée (à la demande) le popup global réutilisé entre toutes les sélections.
+  let _passagePopup = null;
+  function ensurePassagePopup() {
+    if (_passagePopup) return _passagePopup;
+    _passagePopup = document.createElement('div');
+    _passagePopup.className = 'passage-popup';
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'passage-popup-btn';
+    btn.innerHTML = '<span class="passage-popup-icon">✎</span> Surligner';
+    _passagePopup.appendChild(btn);
+    document.body.appendChild(_passagePopup);
+    return _passagePopup;
+  }
+  function hidePassagePopup() {
+    if (_passagePopup) _passagePopup.classList.remove('is-visible');
+  }
+  // Configure un conteneur de cours pour détecter les sélections et proposer
+  // un bouton "Surligner" flottant. Une seule fonction de cleanup est gardée
+  // par sujet (cleanup automatique au prochain rerender via DOM replacement).
+  function setupPassageSelection(container, sujetId) {
+    const popup = ensurePassagePopup();
+    const btn = popup.querySelector('.passage-popup-btn');
+
+    let currentSelection = null; // { blockIdx, text }
+
+    function placePopupNearRect(rect) {
+      const popH = 36;
+      const top = window.scrollY + rect.top - popH - 8;
+      const left = window.scrollX + rect.left + (rect.width / 2);
+      popup.style.top = Math.max(8, top) + 'px';
+      popup.style.left = left + 'px';
+      popup.style.transform = 'translateX(-50%)';
+    }
+
+    function onSelectionEnd() {
+      const sel = window.getSelection();
+      if (!sel || sel.rangeCount === 0 || sel.isCollapsed) { hidePassagePopup(); return; }
+      const text = sel.toString();
+      if (!text || text.trim().length < 2) { hidePassagePopup(); return; }
+      const range = sel.getRangeAt(0);
+      // Vérifie que la sélection est entièrement dans un seul .course-block du container
+      const startNode = range.startContainer.nodeType === 3 ? range.startContainer.parentNode : range.startContainer;
+      const endNode = range.endContainer.nodeType === 3 ? range.endContainer.parentNode : range.endContainer;
+      const startBlock = startNode && startNode.closest ? startNode.closest('[data-block-idx]') : null;
+      const endBlock = endNode && endNode.closest ? endNode.closest('[data-block-idx]') : null;
+      if (!startBlock || startBlock !== endBlock) { hidePassagePopup(); return; }
+      if (!container.contains(startBlock)) { hidePassagePopup(); return; }
+      const blockIdx = parseInt(startBlock.dataset.blockIdx, 10);
+      currentSelection = { blockIdx: blockIdx, text: text };
+      const rect = range.getBoundingClientRect();
+      if (!rect || (rect.width === 0 && rect.height === 0)) { hidePassagePopup(); return; }
+      placePopupNearRect(rect);
+      popup.classList.add('is-visible');
+    }
+
+    // mouseup couvre la sélection souris ; selectionchange est secondaire
+    // (utile clavier mais on évite le bruit en attendant un petit délai)
+    container.addEventListener('mouseup', () => setTimeout(onSelectionEnd, 10));
+    container.addEventListener('keyup', (e) => {
+      if (e.shiftKey || ['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End'].indexOf(e.key) >= 0) {
+        setTimeout(onSelectionEnd, 10);
+      }
+    });
+
+    // Click ailleurs = ferme le popup
+    document.addEventListener('mousedown', (e) => {
+      if (popup.contains(e.target)) return;
+      hidePassagePopup();
+    });
+
+    // Clic sur le bouton = enregistre le surlignage
+    btn.onclick = (e) => {
+      e.preventDefault();
+      if (!currentSelection) { hidePassagePopup(); return; }
+      const ok = addPassageHighlight(sujetId, currentSelection.blockIdx, currentSelection.text);
+      hidePassagePopup();
+      // Désélectionne pour éviter de re-déclencher au prochain mouseup
+      const sel = window.getSelection();
+      if (sel) sel.removeAllRanges();
+      if (ok) rerender();
+    };
+  }
+
+  function wrapTextInNode(root, needle) {
+    if (!needle || !root) return;
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: (n) => {
+        // Skip si déjà à l'intérieur d'un mark.passage-mark ou d'un bouton
+        let p = n.parentNode;
+        while (p && p !== root) {
+          if (p.classList && (p.classList.contains('passage-mark') || p.tagName === 'BUTTON' || p.classList.contains('block-highlight-btn'))) {
+            return NodeFilter.FILTER_REJECT;
+          }
+          p = p.parentNode;
+        }
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    const toProcess = [];
+    let n;
+    while ((n = walker.nextNode())) toProcess.push(n);
+    toProcess.forEach(textNode => {
+      const txt = textNode.nodeValue;
+      // Recherche tolérante : on normalise les whitespaces dans le textNode
+      // pour matcher même si l'utilisateur a sélectionné à travers un \n.
+      const normalizedTxt = txt.replace(/\s+/g, ' ');
+      const idx = normalizedTxt.indexOf(needle);
+      if (idx === -1) return;
+      // Trouve les bornes correspondantes dans le texte brut original
+      // (les longueurs peuvent différer si \n ont été collapsed)
+      let realStart = -1, realEnd = -1, normPos = 0;
+      for (let i = 0; i < txt.length; i++) {
+        if (normPos === idx && realStart === -1) realStart = i;
+        if (normPos === idx + needle.length) { realEnd = i; break; }
+        // chaque run de whitespace compte pour 1 dans normalizedTxt
+        if (/\s/.test(txt[i])) {
+          // si début de run ou char isolé : avance normPos
+          if (i === 0 || !/\s/.test(txt[i - 1])) normPos++;
+        } else {
+          normPos++;
+        }
+      }
+      if (realStart === -1) return;
+      if (realEnd === -1) realEnd = txt.length;
+      const before = txt.slice(0, realStart);
+      const middle = txt.slice(realStart, realEnd);
+      const after = txt.slice(realEnd);
+      const mark = document.createElement('mark');
+      mark.className = 'passage-mark';
+      mark.title = 'Cliquer pour retirer ce surlignage';
+      mark.dataset.phText = needle;
+      mark.textContent = middle;
+      const parent = textNode.parentNode;
+      if (before) parent.insertBefore(document.createTextNode(before), textNode);
+      parent.insertBefore(mark, textNode);
+      if (after) parent.insertBefore(document.createTextNode(after), textNode);
+      parent.removeChild(textNode);
+    });
+  }
+
   // État de lecture d'un sujet pour le filtre par état :
   //   'non-lu'   = jamais ouvert
   //   'en-cours' = ouvert, mais courseProgress < 100
@@ -1729,7 +1939,42 @@
         return n >= 10;
       } },
     { id: 'centenaire',     label: 'Cent jours',          desc: '100 jours d\'activité distincts dans le carnet.',
-      check: () => Object.keys(state.user.dailyActivity || {}).length >= 100 }
+      check: () => Object.keys(state.user.dailyActivity || {}).length >= 100 },
+    // ---- Achievements Mode Champion ----
+    { id: 'champion-4',     label: 'Premier sacre',       desc: 'Gagner ta première manche "4 à la suite".',
+      check: () => {
+        const q = ((state.user.champion || {}).quatreSuite) || {};
+        return Object.values(q).some(x => (x && x.wins) > 0);
+      } },
+    { id: 'champion-finale', label: 'Finaliste',          desc: 'Atteindre 10 pts en "Finale 1 minute" sur n\'importe quel domaine.',
+      check: () => {
+        const f = ((state.user.champion || {}).finale) || {};
+        return Object.values(f).some(x => (x && x.bestScore) >= 10);
+      } },
+    { id: 'champion-9pts',  label: '9 points gagnants',   desc: 'Gagner une partie "9 points gagnants".',
+      check: () => (((state.user.champion || {}).neufPoints) || {}).wins >= 1 },
+    { id: 'champion-face',  label: 'Doublé',              desc: 'Battre ton propre record sur un face-à-face (12/12 ou n\'importe quel score > précédent).',
+      check: () => {
+        const f = ((state.user.champion || {}).faceAFace) || {};
+        return Object.values(f).some(x => (x && x.bestScore) >= 8);
+      } },
+    { id: 'champion-grand-chelem', label: 'Grand chelem', desc: 'Avoir gagné au moins une fois dans chacune des 4 manches du Mode Champion.',
+      check: () => {
+        const c = state.user.champion || {};
+        const hasQ = Object.values(c.quatreSuite || {}).some(x => (x && x.wins) > 0);
+        const hasF = Object.values(c.finale || {}).some(x => (x && x.bestScore) >= 5);
+        const has9 = ((c.neufPoints || {}).wins || 0) >= 1;
+        const hasFace = Object.values(c.faceAFace || {}).some(x => (x && x.bestScore) >= 6);
+        return hasQ && hasF && has9 && hasFace;
+      } },
+    // ---- Achievement Surlignages ----
+    { id: 'surligneur',     label: 'Surligneur',          desc: 'Surligner 10 passages de cours.',
+      check: () => {
+        const ph = state.user.passageHighlights || {};
+        let n = 0;
+        Object.values(ph).forEach(arr => { if (Array.isArray(arr)) n += arr.length; });
+        return n >= 10;
+      } }
   ];
 
   function checkAchievements() {
@@ -2447,6 +2692,7 @@
       }
       if (node) {
         node.dataset.blockIdx = String(i);
+        node.id = 'bloc-' + i; // Permet aux liens #bloc-N (depuis la page Notes) de scroller au bon endroit
         // Bouton de surlignage (étoile) — visible au survol ou si déjà actif
         const isHl = isBlockHighlighted(sujet.meta.id, i);
         if (isHl) node.classList.add('block-highlighted');
@@ -2464,6 +2710,29 @@
         node.appendChild(hlBtn);
         blocksHost.appendChild(node);
         blockNodes.push(node);
+        // Restitution des passages déjà surlignés (granularité texte)
+        try { applyPassageHighlights(node, sujet.meta.id, i); } catch (e) { console.warn('passage highlight', e); }
+      }
+    });
+
+    // --- Surlignage de passages : sélection → popup "Surligner" ---
+    // Écoute la sélection à l'intérieur de blocksHost. Quand l'utilisateur
+    // sélectionne du texte qui touche un .course-block, on affiche un mini
+    // bouton flottant près de la sélection. Le clic enregistre le passage.
+    setupPassageSelection(blocksHost, sujet.meta.id);
+    // Toggle au clic sur un passage déjà surligné
+    blocksHost.addEventListener('click', (e) => {
+      const mk = e.target.closest('.passage-mark');
+      if (!mk) return;
+      // Si l'utilisateur est en train de sélectionner du texte, ne pas toggler
+      const sel = window.getSelection();
+      if (sel && sel.toString().length > 0) return;
+      const block = mk.closest('[data-block-idx]');
+      if (!block) return;
+      const blockIdx = parseInt(block.dataset.blockIdx, 10);
+      const txt = mk.dataset.phText;
+      if (removePassageHighlight(sujet.meta.id, blockIdx, txt)) {
+        rerender();
       }
     });
 
@@ -3520,9 +3789,19 @@
   }
 
   function renderQuizQuestion(quizCard, sujet) {
+    // Préserve la position de scroll : pendant le clear(), le quizCard
+    // devient temporairement vide (hauteur 0), ce qui peut faire scroller
+    // la page vers le haut. On capture avant et on restaure après le rebuild.
+    const _savedScrollY = window.scrollY;
     clear(quizCard);
     const sess = state.quizSession;
     if (!sess) return;
+    // Restaure le scroll après que le DOM est reconstruit (microtask)
+    Promise.resolve().then(() => {
+      if (window.scrollY !== _savedScrollY) {
+        window.scrollTo({ top: _savedScrollY, behavior: 'instant' });
+      }
+    });
 
     if (sess.currentQ >= sess.questions.length) {
       if (sess.isMixed) renderMixedQuizFinal(quizCard);
@@ -6186,6 +6465,77 @@
       sec.appendChild(list);
       main.appendChild(sec);
     }
+
+    // ---- Section "Passages surlignés" ----
+    // state.user.passageHighlights[sujetId] = [{ blockIdx, text, ts }]
+    // Liste tous les extraits surlignés dans les cours, groupés par sujet.
+    // Cliquer sur un passage rouvre le sujet directement sur le bloc concerné.
+    const allPassageEntries = Object.entries(state.user.passageHighlights || {})
+      .filter(([id, arr]) => Array.isArray(arr) && arr.length > 0 && state.sujets[id]);
+
+    if (allPassageEntries.length > 0) {
+      const totalPassages = allPassageEntries.reduce((sum, [, arr]) => sum + arr.length, 0);
+      const sec2 = el('section', { class: 'profil-section notes-passages' });
+      sec2.appendChild(el('h3', { style: { fontStyle: 'italic', fontWeight: 400 } },
+        'Passages surlignés (' + totalPassages + ')'));
+      sec2.appendChild(el('p', { class: 'sr-section-sub' },
+        'Extraits de cours que tu as surlignés en sélectionnant le texte. Cliquer pour rouvrir le sujet sur le bloc concerné. La croix retire le surlignage.'));
+      const list2 = el('div', { class: 'passages-list' });
+      allPassageEntries
+        .sort(([a], [b]) => {
+          const ta = String(state.sujets[a].meta.titre).replace(/<[^>]+>/g, '');
+          const tb = String(state.sujets[b].meta.titre).replace(/<[^>]+>/g, '');
+          return ta.localeCompare(tb);
+        })
+        .forEach(([id, arr]) => {
+          const sujet = state.sujets[id];
+          const dom = (sujet.meta.domaines || ['Autre'])[0];
+          const c = domainColor(dom);
+          const groupe = el('div', { class: 'passages-group' });
+          groupe.style.setProperty('--card-accent', c);
+          groupe.appendChild(el('div', { class: 'passages-group-head' },
+            el('span', { class: 'passages-group-domain' }, dom),
+            el('a', {
+              class: 'passages-group-title',
+              href: '#/sujet/' + encodeURIComponent(id) + '/cours',
+              html: htmlEscapeButKeepEm(sujet.meta.titre)
+            })
+          ));
+          arr.slice().sort((x, y) => x.blockIdx - y.blockIdx).forEach(h => {
+            const item = el('div', { class: 'passage-item' });
+            const link = el('a', {
+              class: 'passage-link',
+              href: '#/sujet/' + encodeURIComponent(id) + '/cours',
+              title: 'Aller au bloc ' + (h.blockIdx + 1),
+              onclick: () => {
+                // Après navigation, scroll vers le bloc concerné. parseHash
+                // ignore l'ancre, donc on défile manuellement après rerender.
+                setTimeout(() => {
+                  const target = document.getElementById('bloc-' + h.blockIdx);
+                  if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+              }
+            }, '« ' + h.text + ' »');
+            const removeBtn = el('button', {
+              class: 'passage-remove',
+              type: 'button',
+              title: 'Retirer ce surlignage',
+              onclick: (ev) => {
+                ev.preventDefault();
+                ev.stopPropagation();
+                removePassageHighlight(id, h.blockIdx, h.text);
+                rerender();
+              }
+            }, '×');
+            item.appendChild(link);
+            item.appendChild(removeBtn);
+            groupe.appendChild(item);
+          });
+          list2.appendChild(groupe);
+        });
+      sec2.appendChild(list2);
+      main.appendChild(sec2);
+    }
   }
 
   // Mini calendrier du mois courant — zoom détaillé sur la heatmap
@@ -6767,8 +7117,17 @@
   // RENDER PRINCIPAL
   // =================================================================
 
+  // Trace du dernier hash rendu : permet de distinguer une vraie navigation
+  // (hash modifié) d'un simple rerender intra-vue (ex: passage à la question
+  // suivante dans un quiz). Dans le second cas, on préserve la position de
+  // scroll pour éviter de reperdre la zone du quiz à chaque clic.
+  let _lastRenderedHash = null;
+
   function rerender() {
     const route = parseHash();
+    const currentHash = location.hash;
+    const isNavigation = (_lastRenderedHash !== currentHash);
+    const preservedScroll = isNavigation ? 0 : window.scrollY;
     const main = renderShell(route.view);
 
     // Timer de session : démarre/maintient sur une fiche sujet, stoppe ailleurs
@@ -6798,6 +7157,9 @@
       renderTimelineGlobale(main);
     } else if (route.view === 'vocabulaire') {
       renderVocabulaire(main);
+    } else if (route.view === 'champion') {
+      setAccent(null);
+      renderChampion(main, route.manche);
     } else {
       setAccent(null);
       renderBibliotheque(main);
@@ -6808,8 +7170,15 @@
     const inReadingCours = route.view === 'sujet' && route.tab === 'cours' && !!state.user.readingMode;
     document.body.classList.toggle('reading-mode', inReadingCours);
 
-    // Reset scroll
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    // Scroll : remise à zéro uniquement sur navigation réelle (changement
+    // de hash). Sur un rerender intra-vue (quiz qui avance, accordion, etc.)
+    // on restaure la position précédente pour ne pas casser la lecture.
+    if (isNavigation) {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    } else {
+      window.scrollTo({ top: preservedScroll, behavior: 'instant' });
+    }
+    _lastRenderedHash = currentHash;
   }
 
   window.addEventListener('hashchange', rerender);
@@ -9054,6 +9423,7 @@
         return;
       }
 
+
       // Les autres raccourcis sont désactivés quand on tape dans un champ
       if (isFormField) return;
 
@@ -9089,6 +9459,833 @@
         return;
       }
     });
+  }
+
+
+  // =================================================================
+  // MODE CHAMPION — adaptation solo du jeu télévisé "Questions pour
+  // un Champion" (France 3). 4 manches au choix :
+  //  - "4 à la suite"   : 4 questions d'un sujet, chrono dégressif,
+  //                       aucune erreur permise. Succès = badge.
+  //  - "Finale 1 min"   : max de bonnes réponses en 60 s sur un
+  //                       domaine. -1 par erreur.
+  //  - "9 points gagnants": questions tirées de tous tes sujets
+  //                       visités, +1/-1, premier à 9 (gagné) ou -3
+  //                       (perdu).
+  //  - "Face-à-face"    : 12 questions sur un sujet, jouées contre
+  //                       ton meilleur score précédent (fantôme).
+  // =================================================================
+
+  // ---- État de session (en RAM, non persistant) ----
+  // state.championSession = {
+  //   manche: '4-a-la-suite' | 'finale' | '9-points' | 'face-a-face',
+  //   phase: 'select' | 'play' | 'result',
+  //   ... params spécifiques à la manche
+  // }
+
+  // ---- Helpers d'accès aux records ----
+  function getChampion() {
+    if (!state.user.champion) state.user.champion = {
+      quatreSuite: {}, finale: {},
+      neufPoints: { wins: 0, played: 0, bestStreak: 0 },
+      faceAFace: {}
+    };
+    return state.user.champion;
+  }
+  function recordQuatreSuiteWin(sujetId) {
+    const c = getChampion();
+    if (!c.quatreSuite[sujetId]) c.quatreSuite[sujetId] = { wins: 0, lastSuccessTs: 0 };
+    c.quatreSuite[sujetId].wins++;
+    c.quatreSuite[sujetId].lastSuccessTs = Date.now();
+    saveUserState();
+    checkAchievements();
+  }
+  function recordFinaleScore(dom, score) {
+    const c = getChampion();
+    const prev = (c.finale[dom] && c.finale[dom].bestScore) || 0;
+    if (score > prev) c.finale[dom] = { bestScore: score, ts: Date.now() };
+    saveUserState();
+    checkAchievements();
+  }
+  function recordNeufPointsResult(won, streak) {
+    const c = getChampion();
+    c.neufPoints.played++;
+    if (won) c.neufPoints.wins++;
+    if (streak > (c.neufPoints.bestStreak || 0)) c.neufPoints.bestStreak = streak;
+    saveUserState();
+    checkAchievements();
+  }
+  function recordFaceAFaceScore(sujetId, score) {
+    const c = getChampion();
+    const prev = (c.faceAFace[sujetId] && c.faceAFace[sujetId].bestScore) || 0;
+    if (score > prev) c.faceAFace[sujetId] = { bestScore: score, ts: Date.now() };
+    saveUserState();
+    checkAchievements();
+  }
+
+  // ---- Helpers de pool de questions ----
+  // Sélectionne k questions aléatoires d'un sujet (ou moins si pas assez).
+  function pickQuizFromSujet(sujet, k) {
+    if (!sujet || !Array.isArray(sujet.quiz) || sujet.quiz.length === 0) return [];
+    const pool = sujet.quiz.slice();
+    shuffleInPlace(pool);
+    const out = pool.slice(0, Math.min(k, pool.length));
+    return out.map((q, i) => Object.assign({}, q, {
+      _sujet: { id: sujet.meta.id, titre: sujet.meta.titre },
+      _qIdx: sujet.quiz.indexOf(q)
+    }));
+  }
+  // Pool global : tous sujets visités (ou tous si paramétré)
+  function buildGlobalQuestionPool(opts) {
+    opts = opts || {};
+    const onlyVisited = opts.onlyVisited !== false;
+    const domain = opts.domain || null;
+    const list = [];
+    Object.values(state.sujets || {}).forEach(sujet => {
+      if (!sujet || !Array.isArray(sujet.quiz)) return;
+      if (onlyVisited) {
+        const p = state.user.progress[sujet.meta.id];
+        if (!p || !p.visited) return;
+      }
+      if (domain) {
+        const doms = sujet.meta.domaines || [];
+        if (doms.indexOf(domain) === -1) return;
+      }
+      sujet.quiz.forEach((q, i) => {
+        list.push(Object.assign({}, q, {
+          _sujet: { id: sujet.meta.id, titre: sujet.meta.titre },
+          _qIdx: i
+        }));
+      });
+    });
+    shuffleInPlace(list);
+    return list;
+  }
+  function shuffleInPlace(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+    }
+    return arr;
+  }
+  function listAllDomains() {
+    const set = new Set();
+    Object.values(state.sujets || {}).forEach(s => {
+      (s.meta.domaines || []).forEach(d => set.add(d));
+    });
+    return Array.from(set).sort();
+  }
+  function listVisitedSujets() {
+    return Object.values(state.sujets || {})
+      .filter(s => {
+        const p = state.user.progress[s.meta.id];
+        return p && p.visited && Array.isArray(s.quiz) && s.quiz.length > 0;
+      })
+      .sort((a, b) => String(a.meta.titre).localeCompare(String(b.meta.titre)));
+  }
+
+  // -----------------------------------------------------------------
+  // RENDER PRINCIPAL DU MODE CHAMPION
+  // -----------------------------------------------------------------
+  function renderChampion(main, mancheParam) {
+    // Si une session est active, on rend sa phase courante.
+    const sess = state.championSession;
+    if (sess && sess.manche) {
+      if (sess.phase === 'play')   return renderChampionPlay(main);
+      if (sess.phase === 'result') return renderChampionResult(main);
+      // 'select' tombe dans le hub spécifique de la manche
+      if (sess.manche === '4-a-la-suite') return renderManche4Select(main);
+      if (sess.manche === 'finale')       return renderMancheFinaleSelect(main);
+      if (sess.manche === '9-points')     return renderManche9Select(main);
+      if (sess.manche === 'face-a-face')  return renderMancheFaceSelect(main);
+    }
+    // Sinon : hub principal des 4 manches
+    renderChampionHub(main);
+  }
+
+  function renderChampionHub(main) {
+    main.appendChild(el('span', { class: 'eyebrow' }, 'Mode Champion'));
+    main.appendChild(el('h1', { class: 'page-title', html: '<em>Question</em> pour un Champion' }));
+    main.appendChild(el('p', { class: 'page-subtitle' },
+      'Quatre manches inspirées du jeu télévisé, adaptées en solo. Pas de répétition espacée ni de mémorisation programmée : ici, c\'est de la pure performance contre ton meilleur score (ou contre le chrono).'));
+
+    const c = getChampion();
+    const visited = listVisitedSujets();
+    const domains = listAllDomains();
+    const grid = el('div', { class: 'champion-hub-grid' });
+
+    // ---- Carte 1 : 4 à la suite ----
+    const totalWins4 = Object.values(c.quatreSuite || {}).reduce((sum, x) => sum + (x.wins || 0), 0);
+    const uniqueSujetsWon = Object.keys(c.quatreSuite || {}).filter(k => (c.quatreSuite[k].wins || 0) > 0).length;
+    grid.appendChild(renderMancheCard({
+      manche: '4-a-la-suite',
+      titre: '4 à la suite',
+      desc: 'Choisis un sujet, enchaîne 4 questions avec chrono dégressif (40s → 30s → 20s → 10s). Aucune erreur permise. Succès = tu es champion de ce sujet.',
+      stats: totalWins4 > 0
+        ? totalWins4 + ' victoire' + (totalWins4 > 1 ? 's' : '') + ' · ' + uniqueSujetsWon + ' sujet' + (uniqueSujetsWon > 1 ? 's' : '') + ' maîtrisé' + (uniqueSujetsWon > 1 ? 's' : '')
+        : 'Jamais tenté.',
+      disabled: visited.length === 0,
+      disabledMsg: 'Visite au moins un sujet avec un quiz.'
+    }));
+
+    // ---- Carte 2 : Finale 1 minute ----
+    const bestFinale = Object.entries(c.finale || {}).reduce((best, [d, v]) => {
+      if (!best || v.bestScore > best.score) return { dom: d, score: v.bestScore };
+      return best;
+    }, null);
+    grid.appendChild(renderMancheCard({
+      manche: 'finale',
+      titre: 'Finale (1 minute)',
+      desc: 'Choisis un domaine. Enchaîne un max de bonnes réponses en 60 secondes. Erreur = -1 point. Affiche ton record par domaine.',
+      stats: bestFinale
+        ? 'Record : ' + bestFinale.score + ' pt' + (bestFinale.score > 1 ? 's' : '') + ' en ' + bestFinale.dom
+        : 'Jamais tenté.',
+      disabled: domains.length === 0,
+      disabledMsg: 'Aucun domaine disponible.'
+    }));
+
+    // ---- Carte 3 : 9 points gagnants ----
+    const np = c.neufPoints || { wins: 0, played: 0, bestStreak: 0 };
+    grid.appendChild(renderMancheCard({
+      manche: '9-points',
+      titre: '9 points gagnants',
+      desc: 'Questions tirées de tous tes sujets visités. Bonne réponse = +1, mauvaise = -1. Premier à 9 ou à -3 termine la partie. Pas de chrono : prends ton temps.',
+      stats: np.played > 0
+        ? np.wins + ' victoire' + (np.wins > 1 ? 's' : '') + ' sur ' + np.played + ' partie' + (np.played > 1 ? 's' : '') + ' · meilleure série : ' + np.bestStreak
+        : 'Jamais tenté.',
+      disabled: visited.length === 0,
+      disabledMsg: 'Visite au moins un sujet avec un quiz.'
+    }));
+
+    // ---- Carte 4 : Face-à-face ----
+    const bestFace = Object.entries(c.faceAFace || {}).reduce((best, [id, v]) => {
+      if (!best || v.bestScore > best.score) return { id, score: v.bestScore };
+      return best;
+    }, null);
+    const bestFaceTitle = bestFace && state.sujets[bestFace.id]
+      ? String(state.sujets[bestFace.id].meta.titre).replace(/<[^>]+>/g, '')
+      : null;
+    grid.appendChild(renderMancheCard({
+      manche: 'face-a-face',
+      titre: 'Face-à-face',
+      desc: '12 questions sur un sujet, jouées contre ton meilleur score précédent affiché en parallèle (fantôme). Si tu bats l\'ancien record, il devient le nouveau.',
+      stats: bestFace
+        ? 'Record : ' + bestFace.score + ' / 12 sur ' + (bestFaceTitle || bestFace.id)
+        : 'Jamais tenté.',
+      disabled: visited.length === 0,
+      disabledMsg: 'Visite au moins un sujet avec un quiz.'
+    }));
+
+    main.appendChild(grid);
+  }
+
+  function renderMancheCard(opts) {
+    const card = el('div', { class: 'champion-manche-card' + (opts.disabled ? ' is-disabled' : '') });
+    card.appendChild(el('h2', null, opts.titre));
+    card.appendChild(el('p', { class: 'champion-manche-desc' }, opts.desc));
+    card.appendChild(el('div', { class: 'champion-manche-stats' }, opts.stats));
+    if (opts.disabled) {
+      card.appendChild(el('div', { class: 'champion-manche-disabled' }, opts.disabledMsg));
+    } else {
+      card.appendChild(el('button', {
+        class: 'btn',
+        onclick: () => {
+          state.championSession = { manche: opts.manche, phase: 'select' };
+          rerender();
+        }
+      }, 'Lancer cette manche →'));
+    }
+    return card;
+  }
+
+  // -----------------------------------------------------------------
+  // MANCHE 1 : 4 À LA SUITE
+  // -----------------------------------------------------------------
+  function renderManche4Select(main) {
+    main.appendChild(renderChampionBackBtn());
+    main.appendChild(el('span', { class: 'eyebrow' }, 'Mode Champion · Sélection'));
+    main.appendChild(el('h1', { class: 'page-title' }, '4 à la suite'));
+    main.appendChild(el('p', { class: 'page-subtitle' },
+      'Choisis le sujet sur lequel tu veux te tester. 4 questions enchaînées, chrono dégressif (40s, 30s, 20s, 10s). Une seule erreur = échec.'));
+    const visited = listVisitedSujets().filter(s => s.quiz.length >= 4);
+    if (visited.length === 0) {
+      main.appendChild(el('p', { class: 'champion-empty' },
+        'Aucun sujet visité ne contient au moins 4 questions de quiz. Lis quelques sujets d\'abord.'));
+      return;
+    }
+    const list = el('div', { class: 'champion-sujet-list' });
+    const c = getChampion();
+    visited.forEach(s => {
+      const won = (c.quatreSuite[s.meta.id] && c.quatreSuite[s.meta.id].wins) || 0;
+      const dom = (s.meta.domaines || ['Autre'])[0];
+      const color = domainColor(dom);
+      const card = el('button', {
+        class: 'champion-sujet-card' + (won > 0 ? ' is-won' : ''),
+        style: { '--card-accent': color },
+        onclick: () => start4ALaSuite(s)
+      },
+        el('span', { class: 'champion-sujet-domain' }, dom),
+        el('span', { class: 'champion-sujet-title', html: htmlEscapeButKeepEm(s.meta.titre) }),
+        el('span', { class: 'champion-sujet-stats' }, won > 0
+          ? '★ ' + won + ' victoire' + (won > 1 ? 's' : '')
+          : s.quiz.length + ' questions disponibles')
+      );
+      list.appendChild(card);
+    });
+    main.appendChild(list);
+  }
+  function start4ALaSuite(sujet) {
+    const questions = pickQuizFromSujet(sujet, 4);
+    state.championSession = {
+      manche: '4-a-la-suite',
+      phase: 'play',
+      sujetId: sujet.meta.id,
+      sujetTitre: sujet.meta.titre,
+      questions: questions,
+      currentQ: 0,
+      score: 0,
+      timers: [40, 30, 20, 10],
+      failed: false,
+      timerLeft: 40,
+      timerId: null
+    };
+    rerender();
+  }
+
+  // -----------------------------------------------------------------
+  // MANCHE 2 : FINALE 1 MINUTE
+  // -----------------------------------------------------------------
+  function renderMancheFinaleSelect(main) {
+    main.appendChild(renderChampionBackBtn());
+    main.appendChild(el('span', { class: 'eyebrow' }, 'Mode Champion · Sélection'));
+    main.appendChild(el('h1', { class: 'page-title' }, 'Finale (1 minute)'));
+    main.appendChild(el('p', { class: 'page-subtitle' },
+      'Choisis un domaine. Tu auras 60 secondes pour enchaîner un maximum de bonnes réponses. Erreur = -1 point. Pioche tirée de tous tes sujets visités du domaine.'));
+    const c = getChampion();
+    const doms = listAllDomains();
+    const list = el('div', { class: 'champion-domain-list' });
+    doms.forEach(d => {
+      const pool = buildGlobalQuestionPool({ onlyVisited: true, domain: d });
+      const best = (c.finale[d] && c.finale[d].bestScore) || 0;
+      const card = el('button', {
+        class: 'champion-domain-card' + (pool.length === 0 ? ' is-disabled' : '') + (best > 0 ? ' is-record' : ''),
+        style: { '--card-accent': domainColor(d) },
+        disabled: pool.length === 0,
+        title: pool.length === 0 ? 'Aucun sujet visité dans ce domaine.' : '',
+        onclick: () => pool.length > 0 ? startFinale(d) : null
+      },
+        el('span', { class: 'champion-domain-name' }, d),
+        el('span', { class: 'champion-domain-stats' }, pool.length === 0
+          ? 'Aucune question'
+          : pool.length + ' questions' + (best > 0 ? ' · record ' + best : ''))
+      );
+      list.appendChild(card);
+    });
+    main.appendChild(list);
+  }
+  function startFinale(dom) {
+    const pool = buildGlobalQuestionPool({ onlyVisited: true, domain: dom });
+    state.championSession = {
+      manche: 'finale',
+      phase: 'play',
+      domain: dom,
+      pool: pool,
+      currentQ: 0,
+      score: 0,
+      timeLeft: 60,
+      timerId: null,
+      finished: false
+    };
+    rerender();
+  }
+
+  // -----------------------------------------------------------------
+  // MANCHE 3 : 9 POINTS GAGNANTS
+  // -----------------------------------------------------------------
+  function renderManche9Select(main) {
+    main.appendChild(renderChampionBackBtn());
+    main.appendChild(el('span', { class: 'eyebrow' }, 'Mode Champion · Confirmation'));
+    main.appendChild(el('h1', { class: 'page-title' }, '9 points gagnants'));
+    main.appendChild(el('p', { class: 'page-subtitle' },
+      'Pioche dans tous tes sujets visités. Bonne réponse = +1, mauvaise = -1. Premier à 9 (victoire) ou à -3 (défaite) termine la partie. Aucun chrono.'));
+    const pool = buildGlobalQuestionPool({ onlyVisited: true });
+    if (pool.length < 15) {
+      main.appendChild(el('p', { class: 'champion-empty' },
+        'Il te faut au moins une quinzaine de questions disponibles (donc plusieurs sujets visités). Continue à lire et reviens !'));
+      return;
+    }
+    main.appendChild(el('p', { class: 'champion-info' },
+      pool.length + ' questions tirées de tes sujets visités sont prêtes à être tirées au sort.'));
+    const c = getChampion();
+    const np = c.neufPoints || {};
+    if (np.played > 0) {
+      main.appendChild(el('p', { class: 'champion-info' },
+        'Historique : ' + (np.wins || 0) + ' victoire' + (np.wins > 1 ? 's' : '') + ' sur ' + np.played + ' partie' + (np.played > 1 ? 's' : '') + '. Meilleure série de bonnes réponses : ' + (np.bestStreak || 0) + '.'));
+    }
+    main.appendChild(el('button', {
+      class: 'btn',
+      onclick: () => start9Points(pool)
+    }, 'Démarrer la partie →'));
+  }
+  function start9Points(pool) {
+    state.championSession = {
+      manche: '9-points',
+      phase: 'play',
+      pool: pool.slice(),
+      currentQ: 0,
+      score: 0,
+      streak: 0,
+      bestStreak: 0,
+      finished: false
+    };
+    rerender();
+  }
+
+  // -----------------------------------------------------------------
+  // MANCHE 4 : FACE-À-FACE
+  // -----------------------------------------------------------------
+  function renderMancheFaceSelect(main) {
+    main.appendChild(renderChampionBackBtn());
+    main.appendChild(el('span', { class: 'eyebrow' }, 'Mode Champion · Sélection'));
+    main.appendChild(el('h1', { class: 'page-title' }, 'Face-à-face'));
+    main.appendChild(el('p', { class: 'page-subtitle' },
+      '12 questions sur un sujet. Ton score affiché côte à côte avec ton meilleur score précédent (fantôme). À toi de battre l\'ancien record.'));
+    const visited = listVisitedSujets().filter(s => s.quiz.length >= 12);
+    if (visited.length === 0) {
+      main.appendChild(el('p', { class: 'champion-empty' },
+        'Aucun sujet visité ne contient au moins 12 questions de quiz. Lis quelques sujets riches d\'abord.'));
+      return;
+    }
+    const c = getChampion();
+    const list = el('div', { class: 'champion-sujet-list' });
+    visited.forEach(s => {
+      const best = (c.faceAFace[s.meta.id] && c.faceAFace[s.meta.id].bestScore) || 0;
+      const dom = (s.meta.domaines || ['Autre'])[0];
+      const card = el('button', {
+        class: 'champion-sujet-card' + (best > 0 ? ' is-record' : ''),
+        style: { '--card-accent': domainColor(dom) },
+        onclick: () => startFaceAFace(s)
+      },
+        el('span', { class: 'champion-sujet-domain' }, dom),
+        el('span', { class: 'champion-sujet-title', html: htmlEscapeButKeepEm(s.meta.titre) }),
+        el('span', { class: 'champion-sujet-stats' }, best > 0
+          ? 'Record : ' + best + ' / 12'
+          : 'Aucun record')
+      );
+      list.appendChild(card);
+    });
+    main.appendChild(list);
+  }
+  function startFaceAFace(sujet) {
+    const questions = pickQuizFromSujet(sujet, 12);
+    const c = getChampion();
+    const prevBest = (c.faceAFace[sujet.meta.id] && c.faceAFace[sujet.meta.id].bestScore) || 0;
+    state.championSession = {
+      manche: 'face-a-face',
+      phase: 'play',
+      sujetId: sujet.meta.id,
+      sujetTitre: sujet.meta.titre,
+      questions: questions,
+      currentQ: 0,
+      score: 0,
+      ghostScore: prevBest,
+      ghostMax: 12
+    };
+    rerender();
+  }
+
+  // -----------------------------------------------------------------
+  // PHASE PLAY — dispatch selon manche
+  // -----------------------------------------------------------------
+  function renderChampionPlay(main) {
+    const sess = state.championSession;
+    if (!sess) { renderChampionHub(main); return; }
+    main.appendChild(renderChampionBackBtn());
+
+    if (sess.manche === '4-a-la-suite') return renderPlay4ALaSuite(main, sess);
+    if (sess.manche === 'finale')       return renderPlayFinale(main, sess);
+    if (sess.manche === '9-points')     return renderPlay9Points(main, sess);
+    if (sess.manche === 'face-a-face')  return renderPlayFaceAFace(main, sess);
+  }
+
+  // ---- Helper : rend une question avec un onAnswer custom ----
+  // Réutilise les renderers existants (QCM, vrai-faux, etc.) en passant un
+  // callback uniforme. Affiche le feedback et un bouton "suivante".
+  function renderChampionQuestion(host, q, opts) {
+    const type = q.type || 'qcm';
+    const interactionHost = el('div', { class: 'quiz-interaction' });
+    if (q.q) host.appendChild(el('div', { class: 'quiz-question champion-question' }, q.q));
+    host.appendChild(interactionHost);
+    const feedback = el('div', { class: 'quiz-feedback', style: { display: 'none' } });
+    host.appendChild(feedback);
+
+    function wrappedOnAnswer(isCorrect, isTimeout) {
+      const msg = isTimeout ? 'Temps écoulé.' : (isCorrect ? 'Exact !' : 'Pas tout à fait.');
+      const explic = (q.explication ? ' ' + q.explication : '');
+      feedback.innerHTML = '<strong>' + msg + '</strong>' + explic;
+      feedback.style.display = 'block';
+      if (opts.onAnswer) opts.onAnswer(isCorrect, isTimeout);
+      // Bouton "suivante" : injecté par opts.afterFeedback si fourni
+      if (opts.afterFeedback) {
+        const wrap = el('div', { class: 'quiz-next-row' });
+        opts.afterFeedback(wrap);
+        feedback.appendChild(wrap);
+      }
+    }
+
+    if (type === 'qcm')               renderQCMQuestion(interactionHost, q, wrappedOnAnswer);
+    else if (type === 'vrai-faux')    renderVraiFauxQuestion(interactionHost, q, wrappedOnAnswer);
+    else if (type === 'ordre-chrono') renderOrdreChronoQuestion(interactionHost, q, wrappedOnAnswer);
+    else if (type === 'texte-a-trou') renderTexteATrouQuestion(interactionHost, q, wrappedOnAnswer);
+    else if (type === 'associer')     renderAssocierQuestion(interactionHost, q, wrappedOnAnswer);
+    else {
+      interactionHost.appendChild(el('p', { class: 'block-error' }, 'Type de question inconnu.'));
+      const skip = el('button', { class: 'btn', onclick: () => wrappedOnAnswer(false) }, 'Passer');
+      interactionHost.appendChild(skip);
+    }
+    return { feedback: feedback };
+  }
+
+  // ---- Manche 1 : Play 4 à la suite ----
+  function renderPlay4ALaSuite(main, sess) {
+    main.appendChild(el('span', { class: 'eyebrow' }, '4 à la suite · ' + String(sess.sujetTitre).replace(/<[^>]+>/g, '')));
+    main.appendChild(el('h1', { class: 'page-title' }, 'Question ' + (sess.currentQ + 1) + ' / 4'));
+
+    // Petit récap des résultats précédents (pastilles)
+    const dots = el('div', { class: 'champion-progress-dots' });
+    for (let i = 0; i < 4; i++) {
+      const cls = i < sess.currentQ ? 'is-ok' : (i === sess.currentQ ? 'is-current' : '');
+      dots.appendChild(el('span', { class: 'champion-dot ' + cls }));
+    }
+    main.appendChild(dots);
+
+    const card = el('div', { class: 'quiz-card champion-play-card' });
+    main.appendChild(card);
+
+    // Timer
+    const baseSecs = sess.timers[sess.currentQ];
+    sess.timerLeft = baseSecs;
+    const timerEl = el('div', { class: 'quiz-timer champion-timer' }, sess.timerLeft + ' s');
+    card.appendChild(timerEl);
+    if (sess.timerId) { clearInterval(sess.timerId); sess.timerId = null; }
+    sess.timerId = setInterval(() => {
+      sess.timerLeft--;
+      if (timerEl) timerEl.textContent = sess.timerLeft + ' s';
+      if (sess.timerLeft <= 3) timerEl.classList.add('quiz-timer-urgent');
+      if (sess.timerLeft <= 0) {
+        clearInterval(sess.timerId);
+        sess.timerId = null;
+        onAnsweredQ(false, true);
+      }
+    }, 1000);
+
+    function onAnsweredQ(isCorrect, isTimeout) {
+      if (sess.timerId) { clearInterval(sess.timerId); sess.timerId = null; }
+      if (isCorrect) sess.score++;
+      else sess.failed = true;
+    }
+
+    const q = sess.questions[sess.currentQ];
+    renderChampionQuestion(card, q, {
+      onAnswer: onAnsweredQ,
+      afterFeedback: (wrap) => {
+        if (sess.failed) {
+          // Échec immédiat
+          wrap.appendChild(el('button', {
+            class: 'btn',
+            onclick: () => {
+              state.championSession.phase = 'result';
+              rerender();
+            }
+          }, 'Voir le résultat →'));
+        } else {
+          const isLast = sess.currentQ >= 3;
+          wrap.appendChild(el('button', {
+            class: 'btn',
+            onclick: () => {
+              if (isLast) {
+                state.championSession.phase = 'result';
+              } else {
+                sess.currentQ++;
+              }
+              rerender();
+            }
+          }, isLast ? 'Voir le résultat →' : 'Question suivante →'));
+        }
+      }
+    });
+  }
+
+  // ---- Manche 2 : Play Finale 1 min ----
+  function renderPlayFinale(main, sess) {
+    main.appendChild(el('span', { class: 'eyebrow' }, 'Finale · ' + sess.domain));
+    main.appendChild(el('h1', { class: 'page-title champion-score-h1' },
+      'Score : ' + sess.score + ' pt' + (Math.abs(sess.score) > 1 ? 's' : '')));
+
+    const card = el('div', { class: 'quiz-card champion-play-card' });
+    main.appendChild(card);
+
+    // Timer global (60s pour toute la finale)
+    if (!sess.timerId) {
+      sess.timerId = setInterval(() => {
+        sess.timeLeft--;
+        const t = card.querySelector('.champion-timer');
+        if (t) t.textContent = sess.timeLeft + ' s';
+        if (sess.timeLeft <= 10 && t) t.classList.add('quiz-timer-urgent');
+        if (sess.timeLeft <= 0) {
+          clearInterval(sess.timerId);
+          sess.timerId = null;
+          sess.finished = true;
+          state.championSession.phase = 'result';
+          rerender();
+        }
+      }, 1000);
+    }
+    const timerEl = el('div', { class: 'quiz-timer champion-timer' },
+      sess.timeLeft + ' s' + (sess.timeLeft <= 10 ? '' : ''));
+    if (sess.timeLeft <= 10) timerEl.classList.add('quiz-timer-urgent');
+    card.appendChild(timerEl);
+
+    const q = sess.pool[sess.currentQ % sess.pool.length];
+    // Source indicateur (sujet d'origine)
+    if (q._sujet) {
+      card.appendChild(el('div', { class: 'champion-q-source' },
+        'Issue de : ' + String(q._sujet.titre).replace(/<[^>]+>/g, '')));
+    }
+    renderChampionQuestion(card, q, {
+      onAnswer: (ok) => {
+        sess.score += ok ? 1 : -1;
+      },
+      afterFeedback: (wrap) => {
+        wrap.appendChild(el('button', {
+          class: 'btn',
+          onclick: () => {
+            sess.currentQ++;
+            // Si on a épuisé le pool, on continue à reshuffler
+            if (sess.currentQ >= sess.pool.length) {
+              sess.pool = shuffleInPlace(sess.pool.slice());
+              sess.currentQ = 0;
+            }
+            rerender();
+          }
+        }, 'Question suivante →'));
+      }
+    });
+  }
+
+  // ---- Manche 3 : Play 9 points gagnants ----
+  function renderPlay9Points(main, sess) {
+    main.appendChild(el('span', { class: 'eyebrow' }, '9 points gagnants'));
+    main.appendChild(el('h1', { class: 'page-title champion-score-h1' },
+      'Score : ' + (sess.score >= 0 ? '+' : '') + sess.score));
+    main.appendChild(el('p', { class: 'page-subtitle' },
+      'Premier à 9 : victoire. Premier à -3 : défaite. Série en cours : ' + sess.streak + ' (record dans la partie : ' + sess.bestStreak + ').'));
+
+    // Jauge
+    const gauge = el('div', { class: 'champion-9-gauge' });
+    for (let v = -3; v <= 9; v++) {
+      const seg = el('span', { class: 'champion-9-seg' + (v === sess.score ? ' is-current' : '') }, String(v));
+      gauge.appendChild(seg);
+    }
+    main.appendChild(gauge);
+
+    const card = el('div', { class: 'quiz-card champion-play-card' });
+    main.appendChild(card);
+
+    const q = sess.pool[sess.currentQ % sess.pool.length];
+    if (q._sujet) {
+      card.appendChild(el('div', { class: 'champion-q-source' },
+        'Issue de : ' + String(q._sujet.titre).replace(/<[^>]+>/g, '')));
+    }
+    renderChampionQuestion(card, q, {
+      onAnswer: (ok) => {
+        if (ok) {
+          sess.score++;
+          sess.streak++;
+          if (sess.streak > sess.bestStreak) sess.bestStreak = sess.streak;
+        } else {
+          sess.score--;
+          sess.streak = 0;
+        }
+      },
+      afterFeedback: (wrap) => {
+        const done = sess.score >= 9 || sess.score <= -3;
+        wrap.appendChild(el('button', {
+          class: 'btn',
+          onclick: () => {
+            if (done) {
+              state.championSession.phase = 'result';
+            } else {
+              sess.currentQ++;
+              if (sess.currentQ >= sess.pool.length) {
+                sess.pool = shuffleInPlace(sess.pool.slice());
+                sess.currentQ = 0;
+              }
+            }
+            rerender();
+          }
+        }, done ? 'Voir le résultat →' : 'Question suivante →'));
+      }
+    });
+  }
+
+  // ---- Manche 4 : Play Face-à-face ----
+  function renderPlayFaceAFace(main, sess) {
+    main.appendChild(el('span', { class: 'eyebrow' }, 'Face-à-face · ' + String(sess.sujetTitre).replace(/<[^>]+>/g, '')));
+    main.appendChild(el('h1', { class: 'page-title' }, 'Question ' + (sess.currentQ + 1) + ' / 12'));
+
+    // Tableau de bord : toi vs fantôme
+    const dash = el('div', { class: 'champion-face-dashboard' });
+    dash.appendChild(el('div', { class: 'champion-face-me' },
+      el('span', { class: 'champion-face-label' }, 'Toi'),
+      el('span', { class: 'champion-face-score' }, String(sess.score))
+    ));
+    dash.appendChild(el('div', { class: 'champion-face-vs' }, 'vs'));
+    // Fantôme : projection linéaire du score précédent sur 12
+    const ghostNow = Math.round(sess.ghostScore * (sess.currentQ / 12));
+    dash.appendChild(el('div', { class: 'champion-face-ghost' },
+      el('span', { class: 'champion-face-label' }, 'Fantôme'),
+      el('span', { class: 'champion-face-score' }, String(ghostNow) + ' / ' + sess.ghostScore)
+    ));
+    main.appendChild(dash);
+
+    const card = el('div', { class: 'quiz-card champion-play-card' });
+    main.appendChild(card);
+
+    const q = sess.questions[sess.currentQ];
+    renderChampionQuestion(card, q, {
+      onAnswer: (ok) => { if (ok) sess.score++; },
+      afterFeedback: (wrap) => {
+        const isLast = sess.currentQ >= 11;
+        wrap.appendChild(el('button', {
+          class: 'btn',
+          onclick: () => {
+            if (isLast) {
+              state.championSession.phase = 'result';
+            } else {
+              sess.currentQ++;
+            }
+            rerender();
+          }
+        }, isLast ? 'Voir le résultat →' : 'Question suivante →'));
+      }
+    });
+  }
+
+  // -----------------------------------------------------------------
+  // PHASE RESULT
+  // -----------------------------------------------------------------
+  function renderChampionResult(main) {
+    const sess = state.championSession;
+    if (!sess) { renderChampionHub(main); return; }
+    main.appendChild(renderChampionBackBtn());
+
+    if (sess.manche === '4-a-la-suite') return renderResult4(main, sess);
+    if (sess.manche === 'finale')       return renderResultFinale(main, sess);
+    if (sess.manche === '9-points')     return renderResult9(main, sess);
+    if (sess.manche === 'face-a-face')  return renderResultFace(main, sess);
+  }
+
+  function renderResult4(main, sess) {
+    const success = !sess.failed && sess.score >= 4;
+    if (success) recordQuatreSuiteWin(sess.sujetId);
+    const titre = String(sess.sujetTitre).replace(/<[^>]+>/g, '');
+    main.appendChild(el('span', { class: 'eyebrow' }, '4 à la suite · ' + titre));
+    main.appendChild(el('h1', { class: 'page-title' },
+      success ? '🏆 Champion de ' + titre + ' !' : 'Manche perdue'));
+    main.appendChild(el('p', { class: 'champion-result-msg' }, success
+      ? 'Tu as enchaîné les 4 questions sans erreur, dans le temps imparti. Belle maîtrise du sujet.'
+      : 'Tu as échoué à la question ' + (sess.currentQ + 1) + ' / 4. Score final : ' + sess.score + ' / 4. Une seule chance par manche, mais tu peux retenter quand tu veux.'));
+    const wins = (getChampion().quatreSuite[sess.sujetId] && getChampion().quatreSuite[sess.sujetId].wins) || 0;
+    if (wins > 0) {
+      main.appendChild(el('p', { class: 'champion-result-stats' },
+        '★ Tu as gagné cette manche ' + wins + ' fois sur ce sujet.'));
+    }
+    main.appendChild(renderResultActions());
+  }
+
+  function renderResultFinale(main, sess) {
+    recordFinaleScore(sess.domain, Math.max(0, sess.score));
+    const prevBest = (getChampion().finale[sess.domain] && getChampion().finale[sess.domain].bestScore) || 0;
+    const isRecord = sess.score >= prevBest && sess.score > 0;
+    main.appendChild(el('span', { class: 'eyebrow' }, 'Finale · ' + sess.domain));
+    main.appendChild(el('h1', { class: 'page-title' },
+      isRecord && sess.score > 0 ? '🏆 Nouveau record !' : 'Finale terminée'));
+    main.appendChild(el('p', { class: 'champion-result-msg' },
+      'Score final : ' + sess.score + ' pt' + (Math.abs(sess.score) > 1 ? 's' : '') + ' en 60 secondes sur le domaine ' + sess.domain + '.'));
+    main.appendChild(el('p', { class: 'champion-result-stats' },
+      'Record actuel sur ce domaine : ' + Math.max(prevBest, sess.score) + ' pt' + (Math.max(prevBest, sess.score) > 1 ? 's' : '') + '.'));
+    main.appendChild(renderResultActions());
+  }
+
+  function renderResult9(main, sess) {
+    const won = sess.score >= 9;
+    recordNeufPointsResult(won, sess.bestStreak);
+    main.appendChild(el('span', { class: 'eyebrow' }, '9 points gagnants'));
+    main.appendChild(el('h1', { class: 'page-title' },
+      won ? '🏆 Victoire !' : 'Défaite'));
+    main.appendChild(el('p', { class: 'champion-result-msg' }, won
+      ? 'Tu as atteint 9 points avant -3. Belle régularité.'
+      : 'Tu es tombé à -3 points. Tu peux retenter dans la foulée.'));
+    main.appendChild(el('p', { class: 'champion-result-stats' },
+      'Score final : ' + (sess.score >= 0 ? '+' : '') + sess.score + ' · Meilleure série de la partie : ' + sess.bestStreak));
+    const np = getChampion().neufPoints;
+    main.appendChild(el('p', { class: 'champion-result-stats' },
+      'Historique cumulé : ' + np.wins + ' victoire' + (np.wins > 1 ? 's' : '') + ' / ' + np.played + ' partie' + (np.played > 1 ? 's' : '') + ' · meilleure série toutes parties : ' + np.bestStreak));
+    main.appendChild(renderResultActions());
+  }
+
+  function renderResultFace(main, sess) {
+    const isRecord = sess.score > sess.ghostScore;
+    recordFaceAFaceScore(sess.sujetId, sess.score);
+    const titre = String(sess.sujetTitre).replace(/<[^>]+>/g, '');
+    main.appendChild(el('span', { class: 'eyebrow' }, 'Face-à-face · ' + titre));
+    main.appendChild(el('h1', { class: 'page-title' },
+      isRecord ? '🏆 Nouveau record !' : (sess.score === sess.ghostScore ? 'Égalité' : 'Tu n\'as pas battu ton record')));
+    main.appendChild(el('p', { class: 'champion-result-msg' },
+      'Score final : ' + sess.score + ' / 12 · Ancien record : ' + sess.ghostScore + ' / 12.'));
+    const best = (getChampion().faceAFace[sess.sujetId] && getChampion().faceAFace[sess.sujetId].bestScore) || 0;
+    main.appendChild(el('p', { class: 'champion-result-stats' },
+      'Record actuel sur ce sujet : ' + best + ' / 12.'));
+    main.appendChild(renderResultActions());
+  }
+
+  function renderResultActions() {
+    const sess = state.championSession;
+    const wrap = el('div', { class: 'champion-result-actions' });
+    wrap.appendChild(el('button', {
+      class: 'btn',
+      onclick: () => {
+        // Rejouer même manche : on garde le type, on repasse en sélection
+        state.championSession = { manche: sess.manche, phase: 'select' };
+        rerender();
+      }
+    }, 'Rejouer cette manche →'));
+    wrap.appendChild(el('button', {
+      class: 'btn btn-secondary',
+      class: 'btn btn-secondary',
+      onclick: () => {
+        state.championSession = null;
+        navigate('/champion');
+      }
+    }, 'Retour au hub Champion'));
+    return wrap;
+  }
+
+  function renderChampionBackBtn() {
+    return el('button', {
+      class: 'btn btn-secondary champion-back-btn',
+      onclick: () => {
+        // Si on est en train de jouer, demander confirmation
+        const sess = state.championSession;
+        if (sess && sess.phase === 'play') {
+          if (!confirm('Abandonner la manche en cours ?')) return;
+        }
+        if (sess && sess.timerId) { clearInterval(sess.timerId); sess.timerId = null; }
+        state.championSession = null;
+        rerender();
+      }
+    }, '← Retour au hub Champion');
   }
 
   // =================================================================
