@@ -1,125 +1,131 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Carnet de Savoirs</title>
   <meta name="description" content="Mon atelier d'apprentissage personnel">
-  <!-- Cache busting : on indique au navigateur de revalider le HTML à
-       chaque chargement. Combiné avec le ?v= sur les scripts (auto-bumpé
-       par Snapshot.bat) et le service worker en network-first, un simple
-       F5 suffit pour voir la nouvelle version après un push GitHub. -->
-  <meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
+  <!-- Cache busting : le ?v= sur les scripts/styles (auto-bumpé par
+       Snapshot.bat) + le service worker en network-first (revalidation
+       ETag) font qu'un simple F5 suffit pour voir la nouvelle version
+       après un push GitHub. (Les <meta http-equiv="Cache-Control"> sont
+       ignorées par les navigateurs pour du HTTP : retirées.) -->
+  <meta name="color-scheme" content="dark">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,800&family=Spectral:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- crossorigin="anonymous" sur les CDN : réponses CORS (non opaques),
+       donc mises en cache proprement par le service worker pour le
+       hors-ligne. Google Fonts et jsDelivr servent les en-têtes CORS. -->
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,800&family=Spectral:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin="anonymous">
   <!-- KaTeX pour le widget Equation. Chargement asynchrone — l'app
-       fonctionne sans (le widget retombe sur le texte brut). -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-  <link rel="stylesheet" href="styles.css?v=202608182303">
+       fonctionne sans (le widget retombe sur le texte brut, puis se
+       re-rend dès que la lib arrive). -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="styles.css?v=202608182313">
   <!-- Le <link rel="manifest"> n'est pas posé ici car en file:// il
        déclenche des erreurs CORS. Il est attaché en JS dans CDS.start
        uniquement si on est en HTTP(S), où la PWA peut fonctionner. -->
   <link rel="icon" href="carnet.ico" type="image/x-icon">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <meta name="theme-color" content="#ff6b35">
 </head>
 <body>
   <div id="app"></div>
 
   <!-- ============ CŒUR DE L'APP ============ -->
-  <script src="app.js?v=202608182303" charset="UTF-8"></script>
+  <script src="app.js?v=202608182313" charset="UTF-8"></script>
 
   <!-- ============ SUJETS ============
        Chaque sujet est un fichier .js qui s'auto-enregistre.
        Cowork ajoute une nouvelle ligne <script> ici à chaque
        nouveau sujet généré.
   -->
-  <script src="sujets/trous-noirs.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/abysses-oceaniques.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/adn-genetique.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/antibiotiques.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/arctique.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/baudouin-iv.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/bauhaus.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/big-bang.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/capitalisme.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/cathedrales-gothiques.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/cerveau-humain.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/changement-climatique.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/chimie-atomes.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/conquete-spatiale-moderne.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/consumerisme.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/crise-subprimes.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/detroit-de-taiwan.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/droit.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/ecriture-cuneiforme.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/effet-placebo.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/empire-byzantin.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/empire-mongol.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/empire-ottoman.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/energie-nucleaire.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/epargne-et-placements.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/epopee.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/evolution-darwin.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/gastronomie.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/histoire-internet.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/ia-generative.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/infini-mathematiques.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/inflation.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/jazz.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/jerome-kerviel.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/le-rap.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/le-sommeil.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/les-animes.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/les-templiers.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/les-volcans.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/linguistique.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/marc-aurele.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/marches-financiers.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/marco-polo.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/mecanique-quantique.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/megafeux.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/memoire-humaine.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/monnaies-numeriques.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/napoleon.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/nombres-premiers.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/paris-geographie.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/photosynthese.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/probabilites.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/pyramides-egypte.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/religions-du-monde.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/renaissance-italienne.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/revolution-francaise.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/rome-antique.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/route-de-la-soie.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/saddam-hussein.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/samourais.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/sapiens-neolithique.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/sport-physiologie.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/stoicisme.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/syndrome-stendhal.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/systeme-immunitaire.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/theorie-des-cordes.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/theorie-relativite.js?v=202608182303" charset="UTF-8"></script>
-  <script src="sujets/vitesse-de-la-lumiere-limite.js?v=202608182303" charset="UTF-8"></script>
+  <script src="sujets/abysses-oceaniques.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/adn-genetique.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/antibiotiques.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/arctique.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/baudouin-iv.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/bauhaus.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/big-bang.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/capitalisme.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/cathedrales-gothiques.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/cerveau-humain.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/changement-climatique.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/chimie-atomes.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/conquete-spatiale-moderne.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/consumerisme.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/crise-subprimes.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/detroit-de-taiwan.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/droit.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/ecriture-cuneiforme.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/effet-placebo.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/empire-byzantin.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/empire-mongol.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/empire-ottoman.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/energie-nucleaire.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/epargne-et-placements.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/epopee.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/evolution-darwin.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/gastronomie.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/histoire-internet.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/ia-generative.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/infini-mathematiques.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/inflation.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/jazz.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/jerome-kerviel.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/le-rap.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/le-sommeil.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/les-animes.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/les-templiers.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/les-volcans.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/linguistique.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/marc-aurele.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/marches-financiers.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/marco-polo.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/mecanique-quantique.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/megafeux.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/memoire-humaine.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/monnaies-numeriques.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/napoleon.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/nombres-premiers.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/paris-geographie.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/photosynthese.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/probabilites.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/pyramides-egypte.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/religions-du-monde.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/renaissance-italienne.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/revolution-francaise.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/rome-antique.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/route-de-la-soie.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/saddam-hussein.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/samourais.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/sapiens-neolithique.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/sport-physiologie.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/stoicisme.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/syndrome-stendhal.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/systeme-immunitaire.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/theorie-des-cordes.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/theorie-relativite.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/trous-noirs.js?v=202608182313" charset="UTF-8"></script>
+  <script src="sujets/vitesse-de-la-lumiere-limite.js?v=202608182313" charset="UTF-8"></script>
 
   <!-- ============ PARCOURS ============
        Chaque parcours est un fichier .js qui s'auto-enregistre via
        window.CarnetDeSavoirs.registerParcours({...}). Ordre alpha pour
        la lisibilité ; l'ordre d'enregistrement n'a pas d'impact fonctionnel.
   -->
-  <script src="parcours/climat-environnement.js?v=202608182303" charset="UTF-8"></script>
-  <script src="parcours/du-cosmos-a-lhomme.js?v=202608182303" charset="UTF-8"></script>
-  <script src="parcours/economie-moderne.js?v=202608182303" charset="UTF-8"></script>
-  <script src="parcours/empires.js?v=202608182303" charset="UTF-8"></script>
-  <script src="parcours/geopolitique-xxie.js?v=202608182303" charset="UTF-8"></script>
-  <script src="parcours/histoire-france.js?v=202608182303" charset="UTF-8"></script>
-  <script src="parcours/le-vivant.js?v=202608182303" charset="UTF-8"></script>
-  <script src="parcours/pensee-du-monde.js?v=202608182303" charset="UTF-8"></script>
-  <script src="parcours/sciences-de-l-ecriture.js?v=202608182303" charset="UTF-8"></script>
-  <script src="parcours/sciences-de-l-esprit.js?v=202608182303" charset="UTF-8"></script>
+  <script src="parcours/climat-environnement.js?v=202608182313" charset="UTF-8"></script>
+  <script src="parcours/du-cosmos-a-lhomme.js?v=202608182313" charset="UTF-8"></script>
+  <script src="parcours/economie-moderne.js?v=202608182313" charset="UTF-8"></script>
+  <script src="parcours/empires.js?v=202608182313" charset="UTF-8"></script>
+  <script src="parcours/geopolitique-xxie.js?v=202608182313" charset="UTF-8"></script>
+  <script src="parcours/histoire-france.js?v=202608182313" charset="UTF-8"></script>
+  <script src="parcours/le-vivant.js?v=202608182313" charset="UTF-8"></script>
+  <script src="parcours/pensee-du-monde.js?v=202608182313" charset="UTF-8"></script>
+  <script src="parcours/sciences-de-l-ecriture.js?v=202608182313" charset="UTF-8"></script>
+  <script src="parcours/sciences-de-l-esprit.js?v=202608182313" charset="UTF-8"></script>
 
   <!-- ============ DÉMARRAGE ============ -->
   <script charset="UTF-8">window.CarnetDeSavoirs.start();</script>

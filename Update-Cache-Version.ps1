@@ -1,9 +1,14 @@
 # =====================================================================
 #  Update-Cache-Version.ps1
 #  Met à jour la version de cache (sw.js + ?v= dans index.html) avec un
-#  timestamp passé en argument. Appelé par Snapshot.bat avant chaque
-#  commit pour que les nouveaux assets soient automatiquement servis
-#  sans avoir besoin de Ctrl+F5 côté navigateur.
+#  timestamp passé en argument, régénère la liste LOCAL_URLS du service
+#  worker à partir des <script>/<link> locaux de index.html, et incrémente
+#  APP_VERSION dans app.js. Appelé par Snapshot.bat avant chaque commit.
+#
+#  Écriture : UTF-8 SANS BOM via [IO.File]::WriteAllText — Set-Content
+#  -Encoding UTF8 ajoute un BOM sous Windows PowerShell 5.1 mais pas sous
+#  PowerShell 7, ce qui faisait basculer l'encodage des fichiers d'un
+#  snapshot à l'autre (diffs Git parasites).
 # =====================================================================
 
 param(
@@ -14,47 +19,56 @@ param(
 $ErrorActionPreference = 'Stop'
 Set-Location -Path $PSScriptRoot
 
-# ---- 1. sw.js : VERSION constant ----
-if (Test-Path 'sw.js') {
-  $sw = Get-Content 'sw.js' -Raw -Encoding UTF8
-  $pattern = "const VERSION = '[^']*';"
-  $replacement = "const VERSION = '$Version';"
-  $new = [regex]::Replace($sw, $pattern, $replacement)
-  if ($new -ne $sw) {
-    Set-Content 'sw.js' -Value $new -NoNewline -Encoding UTF8
-    Write-Host "  [OK] sw.js -> VERSION = '$Version'"
-  } else {
-    Write-Host "  [SKIP] sw.js : pattern VERSION introuvable"
-  }
-}
+$utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+function Read-Utf8($path) { return [IO.File]::ReadAllText((Resolve-Path $path).Path, [Text.Encoding]::UTF8) }
+function Write-Utf8($path, $content) { [IO.File]::WriteAllText((Join-Path $PSScriptRoot $path), $content, $utf8NoBom) }
 
-# ---- 2. index.html : ?v=... sur tous les scripts/styles locaux ----
+# ---- 1. index.html : ?v=... sur tous les scripts/styles locaux ----
+$localAssets = @()
 if (Test-Path 'index.html') {
-  $html = Get-Content 'index.html' -Raw -Encoding UTF8
-  # Match src="<chemin local>.js" (avec ou sans ?v=... déjà présent)
-  # Le lookahead (?!https?:) exclut les CDN externes.
-  $patternJs = '(src="(?!https?:)[^"]+\.js)(\?v=[^"]*)?"'
-  $patternCss = '(href="(?!https?:)[^"]+\.css)(\?v=[^"]*)?"'
-  $replacementJs = '${1}?v=' + $Version + '"'
-  $replacementCss = '${1}?v=' + $Version + '"'
-  $new = [regex]::Replace($html, $patternJs, $replacementJs)
-  $new = [regex]::Replace($new, $patternCss, $replacementCss)
+  $html = Read-Utf8 'index.html'
+  # Match src="<chemin local>.js" (avec ou sans ?v=... déjà présent).
+  # Le lookahead exclut les CDN (https?: et //).
+  $patternJs  = '(src="(?!https?:|//)[^"]+\.js)(\?v=[^"]*)?"'
+  $patternCss = '(href="(?!https?:|//)[^"]+\.css)(\?v=[^"]*)?"'
+  $new = [regex]::Replace($html, $patternJs,  '${1}?v=' + $Version + '"')
+  $new = [regex]::Replace($new,  $patternCss, '${1}?v=' + $Version + '"')
   if ($new -ne $html) {
-    Set-Content 'index.html' -Value $new -NoNewline -Encoding UTF8
-    $countJs = ([regex]::Matches($new, $patternJs)).Count
-    $countCss = ([regex]::Matches($new, $patternCss)).Count
-    Write-Host "  [OK] index.html -> $countJs script(s) + $countCss style(s) versionnes"
+    Write-Utf8 'index.html' $new
+    Write-Host "  [OK] index.html -> assets versionnes ($Version)"
   } else {
     Write-Host "  [SKIP] index.html : aucun script/style local trouve"
+  }
+  # Liste des assets locaux (pour LOCAL_URLS du service worker)
+  foreach ($m in [regex]::Matches($new, 'href="((?!https?:|//)[^"?]+\.css)')) { $localAssets += $m.Groups[1].Value }
+  foreach ($m in [regex]::Matches($new, 'src="((?!https?:|//)[^"?]+\.js)'))   { $localAssets += $m.Groups[1].Value }
+}
+
+# ---- 2. sw.js : VERSION + LOCAL_URLS régénérée ----
+if (Test-Path 'sw.js') {
+  $sw = Read-Utf8 'sw.js'
+  $orig = $sw
+  $sw = [regex]::Replace($sw, "const VERSION = '[^']*';", "const VERSION = '$Version';")
+  if ($localAssets.Count -gt 0) {
+    $fixed = @('./', './index.html', './manifest.json', './carnet.ico', './icon-192.png', './icon-512.png', './icon-maskable-512.png', './apple-touch-icon.png')
+    $all = $fixed + ($localAssets | ForEach-Object { './' + $_ })
+    $list = ($all | ForEach-Object { "  '" + $_ + "'" }) -join ",`n"
+    $block = "// __LOCAL_URLS_START__`nconst LOCAL_URLS = [`n$list`n];`n// __LOCAL_URLS_END__"
+    $sw = [regex]::Replace($sw, '// __LOCAL_URLS_START__[\s\S]*?// __LOCAL_URLS_END__', $block.Replace('$', '$$'))
+  }
+  if ($sw -ne $orig) {
+    Write-Utf8 'sw.js' $sw
+    Write-Host "  [OK] sw.js -> VERSION = '$Version', LOCAL_URLS = $($localAssets.Count + 8) entrees"
+  } else {
+    Write-Host "  [SKIP] sw.js : rien a changer"
   }
 }
 
 # ---- 3. app.js : APP_VERSION incrementee a chaque snapshot ----
 # Le numero affiche en bas de la sidebar passe de v1.0 a v1.1 a v1.2 etc.
-# pour signaler visuellement chaque mise a jour. Apres v1.99 le compteur
-# bascule sur v2.0 et ainsi de suite.
+# Apres v1.99 le compteur bascule sur v2.0 et ainsi de suite.
 if (Test-Path 'app.js') {
-  $appJs = Get-Content 'app.js' -Raw -Encoding UTF8
+  $appJs = Read-Utf8 'app.js'
   $pattern = "const APP_VERSION = 'v(\d+)\.(\d+)';"
   $appMatch = [regex]::Match($appJs, $pattern)
   if ($appMatch.Success) {
@@ -63,7 +77,7 @@ if (Test-Path 'app.js') {
     if ($minor -ge 100) { $major += 1; $minor = 0 }
     $newVer = "const APP_VERSION = 'v$major.$minor';"
     $new = [regex]::Replace($appJs, $pattern, $newVer)
-    Set-Content 'app.js' -Value $new -NoNewline -Encoding UTF8
+    Write-Utf8 'app.js' $new
     Write-Host "  [OK] app.js -> APP_VERSION = v$major.$minor"
   } else {
     Write-Host "  [SKIP] app.js : pattern APP_VERSION introuvable"

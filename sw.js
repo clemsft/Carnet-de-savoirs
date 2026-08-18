@@ -1,97 +1,200 @@
-﻿/* Service Worker — Carnet de Savoirs
- * Cache des assets statiques pour fonctionnement hors-ligne.
+/* Service Worker — Carnet de Savoirs
+ * Cache des assets pour un fonctionnement hors-ligne complet.
  *
- * Stratégie : NETWORK-FIRST pour les ressources locales (HTML, JS, CSS).
- * On essaie d'abord le réseau ; en cas d'échec (offline), on tombe sur le
- * cache. Comme ça, dès qu'un push GitHub Pages est publié, un simple F5
- * suffit à voir la nouvelle version — plus besoin de Ctrl+F5 pour vider
- * le cache. Le SW continue d'assurer l'offline grâce au cache de secours.
+ * Stratégie :
+ *  - Ressources LOCALES (HTML, JS, CSS, sujets, parcours) : NETWORK-FIRST
+ *    avec revalidation HTTP (`cache: 'no-cache'` → ETag/304 gratuits sur
+ *    GitHub Pages) et repli sur le cache si hors-ligne. Un simple F5 voit
+ *    la nouvelle version après un push, et l'app reste utilisable offline.
+ *  - CDN (KaTeX, Google Fonts) : STALE-WHILE-REVALIDATE — on sert le cache
+ *    tout de suite s'il existe et on rafraîchit en arrière-plan. Les
+ *    réponses « opaques » (sans CORS) sont AUSSI mises en cache : avant,
+ *    `resp.ok` était faux pour elles et KaTeX/les polices n'étaient jamais
+ *    disponibles hors-ligne.
+ *  - Correspondance cache insensible à la query (`ignoreSearch`) : les
+ *    scripts sont chargés en `app.js?v=…` mais pré-cachés en `app.js`.
  *
- * Pour les CDN (KaTeX, Google Fonts), on garde la même stratégie
- * network-first avec fallback cache.
+ * LOCAL_URLS est régénérée automatiquement par Update-Cache-Version.ps1
+ * (appelé par Snapshot.bat) à partir des <script>/<link> de index.html :
+ * ne pas éditer la liste à la main, elle serait écrasée.
  *
- * VERSION : bumped automatiquement par Snapshot.bat à chaque push.
+ * VERSION : bumpée automatiquement par Snapshot.bat à chaque push.
  *
  * Note : les Service Workers ne fonctionnent QUE en HTTP(S), pas en
- * file://. Donc l'enregistrement est conditionnel côté app.js. Sur
- * file://, ce fichier dort.
+ * file://. L'enregistrement est conditionnel côté app.js.
  */
 
-const VERSION = '202608182303';
+const VERSION = '202608182313';
 const CACHE_LOCAL = 'carnet-local-' + VERSION;
 const CACHE_EXTERNAL = 'carnet-external-' + VERSION;
 
+// __LOCAL_URLS_START__
 const LOCAL_URLS = [
   './',
   './index.html',
-  './app.js',
-  './styles.css',
   './manifest.json',
-  './carnet.ico'
+  './carnet.ico',
+  './icon-192.png',
+  './icon-512.png',
+  './icon-maskable-512.png',
+  './apple-touch-icon.png',
+  './styles.css',
+  './app.js',
+  './sujets/abysses-oceaniques.js',
+  './sujets/adn-genetique.js',
+  './sujets/antibiotiques.js',
+  './sujets/arctique.js',
+  './sujets/baudouin-iv.js',
+  './sujets/bauhaus.js',
+  './sujets/big-bang.js',
+  './sujets/capitalisme.js',
+  './sujets/cathedrales-gothiques.js',
+  './sujets/cerveau-humain.js',
+  './sujets/changement-climatique.js',
+  './sujets/chimie-atomes.js',
+  './sujets/conquete-spatiale-moderne.js',
+  './sujets/consumerisme.js',
+  './sujets/crise-subprimes.js',
+  './sujets/detroit-de-taiwan.js',
+  './sujets/droit.js',
+  './sujets/ecriture-cuneiforme.js',
+  './sujets/effet-placebo.js',
+  './sujets/empire-byzantin.js',
+  './sujets/empire-mongol.js',
+  './sujets/empire-ottoman.js',
+  './sujets/energie-nucleaire.js',
+  './sujets/epargne-et-placements.js',
+  './sujets/epopee.js',
+  './sujets/evolution-darwin.js',
+  './sujets/gastronomie.js',
+  './sujets/histoire-internet.js',
+  './sujets/ia-generative.js',
+  './sujets/infini-mathematiques.js',
+  './sujets/inflation.js',
+  './sujets/jazz.js',
+  './sujets/jerome-kerviel.js',
+  './sujets/le-rap.js',
+  './sujets/le-sommeil.js',
+  './sujets/les-animes.js',
+  './sujets/les-templiers.js',
+  './sujets/les-volcans.js',
+  './sujets/linguistique.js',
+  './sujets/marc-aurele.js',
+  './sujets/marches-financiers.js',
+  './sujets/marco-polo.js',
+  './sujets/mecanique-quantique.js',
+  './sujets/megafeux.js',
+  './sujets/memoire-humaine.js',
+  './sujets/monnaies-numeriques.js',
+  './sujets/napoleon.js',
+  './sujets/nombres-premiers.js',
+  './sujets/paris-geographie.js',
+  './sujets/photosynthese.js',
+  './sujets/probabilites.js',
+  './sujets/pyramides-egypte.js',
+  './sujets/religions-du-monde.js',
+  './sujets/renaissance-italienne.js',
+  './sujets/revolution-francaise.js',
+  './sujets/rome-antique.js',
+  './sujets/route-de-la-soie.js',
+  './sujets/saddam-hussein.js',
+  './sujets/samourais.js',
+  './sujets/sapiens-neolithique.js',
+  './sujets/sport-physiologie.js',
+  './sujets/stoicisme.js',
+  './sujets/syndrome-stendhal.js',
+  './sujets/systeme-immunitaire.js',
+  './sujets/theorie-des-cordes.js',
+  './sujets/theorie-relativite.js',
+  './sujets/trous-noirs.js',
+  './sujets/vitesse-de-la-lumiere-limite.js',
+  './parcours/climat-environnement.js',
+  './parcours/du-cosmos-a-lhomme.js',
+  './parcours/economie-moderne.js',
+  './parcours/empires.js',
+  './parcours/geopolitique-xxie.js',
+  './parcours/histoire-france.js',
+  './parcours/le-vivant.js',
+  './parcours/pensee-du-monde.js',
+  './parcours/sciences-de-l-ecriture.js',
+  './parcours/sciences-de-l-esprit.js'
 ];
+// __LOCAL_URLS_END__
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_LOCAL).then((cache) => {
-      // Pré-cache best-effort : on ne bloque pas l'installation si une
-      // ressource manque (en file:// par ex.). On veut juste amorcer le
-      // cache pour avoir un fallback offline raisonnable.
-      return cache.addAll(LOCAL_URLS).catch((err) => {
-        console.warn('[SW] Pré-cache partiel : ', err);
-      });
+      // Pré-cache best-effort, fichier par fichier : un 404 (ex. icône
+      // absente) n'annule pas les autres, contrairement à cache.addAll.
+      return Promise.all(LOCAL_URLS.map((u) =>
+        fetch(new Request(u, { cache: 'no-cache' }))
+          .then((resp) => (resp && resp.ok) ? cache.put(u, resp) : null)
+          .catch(() => null)
+      ));
     })
   );
-  // skipWaiting : la nouvelle version active tout de suite, sans attendre
-  // que tous les onglets soient fermés.
+  // La nouvelle version s'active tout de suite ; la page est prévenue via
+  // 'controllerchange' (toast « nouvelle version » côté app.js).
   self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((names) => Promise.all(
-      // Supprime tous les caches d'anciennes versions (toutes les clés qui
-      // ne sont pas exactement le cache local ou externe courant).
       names.filter(n => n !== CACHE_LOCAL && n !== CACHE_EXTERNAL)
            .map(n => caches.delete(n))
     )).then(() => self.clients.claim())
   );
 });
 
+function cacheable(resp) {
+  // 200 OK ou réponse opaque (CDN sans CORS : status 0, type 'opaque')
+  return !!resp && (resp.ok || resp.type === 'opaque');
+}
+
 self.addEventListener('fetch', (event) => {
-  const url = new URL(event.request.url);
+  const req = event.request;
+  if (req.method !== 'GET') return;
+  const url = new URL(req.url);
   const isLocal = url.origin === self.location.origin;
 
-  if (event.request.method !== 'GET') return;
+  if (isLocal) {
+    // NETWORK-FIRST (revalidation HTTP), repli cache, repli index.html pour
+    // les navigations (l'app est une SPA en hash-routing).
+    event.respondWith(
+      fetch(req, { cache: 'no-cache' }).then((resp) => {
+        if (cacheable(resp)) {
+          const clone = resp.clone();
+          caches.open(CACHE_LOCAL).then((c) => c.put(req, clone));
+        }
+        return resp;
+      }).catch(() => caches.match(req, { ignoreSearch: true }).then((cached) => {
+        if (cached) return cached;
+        if (req.mode === 'navigate') return caches.match('./index.html', { ignoreSearch: true });
+        return new Response('Hors-ligne et ressource absente du cache', {
+          status: 503, statusText: 'Service Unavailable',
+          headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+        });
+      }))
+    );
+    return;
+  }
 
-  // NETWORK-FIRST pour tout : on essaie le réseau, on met le résultat à
-  // jour dans le cache, et si ça échoue (offline), on retombe sur la
-  // dernière version cachée. C'est le pattern qui élimine le besoin de
-  // Ctrl+F5 après un push.
-  //
-  // Pour les ressources locales, on force { cache: 'no-store' } sur la
-  // requête réseau pour bypasser le cache HTTP du navigateur (qui peut
-  // servir une version périmée même quand le SW essaie d'aller au réseau).
-  // Les CDN externes gardent un fetch normal — leurs URLs sont déjà
-  // versionnées (katex@0.16.9/…) donc immutables.
-  const cacheName = isLocal ? CACHE_LOCAL : CACHE_EXTERNAL;
-  const fetchOptions = isLocal ? { cache: 'no-store' } : {};
+  // CDN : STALE-WHILE-REVALIDATE
   event.respondWith(
-    fetch(event.request, fetchOptions).then((resp) => {
-      if (resp && resp.ok) {
-        const clone = resp.clone();
-        caches.open(cacheName).then((c) => c.put(event.request, clone));
-      }
-      return resp;
-    }).catch(() => caches.match(event.request).then((cached) => {
-      return cached || new Response('Offline et pas en cache', {
-        status: 503, statusText: 'Service Unavailable'
-      });
-    }))
+    caches.open(CACHE_EXTERNAL).then((cache) =>
+      cache.match(req).then((cached) => {
+        const network = fetch(req).then((resp) => {
+          if (cacheable(resp)) cache.put(req, resp.clone());
+          return resp;
+        }).catch(() => cached || new Response('', { status: 503, statusText: 'Service Unavailable' }));
+        return cached || network;
+      })
+    )
   );
 });
 
-// Message channel : permet à la page de demander un skipWaiting manuel
-// (utile pour forcer la mise à jour sans recharger).
+// Message channel : la page peut demander un skipWaiting manuel.
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();

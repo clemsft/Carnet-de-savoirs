@@ -1,4 +1,4 @@
-﻿/* ===================================================================
+/* ===================================================================
    CARNET DE SAVOIRS — Cœur de l'application
    ===================================================================
    Single-file vanilla JS. Aucune dépendance externe. Aucun build step.
@@ -14,7 +14,7 @@
   // Version de l'application, bumpée automatiquement par Snapshot.bat
   // (cf. Update-Cache-Version.ps1, section APP_VERSION). Affichée en bas
   // de la sidebar pour signaler chaque mise à jour à l'utilisateur.
-  const APP_VERSION = 'v1.9';
+  const APP_VERSION = 'v1.10';
 
   // =================================================================
   // STATE
@@ -10682,6 +10682,26 @@
       manifestLink.href = './manifest.json';
       document.head.appendChild(manifestLink);
       if ('serviceWorker' in navigator) {
+        // Toast « nouvelle version » : quand un nouveau SW prend le contrôle
+        // (skipWaiting + claim côté sw.js), la page en cours tient encore
+        // l'ancien app.js alors que les sujets rechargés viendront de la
+        // nouvelle version → on propose de recharger. Le flag évite le
+        // toast au tout premier enregistrement (pas de contrôleur avant).
+        const hadController = !!navigator.serviceWorker.controller;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (!hadController) return;
+          if (document.querySelector('.update-toast')) return;
+          const toast = el('div', { class: 'achievement-toast update-toast', role: 'status' },
+            el('div', { class: 'achievement-toast-eyebrow' }, 'Mise à jour'),
+            el('div', { class: 'achievement-toast-label' }, '✦ Nouvelle version disponible'),
+            el('div', { class: 'achievement-toast-desc' }, 'Recharge la page pour en profiter.'),
+            el('div', { class: 'btn-row', style: { marginTop: '0.5rem' } },
+              el('button', { class: 'btn', onclick: () => location.reload() }, 'Recharger'),
+              el('button', { class: 'btn btn-secondary', onclick: () => toast.remove() }, 'Plus tard'))
+          );
+          document.body.appendChild(toast);
+          requestAnimationFrame(() => toast.classList.add('is-visible'));
+        });
         navigator.serviceWorker.register('./sw.js').catch(e => {
           console.warn('[CarnetDeSavoirs] Service Worker non enregistré :', e);
         });

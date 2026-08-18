@@ -4101,7 +4101,7 @@ body.overlay-active { overflow: hidden; }
   border-radius: var(--r-lg);
   padding: 1rem 1.3rem;
   box-shadow: var(--shadow-soft);
-  z-index: 200;
+  z-index: 1200;   /* au-dessus des plein-écran (1000), sous la palette (1500) */
   min-width: 240px;
   max-width: 340px;
   opacity: 0;
@@ -6264,3 +6264,7 @@ body.dark mark.passage-mark:hover {
 .timeline-unparsed ul { margin: 0.4rem 0 0 1rem; padding: 0; }
 .timeline-unparsed li { margin: 0.15rem 0; }
 .timeline-unparsed a { color: var(--text-soft); }
+
+/* Toast « nouvelle version » (service worker) */
+.update-toast .btn-row { display: flex; gap: 0.5rem; }
+.update-toast .btn { padding: 0.35rem 0.8rem; font-size: 0.85rem; }
