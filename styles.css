@@ -54,6 +54,8 @@
   --r-sm: 4px;
   --r: 6px;
   --r-lg: 12px;
+  --r-md: 8px;                 /* utilisé par ~12 règles, n'était pas déclaré */
+  --f-mono: ui-monospace, 'Cascadia Code', Consolas, Menlo, monospace;
 
   /* Shadow */
   --shadow-soft: 0 8px 24px rgba(0,0,0,0.3);
@@ -1794,9 +1796,11 @@ input[type="range"].w-range::-moz-range-thumb {
   color: #dc2626;
   text-decoration: line-through;
 }
-.quiz-trou-input.wrong::after {
-  content: ' → ' attr(data-expected);
+.quiz-trou-expected {
   color: var(--text-dim);
+  font-style: italic;
+  margin-left: 0.15em;
+  white-space: nowrap;
 }
 
 /* Associer */
@@ -5891,7 +5895,7 @@ body.dark mark.passage-mark:hover {
   position: absolute;
   z-index: 999;
   display: none;
-  background: var(--bg, #fff);
+  background: var(--bg-elev);
   border: 1px solid var(--accent, #ff6b35);
   border-radius: 6px;
   padding: 4px 10px;
@@ -5998,10 +6002,10 @@ body.dark mark.passage-mark:hover {
   margin-top: 1.5rem;
 }
 .champion-manche-card {
-  border: 1px solid var(--border, rgba(0,0,0,0.12));
+  border: 1px solid var(--line-strong);
   border-radius: 12px;
   padding: 1.5rem;
-  background: var(--card-bg, #fff);
+  background: var(--bg-card);
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
@@ -6023,7 +6027,7 @@ body.dark mark.passage-mark:hover {
   margin: 0;
   font-size: 0.95rem;
   line-height: 1.5;
-  color: var(--text, #333);
+  color: var(--text);
   flex: 1;
 }
 .champion-manche-stats {
@@ -6054,10 +6058,10 @@ body.dark mark.passage-mark:hover {
   flex-direction: column;
   gap: 0.4rem;
   padding: 1rem;
-  border: 1px solid var(--border, rgba(0,0,0,0.12));
+  border: 1px solid var(--line-strong);
   border-left: 4px solid var(--card-accent, #ff6b35);
   border-radius: 6px;
-  background: var(--card-bg, #fff);
+  background: var(--bg-card);
   cursor: pointer;
   font: inherit;
   text-align: left;
@@ -6078,7 +6082,7 @@ body.dark mark.passage-mark:hover {
 .champion-sujet-card.is-won,
 .champion-sujet-card.is-record,
 .champion-domain-card.is-record {
-  background: linear-gradient(180deg, rgba(255, 215, 64, 0.08), var(--card-bg, #fff));
+  background: linear-gradient(180deg, rgba(255, 215, 64, 0.08), var(--bg-card));
 }
 .champion-sujet-domain,
 .champion-domain-name {
@@ -6158,7 +6162,7 @@ body.dark mark.passage-mark:hover {
   padding: 1rem;
   background: rgba(127,127,127,0.06);
   border-radius: 6px;
-  color: var(--text, #333);
+  color: var(--text);
   margin: 1rem 0;
 }
 .champion-score-h1 {

@@ -14,7 +14,7 @@
   // Version de l'application, bumpée automatiquement par Snapshot.bat
   // (cf. Update-Cache-Version.ps1, section APP_VERSION). Affichée en bas
   // de la sidebar pour signaler chaque mise à jour à l'utilisateur.
-  const APP_VERSION = 'v1.6';
+  const APP_VERSION = 'v1.8';
 
   // =================================================================
   // STATE
@@ -90,9 +90,12 @@
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return defaultUserState();
       const parsed = JSON.parse(raw);
+      // Migration AVANT le merge avec les defaults : sinon les champs
+      // injectés par defaultUserState() (quizCounters, dailyQuizDates…)
+      // masquent leur absence et les migrations ne s'exécutent jamais.
+      if (parsed && typeof parsed === 'object') migrateUserState(parsed);
       // Merge avec defaults au cas où
       const merged = Object.assign(defaultUserState(), parsed);
-      migrateUserState(merged);
       return merged;
     } catch (e) {
       console.warn('Erreur lecture localStorage', e);
@@ -365,12 +368,18 @@
   // ROUTAGE (hash-based)
   // =================================================================
 
+  // decodeURIComponent lève URIError sur une séquence % invalide (ex.
+  // #/sujet/%E0) → page blanche définitive. On retombe sur la chaîne brute.
+  function safeDecode(str) {
+    try { return decodeURIComponent(str); } catch (e) { return str; }
+  }
+
   function parseHash() {
     const h = (window.location.hash || '#/').replace(/^#/, '') || '/';
     const parts = h.split('/').filter(Boolean);
     if (parts.length === 0) return { view: 'bibliotheque' };
     if (parts[0] === 'sujet' && parts[1]) {
-      const route = { view: 'sujet', id: decodeURIComponent(parts[1]), tab: parts[2] || 'resume' };
+      const route = { view: 'sujet', id: safeDecode(parts[1]), tab: parts[2] || 'resume' };
       // Cible de bloc optionnelle : #/sujet/{id}/cours/bloc-{N}
       if (parts[3] && parts[3].indexOf('bloc-') === 0) {
         const idx = parseInt(parts[3].slice(5), 10);
@@ -386,7 +395,7 @@
     if (parts[0] === 'quiz-mixte') return { view: 'quiz-mixte' };
     if (parts[0] === 'notes') return { view: 'notes' };
     if (parts[0] === 'parcours') {
-      if (parts[1]) return { view: 'parcours-detail', id: decodeURIComponent(parts[1]) };
+      if (parts[1]) return { view: 'parcours-detail', id: safeDecode(parts[1]) };
       return { view: 'parcours-liste' };
     }
     if (parts[0] === 'timeline') return { view: 'timeline' };
@@ -475,7 +484,9 @@
     });
     s = s.replace(/\[([^\]]+)\]\{accent\}/g, '<em class="term">$1</em>');
     s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-    s = s.replace(/(?<!\*)\*([^*\n]+)\*(?!\*)/g, '<em>$1</em>');
+    // Sans lookbehind (non supporté par Safari/iOS < 16.4) : on capture le
+    // caractère précédent et on le réinjecte.
+    s = s.replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, '$1<em>$2</em>');
     s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
 
     // Parsing ligne par ligne pour gérer les titres (# h2) et sous-titres
@@ -526,6 +537,30 @@
     }
     flushAll();
     return blocks.join('');
+  }
+
+  // =================================================================
+  // FORMATAGE NUMÉRIQUE FR (partagé par les widgets)
+  // =================================================================
+  // - milliers séparés par une espace fine insécable, décimale en virgule
+  // - `decimals` : nombre max de décimales (par défaut : celles de la valeur,
+  //   plafonné à 6, et on arrondit pour éliminer le bruit flottant 0,3999…)
+  function formatNumberFr(v, decimals) {
+    if (typeof v !== 'number' || !isFinite(v)) return String(v);
+    const maxDec = (decimals != null) ? decimals : 6;
+    const rounded = Math.round(v * Math.pow(10, maxDec)) / Math.pow(10, maxDec);
+    try {
+      return rounded.toLocaleString('fr-FR', { maximumFractionDigits: maxDec });
+    } catch (e) {
+      return String(rounded).replace('.', ',');
+    }
+  }
+  // Nombre de décimales d'un pas de slider (0.05 → 2, 0.5 → 1, 1 → 0)
+  function decimalsOfStep(step) {
+    const str = String(step);
+    if (str.indexOf('e-') >= 0) return parseInt(str.split('e-')[1], 10) || 0;
+    const frac = str.split('.')[1];
+    return frac ? frac.length : 0;
   }
 
   // =================================================================
@@ -1368,11 +1403,17 @@
       }
     });
 
-    // Click ailleurs = ferme le popup
-    document.addEventListener('mousedown', (e) => {
-      if (popup.contains(e.target)) return;
-      hidePassagePopup();
-    });
+    // Click ailleurs = ferme le popup — écouteur global posé UNE seule fois
+    // (setupPassageSelection est rappelé à chaque rendu du cours : avant, un
+    // nouvel écouteur document.mousedown s'empilait à chaque fois).
+    if (!setupPassageSelection._docListenerInstalled) {
+      setupPassageSelection._docListenerInstalled = true;
+      document.addEventListener('mousedown', (e) => {
+        const pop = document.querySelector('.passage-popup');
+        if (pop && pop.contains(e.target)) return;
+        hidePassagePopup();
+      });
+    }
 
     // Clic sur le bouton = enregistre le surlignage
     btn.onclick = (e) => {
@@ -2401,11 +2442,7 @@
 
     function next() { if (idx < total - 1) { idx++; update(); } }
     function prev() { if (idx > 0) { idx--; update(); } }
-    function close() {
-      if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
-      document.removeEventListener('keydown', onKey);
-      document.body.classList.remove('overlay-active');
-    }
+    function close() { unmountOverlay(overlay); }
 
     function onKey(e) {
       if (e.key === 'Escape') { close(); e.preventDefault(); }
@@ -2417,10 +2454,7 @@
     closeBtn.addEventListener('click', close);
     prevBtn.addEventListener('click', prev);
     nextBtn.addEventListener('click', next);
-    document.addEventListener('keydown', onKey);
-
-    document.body.classList.add('overlay-active');
-    document.body.appendChild(overlay);
+    if (!mountOverlay(overlay, close, onKey)) return;
     update();
   }
 
@@ -2486,13 +2520,9 @@
     }
 
     function flip() { revealed = !revealed; update(); }
-    function next() { if (idx < points.length - 1) { idx++; revealed = false; update(); } }
+    function next() { if (idx < cards.length - 1) { idx++; revealed = false; update(); } }
     function prev() { if (idx > 0) { idx--; revealed = false; update(); } }
-    function close() {
-      if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
-      document.removeEventListener('keydown', onKey);
-      document.body.classList.remove('overlay-active');
-    }
+    function close() { unmountOverlay(overlay); }
 
     function onKey(e) {
       if (e.key === 'Escape')      { close(); e.preventDefault(); }
@@ -2506,10 +2536,7 @@
     prevBtn.addEventListener('click', prev);
     nextBtn.addEventListener('click', next);
     card.addEventListener('click', flip);
-    document.addEventListener('keydown', onKey);
-
-    document.body.classList.add('overlay-active');
-    document.body.appendChild(overlay);
+    if (!mountOverlay(overlay, close, onKey)) return;
     update();
   }
 
@@ -2922,6 +2949,14 @@
     }, { threshold: [0.1, 0.25, 0.4, 0.5, 0.75, 0.95] });
 
     blockNodes.forEach(n => observer.observe(n));
+    // Nettoyage au prochain rendu : sinon l'observer et les timers de dwell
+    // survivent au DOM qu'ils observent (un bloc pouvait être coché « vu »
+    // 600 ms après avoir quitté la page).
+    onRerender(() => {
+      observer.disconnect();
+      dwellTimers.forEach(t => clearTimeout(t));
+      dwellTimers.clear();
+    });
   }
 
   // =================================================================
@@ -3087,11 +3122,7 @@
         return md(text || '').replace(/^<p>|<\/p>$/g, '');
       }
       function formatVal(v) {
-        if (typeof v === 'number') {
-          return (Math.abs(v) >= 1000)
-            ? v.toLocaleString('fr-FR').replace(/,/g, ' ')
-            : String(v).replace('.', ',');
-        }
+        if (typeof v === 'number') return formatNumberFr(v);
         return v;
       }
       function withUnit(v) {
@@ -3247,12 +3278,14 @@
 
       function update() {
         const v = parseFloat(slider.value);
-        const formatted = Number.isInteger(step) ? v.toFixed(0) : v.toFixed(1);
+        const formatted = formatNumberFr(v, decimalsOfStep(step));
         valueLabel.textContent = formatted + (params.unite ? ' ' + params.unite : '');
         const seuil = seuils.find(s => v < s.jusqua) || seuils[seuils.length - 1];
         if (seuil) {
           resultTitle.textContent = seuil.titre || '';
-          resultDesc.textContent = seuil.description || '';
+          // Markdown-lite (gras, italique, [terme]{accent}…) comme le promet
+          // TEMPLATE_SUJET.md ; md() échappe le HTML.
+          resultDesc.innerHTML = md(seuil.description || '').replace(/^<p>|<\/p>$/g, '');
           if (seuil.couleur) {
             result.style.setProperty('--w-result-color', seuil.couleur);
           }
@@ -3455,6 +3488,7 @@
       const noteEl = el('div', { class: 'w-equation-note' });
 
       function renderTex(texStr) {
+        body._lastTex = texStr;
         if (typeof window.katex === 'undefined') {
           body.textContent = texStr;
           return;
@@ -3476,8 +3510,31 @@
       renderTex(initialTex);
       wrap.appendChild(body);
       if (typeof window.katex === 'undefined') {
-        wrap.appendChild(el('p', { class: 'block-error', style: { fontSize: '0.82rem', marginTop: '0.5rem', textAlign: 'left' } },
-          'KaTeX non chargé — vérifie ta connexion à internet pour le rendu LaTeX.'));
+        // KaTeX est chargé en <script defer> depuis le CDN : au premier
+        // rendu (CDS.start() est appelé en inline, AVANT l'exécution des
+        // scripts defer) il n'est donc pas encore disponible. On affiche
+        // le message d'attente, puis on re-rend automatiquement dès que
+        // la lib arrive (écoute du 'load' du <script> + polling de
+        // secours pendant 15 s). Le message ne reste que si KaTeX ne
+        // se charge vraiment jamais (hors-ligne).
+        const errEl = el('p', { class: 'block-error', style: { fontSize: '0.82rem', marginTop: '0.5rem', textAlign: 'left' } },
+          'KaTeX non chargé — vérifie ta connexion à internet pour le rendu LaTeX.');
+        wrap.appendChild(errEl);
+        let done = false;
+        const onReady = () => {
+          if (done || typeof window.katex === 'undefined') return;
+          done = true;
+          renderTex(body._lastTex || initialTex);
+          if (errEl.parentNode) errEl.parentNode.removeChild(errEl);
+        };
+        const katexScript = document.querySelector('script[src*="katex"]');
+        if (katexScript) katexScript.addEventListener('load', onReady, { once: true });
+        let tries = 0;
+        const poll = setInterval(() => {
+          tries++;
+          if (typeof window.katex !== 'undefined') { clearInterval(poll); onReady(); }
+          else if (tries > 60) clearInterval(poll);
+        }, 250);
       }
 
       // Mode manipulable : sliders pour chaque variable + recalcul live
@@ -3584,10 +3641,7 @@
       function formatCell(c, v) {
         if (v == null) return '—';
         if (c.type === 'number' && typeof v === 'number') {
-          const fmt = Math.abs(v) >= 1000
-            ? v.toLocaleString('fr-FR').replace(/,/g, ' ')
-            : String(v).replace('.', ',');
-          return fmt + (c.unite ? ' ' + c.unite : '');
+          return formatNumberFr(v) + (c.unite ? ' ' + c.unite : '');
         }
         return String(v);
       }
@@ -3804,9 +3858,12 @@
     });
 
     if (sess.currentQ >= sess.questions.length) {
-      if (sess.isMixed) renderMixedQuizFinal(quizCard);
-      else if (sess.mode === 'revision') renderRevisionFinal(quizCard);
+      // Le mode (revision / quotidien) prime sur isMixed : ces sessions
+      // posent aussi isMixed=true, l'ancien ordre les envoyait toujours
+      // sur l'écran « mixte » et leur écran final n'était jamais atteint.
+      if (sess.mode === 'revision') renderRevisionFinal(quizCard);
       else if (sess.mode === 'quotidien') renderDailyQuizFinal(quizCard);
+      else if (sess.isMixed) renderMixedQuizFinal(quizCard);
       else renderQuizFinal(quizCard, sujet);
       return;
     }
@@ -3849,6 +3906,10 @@
       sess._timerLeft = sess._timerSecs || 30;
       timerEl = el('div', { class: 'quiz-timer' }, sess._timerLeft + ' s');
       quizCard.insertBefore(timerEl, progress.nextSibling);
+      // Un seul timer par session : un re-rendu ne doit pas en empiler un
+      // second, et quitter la page doit l'arrêter (sinon le timeout enregistre
+      // une mauvaise réponse sur un DOM détaché, puis la question est reposée).
+      if (sess._timerId) { clearInterval(sess._timerId); sess._timerId = null; }
       timerId = setInterval(() => {
         sess._timerLeft--;
         if (timerEl) timerEl.textContent = sess._timerLeft + ' s';
@@ -3856,15 +3917,18 @@
         if (sess._timerLeft <= 0) {
           clearInterval(timerId);
           timerId = null;
+          sess._timerId = null;
           onAnswer(false, true); // timeout
         }
       }, 1000);
+      sess._timerId = timerId;
+      onLeaveView(() => { if (sess._timerId) { clearInterval(sess._timerId); sess._timerId = null; } });
     }
 
     // Callback uniforme après réponse, peu importe le type
     function onAnswer(isCorrect, isTimeout) {
       // Arrête le timer du défi si présent
-      if (timerId) { clearInterval(timerId); timerId = null; }
+      if (timerId) { clearInterval(timerId); timerId = null; sess._timerId = null; }
       const durationMs = Date.now() - sess._questionStart;
       if (isCorrect) sess.score++;
       // Bonus de vitesse en mode défi
@@ -3882,7 +3946,7 @@
       if (isTimeout) msg = 'Temps écoulé.';
       else if (isCorrect) msg = bonus > 0 ? 'Exact ! +' + bonus + ' bonus de vitesse' : 'Exact !';
       else msg = 'Pas tout à fait.';
-      feedback.innerHTML = '<strong>' + msg + '</strong> ' + (q.explication || '');
+      feedback.innerHTML = '<strong>' + msg + '</strong> ' + md(q.explication || '').replace(/^<p>|<\/p>$/g, '');
       feedback.style.display = 'block';
 
       const isLast = sess.currentQ === sess.questions.length - 1;
@@ -4071,7 +4135,13 @@
           b.input.disabled = true;
           const ok = normalizeAnswer(b.input.value) === normalizeAnswer(b.expected);
           b.input.classList.add(ok ? 'correct' : 'wrong');
-          if (!ok) b.input.setAttribute('data-expected', b.expected);
+          if (!ok) {
+            b.input.setAttribute('data-expected', b.expected);
+            // ::after ne se rend pas sur un <input> (élément remplacé) :
+            // on insère la bonne réponse dans un span juste après.
+            const exp = el('span', { class: 'quiz-trou-expected' }, ' → ' + b.expected);
+            b.input.insertAdjacentElement('afterend', exp);
+          }
         });
         onAnswer(isCorrect);
       }
@@ -4129,17 +4199,24 @@
     else if (pct >= 40) verdict = 'Une bonne base à consolider.';
     else verdict = 'Une seconde lecture pourrait aider !';
 
-    // Save
-    const prev = state.user.quizScores[sujet.meta.id] || { best: 0, total };
-    const isNewBest = score > prev.best;
-    state.user.quizScores[sujet.meta.id] = {
-      best: Math.max(prev.best, score),
-      total,
-      attempts: [...(prev.attempts || []), { score, date: new Date().toISOString() }].slice(-10)
-    };
-    saveUserState();
-    recordActivity('quiz', sujet.meta.id);
-    updateSpacedRepetition(sujet.meta.id, score, total);
+    // Save — UNE seule fois par session. renderTabQuiz conserve la session
+    // terminée pour réafficher le score au retour sur l'onglet : sans ce
+    // garde-fou, chaque revisite ajoutait une tentative, une activité et
+    // recalculait la répétition espacée.
+    if (!sess._finalized) {
+      const prev = state.user.quizScores[sujet.meta.id] || { best: 0, total };
+      sess._isNewBest = score > prev.best;
+      state.user.quizScores[sujet.meta.id] = {
+        best: Math.max(prev.best, score),
+        total,
+        attempts: [...(prev.attempts || []), { score, date: new Date().toISOString() }].slice(-10)
+      };
+      sess._finalized = true;
+      saveUserState();
+      recordActivity('quiz', sujet.meta.id);
+      updateSpacedRepetition(sujet.meta.id, score, total);
+    }
+    const isNewBest = !!sess._isNewBest;
 
     clear(quizCard);
     quizCard.appendChild(el('div', { class: 'quiz-final' },
@@ -6146,7 +6223,7 @@
     const sess = state.quizSession;
     const total = sess.questions.length;
     const score = sess.score;
-    recordActivity('quiz', null);
+    if (!sess._recorded) { sess._recorded = true; recordActivity('quiz', null); }
     clear(quizCard);
     const stillToReview = getQuestionsToReview().length;
     quizCard.appendChild(el('div', { class: 'quiz-final' },
@@ -6174,24 +6251,27 @@
     const sess = state.quizSession;
     const total = sess.questions.length;
     const score = sess.score;
-    recordActivity('quiz', null);
-    // Enregistre le résultat du jour
-    const dayKey = sess._dailyDate || dateKey(new Date());
-    state.user.dailyQuiz = {
-      date: dayKey,
-      score: score,
-      total: total,
-      completed: true
-    };
-    // Maintient une liste durable des dates de complétion pour
-    // l'achievement quotidien-7 (le quizLog est capé à 500 entrées et
-    // ne peut donc pas servir de source fiable pour cette mesure).
-    if (!Array.isArray(state.user.dailyQuizDates)) state.user.dailyQuizDates = [];
-    if (state.user.dailyQuizDates.indexOf(dayKey) < 0) {
-      state.user.dailyQuizDates.push(dayKey);
+    if (!sess._recorded) {
+      sess._recorded = true;
+      recordActivity('quiz', null);
+      // Enregistre le résultat du jour
+      const dayKey = sess._dailyDate || dateKey(new Date());
+      state.user.dailyQuiz = {
+        date: dayKey,
+        score: score,
+        total: total,
+        completed: true
+      };
+      // Maintient une liste durable des dates de complétion pour
+      // l'achievement quotidien-7 (le quizLog est capé à 500 entrées et
+      // ne peut donc pas servir de source fiable pour cette mesure).
+      if (!Array.isArray(state.user.dailyQuizDates)) state.user.dailyQuizDates = [];
+      if (state.user.dailyQuizDates.indexOf(dayKey) < 0) {
+        state.user.dailyQuizDates.push(dayKey);
+      }
+      saveUserState();
+      checkAchievements();
     }
-    saveUserState();
-    checkAchievements();
     clear(quizCard);
     const pct = total > 0 ? (score / total) * 100 : 0;
     let verdict;
@@ -6226,8 +6306,11 @@
     else if (pct >= 40) verdict = 'Une bonne base.';
     else verdict = 'Plusieurs sujets méritent une seconde lecture.';
 
-    recordActivity('quiz', null);
-    checkAchievements();
+    if (!sess._recorded) {
+      sess._recorded = true;
+      recordActivity('quiz', null);
+      checkAchievements();
+    }
 
     clear(quizCard);
     quizCard.appendChild(el('div', { class: 'quiz-final' },
@@ -6238,8 +6321,12 @@
         el('button', {
           class: 'btn',
           onclick: () => {
+            const prevMode = sess.mode, prevDomain = sess._domain, prevParcours = sess._parcoursId;
             state.quizSession = null;
-            if (isDefi) startChallengeQuiz(total); else startMixedQuiz(total);
+            // Conserve le contexte : défi, parcours, ou mixte filtré par domaine
+            if (isDefi) startChallengeQuiz(total);
+            else if (prevMode === 'parcours' && prevParcours) startParcoursQuiz(prevParcours, total);
+            else startMixedQuiz(total, prevDomain);
             rerender();
           }
         }, 'Recommencer'),
@@ -6432,8 +6519,7 @@
     // Résumé de chaque fiche sujet. Ici on les regroupe en un seul endroit
     // pour qu'on puisse les retrouver d'un coup d'œil.
     const sujetNotes = Object.entries(state.user.notes || {})
-      .filter(([id, txt]) => txt && txt.trim() && state.user.sujets ? state.sujets[id] : state.sujets[id])
-      .filter(([id]) => state.sujets[id]);
+      .filter(([id, txt]) => typeof txt === 'string' && txt.trim() && state.sujets[id]);
 
     if (sujetNotes.length > 0) {
       const sec = el('section', { class: 'profil-section notes-attached' });
@@ -7123,10 +7209,61 @@
   // scroll pour éviter de reperdre la zone du quiz à chaque clic.
   let _lastRenderedHash = null;
 
+  // ---- Overlays plein écran (présentation, flashcards, diaporama…) ----
+  // Montage commun : refuse un second overlay tant qu'un est ouvert, pose
+  // la classe body, l'écouteur clavier (ignoré dans les champs de saisie),
+  // et FERME l'overlay à la navigation (bouton Retour, Ctrl+K, lien dans
+  // une carte) — sinon body.overlay-active et le keydown global survivaient
+  // à la vue qui les avait ouverts.
+  function mountOverlay(overlay, close, onKey) {
+    if (document.body.classList.contains('overlay-active')) return false;
+    const keyHandler = (e) => {
+      const t = e.target;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return;
+      onKey(e);
+    };
+    overlay._keyHandler = keyHandler;
+    document.addEventListener('keydown', keyHandler);
+    document.body.classList.add('overlay-active');
+    document.body.appendChild(overlay);
+    if (!overlay.hasAttribute('role')) overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    window.addEventListener('hashchange', () => { if (overlay.parentNode) close(); }, { once: true });
+    return true;
+  }
+  function unmountOverlay(overlay) {
+    if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+    if (overlay._keyHandler) { document.removeEventListener('keydown', overlay._keyHandler); overlay._keyHandler = null; }
+    document.body.classList.remove('overlay-active');
+  }
+
+  // ---- Cycle de vie des vues ----
+  // Deux registres de fonctions de nettoyage :
+  //  - onRerender(fn)  : exécutée au PROCHAIN rerender, quel qu'il soit
+  //                      (observers, timers de dwell liés au DOM courant).
+  //  - onLeaveView(fn) : exécutée seulement quand le hash change (timers de
+  //                      manche, écouteurs document/window, overlays…) — un
+  //                      rerender intra-vue (question suivante, accordéon)
+  //                      ne doit pas les tuer.
+  // Évite les fuites d'écouteurs, les chronos fantômes qui tournent après
+  // navigation et les callbacks sur DOM détaché.
+  const _renderCleanups = [];
+  const _viewCleanups = [];
+  function onRerender(fn) { if (typeof fn === 'function') _renderCleanups.push(fn); }
+  function onLeaveView(fn) { if (typeof fn === 'function') _viewCleanups.push(fn); }
+  function runCleanups(list) {
+    while (list.length) {
+      const fn = list.pop();
+      try { fn(); } catch (e) { console.warn('[CarnetDeSavoirs] cleanup', e); }
+    }
+  }
+
   function rerender() {
     const route = parseHash();
     const currentHash = location.hash;
     const isNavigation = (_lastRenderedHash !== currentHash);
+    runCleanups(_renderCleanups);
+    if (isNavigation) runCleanups(_viewCleanups);
     const preservedScroll = isNavigation ? 0 : window.scrollY;
     const main = renderShell(route.view);
 
@@ -7754,11 +7891,7 @@
     function flip() { revealed = !revealed; update(); }
     function next() { if (idx < deck.length - 1) { idx++; revealed = false; update(); } }
     function prev() { if (idx > 0) { idx--; revealed = false; update(); } }
-    function close() {
-      if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
-      document.removeEventListener('keydown', onKey);
-      document.body.classList.remove('overlay-active');
-    }
+    function close() { unmountOverlay(overlay); }
     function onKey(e) {
       if (e.key === 'Escape')      { close(); e.preventDefault(); }
       else if (e.key === 'ArrowLeft')  { prev(); e.preventDefault(); }
@@ -7770,10 +7903,7 @@
     prevBtn.addEventListener('click', prev);
     nextBtn.addEventListener('click', next);
     card.addEventListener('click', flip);
-    document.addEventListener('keydown', onKey);
-
-    document.body.classList.add('overlay-active');
-    document.body.appendChild(overlay);
+    if (!mountOverlay(overlay, close, onKey)) return;
     update();
   }
 
@@ -8353,11 +8483,7 @@
     function prev() { if (idx > 0) { idx--; render(); } }
     function first() { if (idx !== 0) { idx = 0; render(); } }
     function last() { if (idx !== etapes.length - 1) { idx = etapes.length - 1; render(); } }
-    function close() {
-      if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
-      document.removeEventListener('keydown', onKey);
-      document.body.classList.remove('overlay-active');
-    }
+    function close() { unmountOverlay(overlay); }
     function onKey(e) {
       if (e.key === 'Escape')          { close(); e.preventDefault(); }
       else if (e.key === 'ArrowLeft' || e.key === 'PageUp')   { prev();  e.preventDefault(); }
@@ -8374,9 +8500,7 @@
       const a = e.target.closest('a');
       if (a) close();
     });
-    document.addEventListener('keydown', onKey);
-    document.body.classList.add('overlay-active');
-    document.body.appendChild(overlay);
+    if (!mountOverlay(overlay, close, onKey)) return;
     render();
   }
 
@@ -9327,8 +9451,12 @@
       if (s.running) document.title = '⏱ ' + display.textContent + ' — Carnet';
       else document.title = 'Carnet de Savoirs';
     }
+    // Le décompte est basé sur un horodatage de fin (s.endTs) et non sur
+    // un compteur décrémenté à chaque tick : les navigateurs ralentissent
+    // les setInterval des onglets en arrière-plan (jusqu'à 1 tick/min),
+    // ce qui faisait durer un pomodoro de 25 min bien plus longtemps.
     function tick() {
-      s.remaining--;
+      s.remaining = Math.max(0, Math.round((s.endTs - Date.now()) / 1000));
       if (s.remaining <= 0) {
         stopTimer();
         tryChime();
@@ -9337,15 +9465,17 @@
         s.remaining = s.isWork ? WORK_S : BREAK_S;
         phase.textContent = s.isWork ? 'Travail' : 'Pause';
         updateDisplay();
-        // Notification douce (non bloquante)
-        setTimeout(() => alert('Pomodoro : début de la ' + next + '.'), 50);
+        // Notification douce et VRAIMENT non bloquante (un alert() gèle la
+        // page) : on réutilise le toast des succès.
+        showAchievementToast({ label: 'Pomodoro', desc: 'Début de la ' + next + '.' });
       } else {
         updateDisplay();
       }
     }
     function startTimer() {
       s.running = true;
-      s.intervalId = setInterval(tick, 1000);
+      s.endTs = Date.now() + s.remaining * 1000;
+      s.intervalId = setInterval(tick, 500);
       startBtn.textContent = 'Pause';
       updateDisplay();
     }
@@ -9353,6 +9483,8 @@
       s.running = false;
       if (s.intervalId) clearInterval(s.intervalId);
       s.intervalId = null;
+      if (s.endTs) s.remaining = Math.max(0, Math.round((s.endTs - Date.now()) / 1000));
+      s.endTs = null;
       startBtn.textContent = 'Reprendre';
       document.title = 'Carnet de Savoirs';
     }
@@ -9919,9 +10051,14 @@
     const feedback = el('div', { class: 'quiz-feedback', style: { display: 'none' } });
     host.appendChild(feedback);
 
+    let answered = false;
     function wrappedOnAnswer(isCorrect, isTimeout) {
+      if (answered) return;   // une seule réponse par question (timeout vs clic)
+      answered = true;
+      // Neutralise l'interaction restante (boutons, inputs, selects)
+      interactionHost.querySelectorAll('button, input, select').forEach(n => { n.disabled = true; });
       const msg = isTimeout ? 'Temps écoulé.' : (isCorrect ? 'Exact !' : 'Pas tout à fait.');
-      const explic = (q.explication ? ' ' + q.explication : '');
+      const explic = (q.explication ? ' ' + md(q.explication).replace(/^<p>|<\/p>$/g, '') : '');
       feedback.innerHTML = '<strong>' + msg + '</strong>' + explic;
       feedback.style.display = 'block';
       if (opts.onAnswer) opts.onAnswer(isCorrect, isTimeout);
@@ -9943,7 +10080,9 @@
       const skip = el('button', { class: 'btn', onclick: () => wrappedOnAnswer(false) }, 'Passer');
       interactionHost.appendChild(skip);
     }
-    return { feedback: feedback };
+    // forceAnswer : utilisé par les timers de manche pour clore la question
+    // (feedback + bouton suivant) au lieu de la laisser cliquable.
+    return { feedback: feedback, forceAnswer: (isCorrect, isTimeout) => wrappedOnAnswer(!!isCorrect, !!isTimeout) };
   }
 
   // ---- Manche 1 : Play 4 à la suite ----
@@ -9968,6 +10107,7 @@
     const timerEl = el('div', { class: 'quiz-timer champion-timer' }, sess.timerLeft + ' s');
     card.appendChild(timerEl);
     if (sess.timerId) { clearInterval(sess.timerId); sess.timerId = null; }
+    let qHandle = null; // renseigné après renderChampionQuestion (ci-dessous)
     sess.timerId = setInterval(() => {
       sess.timerLeft--;
       if (timerEl) timerEl.textContent = sess.timerLeft + ' s';
@@ -9975,9 +10115,16 @@
       if (sess.timerLeft <= 0) {
         clearInterval(sess.timerId);
         sess.timerId = null;
-        onAnsweredQ(false, true);
+        // Passe par le wrapper de la question : feedback « Temps écoulé »,
+        // options désactivées et bouton « Voir le résultat » — avant, on
+        // marquait juste failed=true et le joueur restait bloqué à 0 s.
+        if (qHandle) qHandle.forceAnswer(false, true);
+        else onAnsweredQ(false, true);
       }
     }, 1000);
+    // Quitter la vue arrête le chrono (sinon il expirait sur un DOM détaché
+    // et la manche était perdue silencieusement).
+    onLeaveView(() => { if (sess.timerId) { clearInterval(sess.timerId); sess.timerId = null; } });
 
     function onAnsweredQ(isCorrect, isTimeout) {
       if (sess.timerId) { clearInterval(sess.timerId); sess.timerId = null; }
@@ -9986,7 +10133,7 @@
     }
 
     const q = sess.questions[sess.currentQ];
-    renderChampionQuestion(card, q, {
+    qHandle = renderChampionQuestion(card, q, {
       onAnswer: onAnsweredQ,
       afterFeedback: (wrap) => {
         if (sess.failed) {
@@ -10025,21 +10172,37 @@
     const card = el('div', { class: 'quiz-card champion-play-card' });
     main.appendChild(card);
 
-    // Timer global (60s pour toute la finale)
+    // Timer global (60s pour toute la finale), basé sur un horodatage de fin :
+    // insensible au throttling des onglets cachés, et le temps continue de
+    // courir si l'on quitte la vue (pas de pause gratuite). L'intervalle,
+    // lui, est nettoyé à la navigation et recréé au retour.
+    if (!sess.endTs) sess.endTs = Date.now() + (sess.timeLeft || 60) * 1000;
+    const tickFinale = () => {
+      sess.timeLeft = Math.max(0, Math.ceil((sess.endTs - Date.now()) / 1000));
+      // `card` est recréé à chaque question (rerender) : on cherche dans
+      // le document, sinon l'affichage se fige après la 1re question.
+      const t = document.querySelector('.champion-play-card .champion-timer');
+      if (t) t.textContent = sess.timeLeft + ' s';
+      if (sess.timeLeft <= 10 && t) t.classList.add('quiz-timer-urgent');
+      if (sess.timeLeft <= 0) {
+        clearInterval(sess.timerId);
+        sess.timerId = null;
+        sess.finished = true;
+        state.championSession.phase = 'result';
+        rerender();
+      }
+    };
     if (!sess.timerId) {
-      sess.timerId = setInterval(() => {
-        sess.timeLeft--;
-        const t = card.querySelector('.champion-timer');
-        if (t) t.textContent = sess.timeLeft + ' s';
-        if (sess.timeLeft <= 10 && t) t.classList.add('quiz-timer-urgent');
-        if (sess.timeLeft <= 0) {
-          clearInterval(sess.timerId);
-          sess.timerId = null;
-          sess.finished = true;
-          state.championSession.phase = 'result';
-          rerender();
-        }
-      }, 1000);
+      sess.timerId = setInterval(tickFinale, 250);
+    }
+    onLeaveView(() => { if (sess.timerId) { clearInterval(sess.timerId); sess.timerId = null; } });
+    // Si le temps a expiré pendant qu'on était ailleurs, on bascule tout de suite
+    if (sess.endTs - Date.now() <= 0 && !sess.finished) {
+      if (sess.timerId) { clearInterval(sess.timerId); sess.timerId = null; }
+      sess.finished = true;
+      state.championSession.phase = 'result';
+      setTimeout(rerender, 0);   // hors du rendu en cours
+      return;
     }
     const timerEl = el('div', { class: 'quiz-timer champion-timer' },
       sess.timeLeft + ' s' + (sess.timeLeft <= 10 ? '' : ''));
@@ -10188,7 +10351,9 @@
 
   function renderResult4(main, sess) {
     const success = !sess.failed && sess.score >= 4;
-    if (success) recordQuatreSuiteWin(sess.sujetId);
+    // Enregistrement unique par partie : l'écran de résultat peut être
+    // re-rendu (retour depuis une autre vue) sans re-compter la victoire.
+    if (success && !sess._recorded) { sess._recorded = true; recordQuatreSuiteWin(sess.sujetId); }
     const titre = String(sess.sujetTitre).replace(/<[^>]+>/g, '');
     main.appendChild(el('span', { class: 'eyebrow' }, '4 à la suite · ' + titre));
     main.appendChild(el('h1', { class: 'page-title' },
@@ -10205,9 +10370,15 @@
   }
 
   function renderResultFinale(main, sess) {
-    recordFinaleScore(sess.domain, Math.max(0, sess.score));
-    const prevBest = (getChampion().finale[sess.domain] && getChampion().finale[sess.domain].bestScore) || 0;
-    const isRecord = sess.score >= prevBest && sess.score > 0;
+    if (!sess._recorded) {
+      // Lire l'ancien record AVANT de l'enregistrer, sinon « Nouveau record »
+      // s'affiche aussi à égalité.
+      const prevBest = (getChampion().finale[sess.domain] && getChampion().finale[sess.domain].bestScore) || 0;
+      sess._isRecord = sess.score > prevBest && sess.score > 0;
+      sess._recorded = true;
+      recordFinaleScore(sess.domain, Math.max(0, sess.score));
+    }
+    const isRecord = !!sess._isRecord;
     main.appendChild(el('span', { class: 'eyebrow' }, 'Finale · ' + sess.domain));
     main.appendChild(el('h1', { class: 'page-title' },
       isRecord && sess.score > 0 ? '🏆 Nouveau record !' : 'Finale terminée'));
@@ -10220,7 +10391,7 @@
 
   function renderResult9(main, sess) {
     const won = sess.score >= 9;
-    recordNeufPointsResult(won, sess.bestStreak);
+    if (!sess._recorded) { sess._recorded = true; recordNeufPointsResult(won, sess.bestStreak); }
     main.appendChild(el('span', { class: 'eyebrow' }, '9 points gagnants'));
     main.appendChild(el('h1', { class: 'page-title' },
       won ? '🏆 Victoire !' : 'Défaite'));
@@ -10237,7 +10408,7 @@
 
   function renderResultFace(main, sess) {
     const isRecord = sess.score > sess.ghostScore;
-    recordFaceAFaceScore(sess.sujetId, sess.score);
+    if (!sess._recorded) { sess._recorded = true; recordFaceAFaceScore(sess.sujetId, sess.score); }
     const titre = String(sess.sujetTitre).replace(/<[^>]+>/g, '');
     main.appendChild(el('span', { class: 'eyebrow' }, 'Face-à-face · ' + titre));
     main.appendChild(el('h1', { class: 'page-title' },
