@@ -14,7 +14,7 @@
   // Version de l'application, bumpée automatiquement par Snapshot.bat
   // (cf. Update-Cache-Version.ps1, section APP_VERSION). Affichée en bas
   // de la sidebar pour signaler chaque mise à jour à l'utilisateur.
-  const APP_VERSION = 'v1.8';
+  const APP_VERSION = 'v1.9';
 
   // =================================================================
   // STATE
@@ -94,13 +94,76 @@
       // injectés par defaultUserState() (quizCounters, dailyQuizDates…)
       // masquent leur absence et les migrations ne s'exécutent jamais.
       if (parsed && typeof parsed === 'object') migrateUserState(parsed);
-      // Merge avec defaults au cas où
-      const merged = Object.assign(defaultUserState(), parsed);
-      return merged;
+      // Assainissement champ par champ (types attendus = defaultUserState) :
+      // un localStorage altéré ou un vieil import ne peut plus casser le rendu.
+      return sanitizeUserState(parsed);
     } catch (e) {
       console.warn('Erreur lecture localStorage', e);
       return defaultUserState();
     }
+  }
+
+  // Assainit un état utilisateur venu de l'extérieur (localStorage, import
+  // JSON) : chaque champ n'est conservé que s'il a le type attendu par
+  // defaultUserState() (objet vs tableau vs chaîne vs nombre vs booléen) ;
+  // sinon il retombe sur la valeur par défaut. Les objets « plats » de
+  // réglages (filters, quizCounters, quizStreak, goals, champion.*) sont
+  // fusionnés clé par clé avec la même règle. Retourne toujours un état
+  // complet et utilisable — même pour `[]`, `null` ou `{ progress: null }`.
+  function sanitizeUserState(input) {
+    const def = defaultUserState();
+    if (!input || typeof input !== 'object' || Array.isArray(input)) return def;
+    const kind = (v) => Array.isArray(v) ? 'array' : (v === null ? 'null' : typeof v);
+    const mergeFlat = (d, src) => {
+      if (!src || typeof src !== 'object' || Array.isArray(src)) return d;
+      Object.keys(d).forEach(k => {
+        if (!(k in src)) return;
+        // Une valeur par défaut `null` signifie « scalaire optionnel »
+        // (filters.domain, filters.tag…) : on accepte chaîne / nombre / booléen / null.
+        if (d[k] === null) { if (src[k] === null || ['string', 'number', 'boolean'].indexOf(typeof src[k]) >= 0) d[k] = src[k]; return; }
+        if (kind(src[k]) === kind(d[k])) d[k] = src[k];
+      });
+      return d;
+    };
+    const out = {};
+    Object.keys(def).forEach(k => {
+      const dv = def[k], sv = input[k];
+      if (!(k in input)) { out[k] = dv; return; }
+      // Champs nullables
+      if (k === 'activeParcours') { out[k] = (sv && typeof sv === 'object' && !Array.isArray(sv)) ? sv : null; return; }
+      if (kind(sv) !== kind(dv)) { out[k] = dv; return; }
+      if (['filters', 'quizCounters', 'quizStreak', 'goals'].indexOf(k) >= 0) { out[k] = mergeFlat(dv, sv); return; }
+      if (k === 'champion') {
+        out[k] = {
+          quatreSuite: (sv.quatreSuite && typeof sv.quatreSuite === 'object' && !Array.isArray(sv.quatreSuite)) ? sv.quatreSuite : {},
+          finale:      (sv.finale && typeof sv.finale === 'object' && !Array.isArray(sv.finale)) ? sv.finale : {},
+          neufPoints:  mergeFlat(dv.neufPoints, sv.neufPoints),
+          faceAFace:   (sv.faceAFace && typeof sv.faceAFace === 'object' && !Array.isArray(sv.faceAFace)) ? sv.faceAFace : {}
+        };
+        return;
+      }
+      out[k] = sv;
+    });
+    // Tableaux de scalaires : on filtre les entrées manifestement corrompues
+    out.favorites = out.favorites.filter(x => typeof x === 'string');
+    out.achievements = out.achievements.filter(x => typeof x === 'string');
+    out.dailyQuizDates = out.dailyQuizDates.filter(x => typeof x === 'string');
+    out.quizLog = out.quizLog.filter(x => x && typeof x === 'object');
+    // Scores de quiz : entrées cohérentes uniquement (total > 0, best numérique)
+    Object.keys(out.quizScores).forEach(k => {
+      const q = out.quizScores[k];
+      if (!q || typeof q !== 'object' || !(q.total > 0) || typeof q.best !== 'number') delete out.quizScores[k];
+      else if (!Array.isArray(q.attempts)) q.attempts = [];
+    });
+    // Progression : objets uniquement
+    Object.keys(out.progress).forEach(k => { const v = out.progress[k]; if (!v || typeof v !== 'object' || Array.isArray(v)) delete out.progress[k]; });
+    // Notes : uniquement des chaînes non vides
+    Object.keys(out.notes).forEach(k => { if (typeof out.notes[k] !== 'string' || !out.notes[k].trim()) delete out.notes[k]; });
+    // Bornes des objectifs
+    const freshGoals = defaultUserState().goals;   // (def.goals a pu être muté par mergeFlat)
+    if (!(out.goals.timeMs > 0)) out.goals.timeMs = freshGoals.timeMs;
+    if (!(out.goals.intensity > 0)) out.goals.intensity = freshGoals.intensity;
+    return out;
   }
 
   // Migrations one-shot pour les comptes existants. Idempotent : peut
@@ -1603,6 +1666,14 @@
       String(d.getMonth() + 1).padStart(2, '0') + '-' +
       String(d.getDate()).padStart(2, '0');
   }
+  // Inverse de dateKey : 'YYYY-MM-DD' → Date locale à minuit. Ne PAS utiliser
+  // `new Date('YYYY-MM-DD')` : ce format est interprété en UTC, ce qui décale
+  // d'un jour selon le fuseau (bannière « 3 jours sans activité » à J+2, etc.).
+  function parseDateKey(key) {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(key || ''));
+    if (!m) { const d = new Date(key); return isNaN(d) ? new Date(0) : d; }
+    return new Date(+m[1], +m[2] - 1, +m[3]);
+  }
 
   // Enregistre une action d'apprentissage. Si sujetId est fourni, le compteur
   // est incrémenté à la fois au global du jour et dans le sous-objet par-sujet
@@ -1678,7 +1749,15 @@
       }
     });
     window.addEventListener('beforeunload', stopSujetTimer);
+    // pagehide est plus fiable que beforeunload sur mobile / Safari
+    window.addEventListener('pagehide', stopSujetTimer);
+    // Flush des sauvegardes différées (notes) : sans ça, les 600 dernières
+    // ms de saisie étaient perdues en fermant l'onglet.
+    const flushPending = () => { if (_pendingSave) { _pendingSave = false; saveUserState(); } };
+    window.addEventListener('pagehide', flushPending);
+    window.addEventListener('beforeunload', flushPending);
   }
+  let _pendingSave = false;
 
   // Pondération pour calculer l'intensité d'une journée :
   //   1 visite = 1, 1 bloc lu = 1, 1 quiz = 3 (action plus profonde).
@@ -1757,10 +1836,10 @@
 
     if (cursor) {
       let i = dates.length - 1;
-      let prev = new Date(dates[i]);
+      let prev = parseDateKey(dates[i]);
       current = 1; i--;
       while (i >= 0) {
-        const d = new Date(dates[i]);
+        const d = parseDateKey(dates[i]);
         const diff = Math.round((prev - d) / 86400000);
         if (diff === 1) { current++; prev = d; i--; }
         else break;
@@ -1770,7 +1849,7 @@
     // Meilleur streak historique
     let best = 0, run = 1;
     for (let i = 1; i < dates.length; i++) {
-      const diff = Math.round((new Date(dates[i]) - new Date(dates[i - 1])) / 86400000);
+      const diff = Math.round((parseDateKey(dates[i]) - parseDateKey(dates[i - 1])) / 86400000);
       if (diff === 1) run++;
       else { best = Math.max(best, run); run = 1; }
     }
@@ -2246,10 +2325,9 @@
     const da = (state.user && state.user.dailyActivity) || {};
     const dates = Object.keys(da).filter(k => dailyIntensity(da[k]) > 0).sort().reverse();
     if (dates.length === 0) return null;
-    const last = new Date(dates[0]);
+    const last = parseDateKey(dates[0]);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    last.setHours(0, 0, 0, 0);
     return Math.round((today - last) / 86400000);
   }
 
@@ -2296,14 +2374,19 @@
     textarea.value = notes;
     let saveTimer = null;
     textarea.addEventListener('input', () => {
-      state.user.notes[sujet.meta.id] = textarea.value;
+      // Une note vide n'est pas stockée (évite les clés fantômes)
+      if (textarea.value.trim()) state.user.notes[sujet.meta.id] = textarea.value;
+      else delete state.user.notes[sujet.meta.id];
       status.textContent = 'Saisie en cours…';
+      _pendingSave = true;
       clearTimeout(saveTimer);
       saveTimer = setTimeout(() => {
+        _pendingSave = false;
         saveUserState();
         status.textContent = 'Sauvegardé · ' + new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
       }, 600);
     });
+    textarea.addEventListener('blur', () => { if (_pendingSave) { clearTimeout(saveTimer); _pendingSave = false; saveUserState(); status.textContent = 'Sauvegardé'; } });
     container.appendChild(textarea);
     container.appendChild(status);
 
@@ -6395,8 +6478,10 @@
       state.user.globalNotes = textarea.value;
       status.textContent = 'Saisie en cours…';
       updateStats(textarea.value);
+      _pendingSave = true;
       clearTimeout(saveTimer);
       saveTimer = setTimeout(() => {
+        _pendingSave = false;
         saveUserState();
         status.textContent = 'Sauvegardé · ' + new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
       }, 600);
@@ -7156,8 +7241,18 @@
     );
   }
 
+  const EXPORT_MARKER = 'carnet-de-savoirs';
+  const EXPORT_VERSION = 1;
+
   function exportData() {
-    const dataStr = JSON.stringify(state.user, null, 2);
+    const envelope = {
+      app: EXPORT_MARKER,
+      version: EXPORT_VERSION,
+      appVersion: APP_VERSION,
+      exportedAt: new Date().toISOString(),
+      user: state.user
+    };
+    const dataStr = JSON.stringify(envelope, null, 2);
     const blob = new Blob([dataStr], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -7178,8 +7273,27 @@
       reader.onload = (ev) => {
         try {
           const data = JSON.parse(ev.target.result);
-          if (!data || typeof data !== 'object') throw new Error('Format invalide');
-          state.user = Object.assign(defaultUserState(), data);
+          if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('Format invalide');
+          // Deux formats acceptés : l'enveloppe { app, version, user } (exports
+          // récents) et l'ancien export « brut » (l'objet user directement),
+          // reconnu par la présence d'au moins un champ structurel.
+          let raw;
+          if (data.app === EXPORT_MARKER && data.user && typeof data.user === 'object') raw = data.user;
+          else if ('progress' in data || 'quizScores' in data || 'dailyActivity' in data) raw = data;
+          else throw new Error('Ce fichier n\'est pas un export du Carnet de Savoirs.');
+          migrateUserState(raw);
+          const clean = sanitizeUserState(raw);
+          const nbSujets = Object.keys(clean.progress || {}).length;
+          const nbQuiz = Object.keys(clean.quizScores || {}).length;
+          const nbJours = Object.keys(clean.dailyActivity || {}).length;
+          const when = data.exportedAt ? ' (export du ' + String(data.exportedAt).slice(0, 10) + ')' : '';
+          const ok = confirm('Importer ces données' + when + ' ?\n\n' +
+            '• ' + nbSujets + ' fiche(s) ouverte(s)\n' +
+            '• ' + nbQuiz + ' quiz joué(s)\n' +
+            '• ' + nbJours + ' jour(s) d\'activité\n\n' +
+            'Ta progression actuelle sera REMPLACÉE (pense à l\'exporter avant si besoin).');
+          if (!ok) return;
+          state.user = clean;
           saveUserState();
           alert('Données importées. La page va se recharger.');
           location.reload();
@@ -8571,62 +8685,137 @@
   // de temps écoulé** depuis aujourd'hui, ce qui donne sa place à la
   // préhistoire cosmique sans écraser l'histoire récente.
 
+  // Convertit une date « libre » de Frise en année numérique (négatif = av.
+  // J.-C. ; les échelles géologiques Ga/Ma/ka sont comptées en années avant
+  // aujourd'hui). Retourne null si rien d'exploitable — l'appelant compte
+  // ces cas et les signale.
+  //
+  // Étapes : normalisation (espaces fines, exposants ᵉ, « 10 000 » → 10000,
+  // « 1990s » → 1990), unités géologiques, marqueurs av./ap. J.-C. stricts
+  // (« av » seul ne suffit pas : « avril »), millénaires et siècles (romains
+  // ou chiffres, avec plages), mois + année, plages numériques (« 1954-55 »,
+  // « -400 à 400 », « Années 1990-2000 »), nombre négatif explicite, année
+  // simple, « il y a N ans ». Testée sur les 450 dates réelles du carnet
+  // (voir /tests ou le script d'audit).
   function parseHistoricalDate(s) {
     if (s == null) return null;
-    const str = String(s).trim();
+    let str = String(s).trim();
     if (!str) return null;
-    // Frontières de mot strictes sur les unités Ga / Ma / ka — sinon
-    // "Ma" matche dans "mars", "Ga" dans "Gaulle", "ka" dans "Kafka".
-    // 13,8 Ga / Gyr / milliards d'années
-    let m = str.match(/(\d+[,.]?\d*)\s*(Ga\b|Gyr\b|G\.\s*a\.|milliards?\s+d['’]ann[ée]es?)/);
-    if (m) return -parseFloat(m[1].replace(',', '.')) * 1e9;
-    // Ma / millions d'années (Ma majuscule strict, ou millions complet)
-    m = str.match(/(\d+[,.]?\d*)\s*Ma\b/);
-    if (m) return -parseFloat(m[1].replace(',', '.')) * 1e6;
-    m = str.match(/(\d+[,.]?\d*)\s*millions?\s+d['’]ann[ée]es?/i);
-    if (m) return -parseFloat(m[1].replace(',', '.')) * 1e6;
-    // ka / milliers d'années
-    m = str.match(/(\d+[,.]?\d*)\s*ka\b/);
-    if (m) return -parseFloat(m[1].replace(',', '.')) * 1e3;
-    m = str.match(/(\d+[,.]?\d*)\s*milliers?\s+d['’]ann[ée]es?/i);
-    if (m) return -parseFloat(m[1].replace(',', '.')) * 1e3;
-    // Plage : "1900-1917" -> milieu
-    m = str.match(/^[~≈\s]*(-?\d{1,5})\s*[–\-]\s*(-?\d{1,5})\s*$/);
-    if (m) return (parseInt(m[1], 10) + parseInt(m[2], 10)) / 2;
-    // Plage "av. J.-C." : "300-200 av. J.-C." -> milieu négatif
-    m = str.match(/^(\d{1,5})\s*[–\-]\s*(\d{1,5})\s*av/i);
-    if (m) return -((parseInt(m[1], 10) + parseInt(m[2], 10)) / 2);
-    // Année négative directe : "-301" / "Vers -2500"
-    m = str.match(/-\s*(\d{1,8})\b/);
-    if (m && !/après|ap\./i.test(str)) return -parseInt(m[1], 10);
-    // "300 av. J.-C." / "av JC"
-    m = str.match(/(\d{1,5})\s*av\.?\s*J?\.?-?C?\.?/i);
-    if (m) return -parseInt(m[1], 10);
-    // Siècle : "XIIe siècle", "Xe siècle av. J.-C."
-    m = str.match(/([IVXLCM]+)\s*[èe]?\s*si[èe]cle(?:\s+av\.?\s*J?\.?-?C?\.?)?/i);
-    if (m) {
-      const roman = m[1].toUpperCase();
-      const map = { I:1, V:5, X:10, L:50, C:100, D:500, M:1000 };
+    // --- Normalisation ---
+    str = str
+      .replace(/[   ]/g, ' ')            // espaces insécables / fines
+      .replace(/ᵉʳ|ᵉ|ᵈ|ʳᵉ/g, 'e')                        // exposants « XVᵉ » → « XVe »
+      .replace(/(\d)\s(?=\d{3}\b)/g, '$1')               // « 10 000 » → « 10000 »
+      .replace(/(\d{4})s\b/g, '$1')                      // « 1990s » → « 1990 »
+      .replace(/\s+/g, ' ');
+    const low = str.toLowerCase();
+    const num = (t) => parseFloat(String(t).replace(',', '.'));
+    let m;
+    const romanVal = (r) => {
+      const map = { I: 1, V: 5, X: 10, L: 50, C: 100, D: 500, M: 1000 };
       let val = 0, prev = 0;
-      for (let i = roman.length - 1; i >= 0; i--) {
-        const v = map[roman[i]] || 0;
+      const R = r.toUpperCase();
+      for (let i = R.length - 1; i >= 0; i--) {
+        const v = map[R[i]] || 0;
         if (v < prev) val -= v; else { val += v; prev = v; }
       }
-      const isBC = /av\.?\s*J/i.test(str);
-      // siècle N → milieu = (N-1)*100 + 50, ex. XIIe → 1150
-      const mid = (val - 1) * 100 + 50;
-      return isBC ? -mid : mid;
+      return val;
+    };
+    // Notations scientifiques (« 10⁻³⁶ s ») : pas une date calendaire
+    if (/[⁰¹²³⁴⁵⁶⁷⁸⁹⁻]/.test(str)) return null;
+    // Calendrier républicain : « 9 thermidor an II » → 1793,5 ; « an VIII » → 1799,5
+    m = str.match(/\ban\s+([IVX]+)\b/);
+    if (m) return 1792 + romanVal(m[1]) - 0.5;
+    if (/aujourd/i.test(str) && !/\b\d{4}\b/.test(str)) return new Date().getFullYear();
+
+    // --- Échelles géologiques (frontières de mot strictes : « Ma » ≠ « mars ») ---
+    m = str.match(/(\d+[,.]?\d*)\s*(?:Ga\b|Gyr\b|Gda\b|G\.\s*a\.|milliards?\s+d['’]ann[ée]es?)/);
+    if (m) return -num(m[1]) * 1e9;
+    m = str.match(/(\d+[,.]?\d*)\s*Ma\b/);
+    if (m) return -num(m[1]) * 1e6;
+    m = str.match(/(\d+[,.]?\d*)\s*millions?\s+d['’]ann[ée]es?/i);
+    if (m) return -num(m[1]) * 1e6;
+    m = str.match(/(\d+[,.]?\d*)\s*(?:ka\b|milliers?\s+d['’]ann[ée]es?)/i);
+    if (m) return -num(m[1]) * 1e3;
+
+    // --- Marqueurs d'ère ---
+    // av. J.-C. / avant J.-C. / av. JC / avant notre ère — « avril » ne matche pas.
+    const isBC = /\bav(?:\.|ant)?\s*(?:j\.?\s*-?\s*c\.?|jc\b|notre[\s-]+ère|n\.\s*è\.)/i.test(str) || /\bavant notre ère\b/i.test(low);
+    const isAD = /\bap(?:\.|rès)?\s*(?:j\.?\s*-?\s*c\.?|jc\b|notre[\s-]+ère)/i.test(str) || /\bde notre ère\b/i.test(low);
+    const era = (y) => (isBC ? -Math.abs(y) : y);
+    const ORD = '(?:er|ère|re|ème|e)?';
+
+    // --- Millénaire : « IVe millénaire av. J.-C. », « 3e millénaire » ---
+    m = str.match(new RegExp('\\b([IVXLCM]+|\\d{1,2})\\s*' + ORD + '\\s*mill[ée]naire', 'i'));
+    if (m) {
+      const n = /^\d+$/.test(m[1]) ? parseInt(m[1], 10) : romanVal(m[1]);
+      if (n > 0) return era((n - 1) * 1000 + 500);
     }
-    // Année 1 à 4 chiffres simple : "1789", "1963" (4 chiffres en priorité)
+    // --- Siècles : « XVe siècle », « XIIe-XIIIe s. », « Ier s. ap. J.-C. », « 1er siècle » ---
+    const SIECLE = '(?:s\\.|si[èe]cles?)';
+    m = str.match(new RegExp('\\b([IVXLCM]+|\\d{1,2})\\s*' + ORD + '\\s*[–\\-—]\\s*([IVXLCM]+|\\d{1,2})\\s*' + ORD + '\\s*' + SIECLE, 'i'));
+    if (m) {
+      const a = /^\d+$/.test(m[1]) ? parseInt(m[1], 10) : romanVal(m[1]);
+      const b = /^\d+$/.test(m[2]) ? parseInt(m[2], 10) : romanVal(m[2]);
+      if (a > 0 && b > 0) return era(((a - 1) * 100 + 50 + (b - 1) * 100 + 50) / 2);
+    }
+    m = str.match(new RegExp('\\b([IVXLCM]+|\\d{1,2})\\s*' + ORD + '\\s*' + SIECLE, 'i'));
+    if (m) {
+      const n = /^\d+$/.test(m[1]) ? parseInt(m[1], 10) : romanVal(m[1]);
+      if (n > 0) return era((n - 1) * 100 + 50);
+    }
+
+    // --- Mois + année : « 15 avril 2019 », « 21-23 janv. 2008 », « Fév. 2007 » ---
+    const MONTHS = /\b(janv|f[ée]v|mars|avr|mai|juin|juil|ao[uû]t|sept|oct|nov|d[ée]c|janvier|f[ée]vrier|avril|juillet|septembre|octobre|novembre|d[ée]cembre|été|printemps|automne|hiver|fin|début|mi)\b/i;
+    if (MONTHS.test(str)) {
+      m = str.match(/\b(\d{3,4})\b/);
+      if (m) return era(parseInt(m[1], 10));
+    }
+
+    // --- Plages numériques : « 1954-55 », « 300-200 av. J.-C. », « -400 à 400 », « ~1900-1917 » ---
+    m = str.match(/(-?\d{1,7})\s*(?:[–\-—\/]|à|→)\s*(-?\d{1,7})/);
+    if (m) {
+      let a = parseInt(m[1], 10), b = parseInt(m[2], 10);
+      // Second terme abrégé : « 1954-55 » → 1955, « 1940-50 » → 1950
+      if (b >= 0 && b < 100 && Math.abs(a) >= 1000 && m[2].length <= 2 && !isBC) b = a - (a % 100) + b;
+      if (isBC) { a = -Math.abs(a); b = -Math.abs(b); }
+      return (a + b) / 2;
+    }
+    // « 2016 → aujourd'hui », « 1274 et 1281 »
+    m = str.match(/\b(\d{3,4})\b\s*(?:et|→|puis)\s*\b(\d{3,4})\b/);
+    if (m) return era((parseInt(m[1], 10) + parseInt(m[2], 10)) / 2);
+    if (/aujourd/i.test(str)) {
+      m = str.match(/\b(\d{4})\b/);
+      const now = new Date().getFullYear();
+      return m ? (parseInt(m[1], 10) + now) / 2 : now;
+    }
+
+    // --- Nombre négatif explicite : « -301 », « ~-2500 », « Vers -10000 » ---
+    m = str.match(/(?:^|[^\d\w])-\s*(\d{1,12})\b/);
+    if (m && !isAD) return -parseInt(m[1], 10);
+
+    // --- « il y a N ans » / « N ans » (préhistoire) ---
+    m = str.match(/il y a\s*(?:~|environ|env\.)?\s*(\d{1,9})\s*ans/i);
+    if (m) return -parseInt(m[1], 10);
+    m = str.match(/\b(\d{4,9})\s*ans\b/i);
+    if (m && !/\b(?:après|apr\.|ap\.)\b/i.test(str)) return -parseInt(m[1], 10);
+    // durées courtes (« ~ 5 ans », « Jour 1 », « ~3 minutes ») : pas une date
+    if (/\b\d{1,3}\+?\s*(?:ans?|mois|jours?|minutes?|secondes?|s)\b/i.test(str) && !/\b\d{4}\b/.test(str)) return null;
+
+    // --- Année simple : 4 chiffres en priorité, sinon 1 à 3 chiffres ---
     m = str.match(/\b(\d{4})\b/);
-    if (m) return parseInt(m[1], 10);
-    m = str.match(/\b(\d{3})\b/);
-    if (m) return parseInt(m[1], 10);
+    if (m) return era(parseInt(m[1], 10));
+    // 5 chiffres et plus (« 10000 av. J.-C. », « -13800000000 » déjà traité) : lu tel quel
+    m = str.match(/\b(\d{5,12})\b/);
+    if (m) return era(parseInt(m[1], 10));
+    m = str.match(/\b(\d{1,3})\b/);
+    if (m && (isBC || isAD || /^[~≈v.ers ]*\d{1,3}$/i.test(str) || /^\d{1,3}\b/.test(str))) return era(parseInt(m[1], 10));
     return null;
   }
 
   function collectTimelineEvents() {
     const events = [];
+    collectTimelineEvents.unparsed = [];   // dates non reconnues (affichées sous la timeline)
     state.sujetsOrder.forEach(id => {
       const s = state.sujets[id];
       if (!s || !Array.isArray(s.cours)) return;
@@ -8638,7 +8827,7 @@
         evs.forEach(ev => {
           if (!ev || !ev.titre) return;
           const yr = parseHistoricalDate(ev.date);
-          if (yr == null) return;
+          if (yr == null) { collectTimelineEvents.unparsed.push({ date: ev.date, sujetId: id, titre: ev.titre }); return; }
           events.push({
             year: yr,
             dateLabel: String(ev.date || '').trim(),
@@ -8676,6 +8865,22 @@
         el('div', { class: 'empty-state-icon' }, '⌛'),
         el('p', null, 'Aucun événement daté pour le moment (les frises des sujets sont vides ou non datées).')));
       return;
+    }
+
+    // Transparence : combien d'événements n'ont pas pu être datés (dates
+    // libres du type « Renaissance », « Jour 1 », « ~ 5 ans »). Avant, ils
+    // disparaissaient silencieusement.
+    const unparsed = collectTimelineEvents.unparsed || [];
+    if (unparsed.length) {
+      const det = el('details', { class: 'timeline-unparsed' },
+        el('summary', null, unparsed.length + ' événement' + (unparsed.length > 1 ? 's' : '') + ' de frise sans date exploitable (non affiché' + (unparsed.length > 1 ? 's' : '') + ')'),
+        el('ul', null, ...unparsed.slice(0, 60).map(u => {
+          const sj = state.sujets[u.sujetId];
+          const t = sj ? String(sj.meta.titre || u.sujetId).replace(/<[^>]+>/g, '') : u.sujetId;
+          return el('li', null, el('em', null, '« ' + String(u.date || '—') + ' »'), ' — ' + String(u.titre || '').replace(/[*`]/g, '') + ' (', el('a', { href: '#/sujet/' + encodeURIComponent(u.sujetId) + '/cours' }, t), ')');
+        }))
+      );
+      main.appendChild(det);
     }
 
     // ---- Toolbar : toggle Long/Court + filtre par domaine ----

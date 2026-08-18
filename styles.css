@@ -6253,3 +6253,14 @@ body.dark mark.passage-mark:hover {
   margin-top: 1.5rem;
   flex-wrap: wrap;
 }
+
+/* Timeline globale — événements de frise sans date exploitable */
+.timeline-unparsed {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  margin: 0.25rem 0 1rem;
+}
+.timeline-unparsed summary { cursor: pointer; }
+.timeline-unparsed ul { margin: 0.4rem 0 0 1rem; padding: 0; }
+.timeline-unparsed li { margin: 0.15rem 0; }
+.timeline-unparsed a { color: var(--text-soft); }
