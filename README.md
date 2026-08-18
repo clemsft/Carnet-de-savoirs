@@ -1,109 +1,82 @@
 # Carnet de Savoirs
 
-> Atelier d'apprentissage personnel — single-file local, sans serveur, sans API.
+> Atelier d'apprentissage personnel — application web locale, sans serveur, sans build, sans API. Un fichier `.js` par sujet, une app vanilla JS qui les assemble.
 
 ## Ouvrir l'app
 
-Double-cliquer sur `index.html`. Aucune installation nécessaire.
+- **En local** : double-cliquer sur `index.html` (protocole `file://`). Aucune installation.
+- **En ligne** : le dossier est publié tel quel sur GitHub Pages (`Snapshot.bat` commit + push). En HTTP(S) l'app fonctionne aussi en **PWA installable** et **hors-ligne** (service worker `sw.js`, manifest, icônes PNG).
 
-L'app fonctionne en local (protocole `file://`). Toutes les données utilisateur (progression, scores, favoris, notes) sont stockées dans le **localStorage** du navigateur. Pour les sauvegarder ou transférer sur un autre appareil, utiliser **Mon profil → Exporter mes données**.
+Toutes les données utilisateur (progression, scores, favoris, notes, surlignages, succès, réglages) sont dans le **localStorage** du navigateur, clé `carnetdesavoirs_v1`. Pour les sauvegarder ou changer d'appareil : **Mon profil → Exporter mes données** (JSON enveloppé `{ app, version, exportedAt, user }`), puis **Importer** sur l'autre poste (l'import valide et assainit le fichier, et affiche un récapitulatif avant d'écraser).
 
-## Structure des fichiers
+## Structure du dossier
 
 ```
 CarnetDeSavoirs/
-├── index.html           ← Point d'entrée (à ouvrir)
-├── styles.css           ← Design system
-├── app.js               ← Cœur de l'app (state, routing, widgets)
-└── sujets/
-    └── trous-noirs.js   ← Un fichier .js par sujet
+├── index.html                ← point d'entrée : charge app.js, styles.css, sujets/*.js, parcours/*.js
+├── app.js                    ← cœur (≈ 10 500 lignes) : état, routage hash, markdown lite, widgets,
+│                                quiz (5 types), carte mentale, carte globale, timeline, vocabulaire,
+│                                parcours, notes, profil, succès, mode Champion, Pomodoro, recherche Ctrl+K
+├── styles.css                ← design system (thème sombre, variables --d-{domaine})
+├── sw.js                     ← service worker (hors-ligne ; LOCAL_URLS régénérée par le script de version)
+├── manifest.json             ← PWA (id, icônes 192/512 + maskable)
+├── carnet.ico, icon-*.png, apple-touch-icon.png
+├── sujets/{slug}.js          ← une fiche par fichier : window.CarnetDeSavoirs.register({...})
+├── parcours/{slug}.js        ← chemins guidés : window.CarnetDeSavoirs.registerParcours({...})
+├── TEMPLATE_SUJET.md         ← LA référence pour générer une fiche (à donner à Claude)
+├── BRIEFING_COWORK.md        ← procédure d'intégration / maintenance côté Cowork
+├── AUDIT_2026-08-18.md       ← audit complet + plan d'action (lots 1-5 appliqués)
+├── Snapshot.bat              ← commit + bump de version + push
+├── Update-Cache-Version.ps1  ← bump ?v=, VERSION du SW, LOCAL_URLS, APP_VERSION (UTF-8 sans BOM)
+└── Init-Git.bat, Voir-Historique.bat, Reset-Git-Anonyme.bat, Creer-Raccourci-Bureau.bat, Generer-Icone.ps1
 ```
 
-## Workflow d'ajout d'un nouveau sujet (Claude + Cowork)
+## Ajouter un sujet
 
-À chaque nouvelle discussion d'apprentissage avec Claude :
+1. Générer `sujets/{slug}.js` avec Claude à partir de `TEMPLATE_SUJET.md` (le fichier appelle `window.CarnetDeSavoirs.register({...})`, `meta.id === slug`).
+2. Le déposer dans `sujets/`.
+3. Ajouter dans `index.html`, dans la section `SUJETS` (ordre alphabétique) :
+   `<script src="sujets/{slug}.js?v=000000000000" charset="UTF-8"></script>` — la valeur de `?v=` sera réécrite au prochain snapshot.
+4. F5. Le sujet apparaît dans la bibliothèque, la carte globale, la recherche, le vocabulaire, la timeline (si Frise) et le quiz mixte. Les avertissements de validation (`validateSujet`) s'affichent dans la console (F12).
+5. `Snapshot.bat` pour versionner et publier (met à jour `?v=`, `sw.js`, `APP_VERSION`).
 
-**1. Claude génère** un fichier `sujets/{nom-sujet}.js` qui s'auto-enregistre dans l'app via `window.CarnetDeSavoirs.register({...})`.
+Un sujet peut lier d'autres fiches via `meta.lie_a`, `meta.prerequis` et les liens `[[slug]]` dans le texte (backlinks automatiques).
 
-**2. Cowork place le fichier** dans le dossier `sujets/`.
+## Ajouter un parcours
 
-**3. Cowork ajoute une ligne** dans `index.html`, juste avant le commentaire `<!-- ============ DÉMARRAGE ============ -->` :
-```html
-<script src="sujets/{nom-sujet}.js"></script>
-```
+`parcours/{slug}.js` :
 
-**4. Au prochain rechargement** de l'app, le sujet apparaît automatiquement dans la bibliothèque, intégré aux filtres par domaine et à la carte globale.
-
-## Modèle de données d'un sujet
-
-Voir `sujets/trous-noirs.js` pour un exemple complet et commenté.
-
-Structure générale :
 ```js
-window.CarnetDeSavoirs.register({
-  meta: {
-    id: 'mon-sujet',                // identifiant unique (slug)
-    titre: 'Mon <em>sujet</em>',    // <em> autorisé pour mise en italique
-    domaines: ['Astrophysique'],    // un ou plusieurs
-    tags: ['relativité'],
-    difficulte: 2,                  // 1, 2 ou 3
-    duree_estimee_min: 25,
-    prerequis: [],                  // ids d'autres sujets (futur)
-    lie_a: [],                      // ids d'autres sujets (futur)
-    date_creation: '2026-05-09',
-    date_maj: '2026-05-09'
-  },
-  resume: '...',                    // affiché en carte et en intro de sujet
-  points_cles: ['...', '...'],      // pour l'onglet Résumé
-  carte_mentale: { central, noeuds, liens },
-  cours: [ /* blocs de cours */ ],
-  quiz: [ /* questions QCM */ ]
+window.CarnetDeSavoirs.registerParcours({
+  meta: { id: 'mon-parcours', titre: 'Mon <em>parcours</em>', domaine: 'Histoire', description: '…', duree_estimee_min: 120 },
+  etapes: [ { slug: 'rome-antique', note: 'Pourquoi cette étape…' }, { slug: 'empire-byzantin' } ]   // ≥ 2 étapes, slugs existants
 });
 ```
 
-## Types de blocs de cours disponibles
+puis une balise `<script>` dans la section `PARCOURS` de `index.html`.
 
-- `texte` — paragraphe avec markdown léger (gras, italique, [terme]{accent})
-- `encadre` — bloc à retenir / point-clé
-- `widget` — composant interactif (voir liste ci-dessous)
-- `html_libre` — HTML/SVG/JS arbitraire pour interactivité unique au sujet
+## Blocs de cours et widgets (résumé — détail dans TEMPLATE_SUJET.md)
 
-## Bibliothèque de widgets
+Blocs : `texte`, `encadre`, `widget`, `mini-quiz`, `html_libre`.
+Widgets : `SelecteurValeurs` (+ comparateur), `CurseurParametrique` (+ presets), `GrilleCartes` (cartes retournables), `ListeMethodes` (accordéon), `Frise` (timeline, agrégée dans la Timeline globale), `Equation` (KaTeX, mode manipulable), `SchemaAnnote` (image base64 + hotspots), `TableauComparatif` (tri + extrêmes).
+Quiz : `qcm`, `vrai-faux`, `ordre-chrono`, `texte-a-trou`, `associer`.
 
-| Composant | Usage |
-|-----------|-------|
-| `SelecteurValeurs` | Boutons → affichage d'une valeur + description |
-| `CurseurParametrique` | Slider qui change le résultat selon des seuils |
-| `GrilleCartes` | Petites cartes côte à côte (comparaison, classification) |
-| `ListeMethodes` | Liste numérotée avec titre + description |
+## Domaines & couleurs
 
-Chaque widget est documenté dans `app.js` avec exemples de paramètres.
+14 domaines prédéfinis dans `styles.css` (`--d-{slug}`) : Astrophysique, Physique, Mathématiques, Biologie, Médecine, Sciences cognitives, Sciences de la Terre, Environnement, Histoire, Géopolitique, Informatique, Économie, Philosophie, Arts. Slug = nom minusculisé sans accents ni caractères non alphabétiques (`Sciences cognitives` → `sciencescognitives`). Un domaine inconnu reçoit une couleur stable générée par hash.
 
-## Couleurs des domaines
+## Raccourcis clavier
 
-Définies dans `styles.css`. Pour ajouter un nouveau domaine, ajouter une variable CSS `--d-{nom-slug}` :
+`/` recherche · `Ctrl+K` palette · `b` bibliothèque · `1`-`4` onglets d'une fiche · `Esc` quitter un overlay / le mode lecture · flèches dans les overlays (présentation, flashcards, diaporama).
 
-```css
---d-astrophysique:  #ff6b35;   /* orange feu */
---d-physique:       #5b8def;   /* bleu cobalt */
---d-mathematiques:  #d946ef;   /* magenta */
---d-histoire:       #f5b342;   /* ambre */
---d-biologie:       #4ade80;   /* vert */
---d-philosophie:    #a78bfa;   /* violet */
---d-informatique:   #06b6d4;   /* cyan */
---d-litterature:    #fb7185;   /* rose */
-```
+## Développement
 
-Le slug est obtenu en minusculisant le nom du domaine, retirant les accents et caractères non-alphabétiques. Ex. : "Mathématiques" → `mathematiques` → variable `--d-mathematiques`.
-
-## Roadmap (évolutions possibles)
-
-- Carte globale en graphe interactif (force-directed) plutôt qu'en clusters
-- Système de prérequis avec chemins d'apprentissage suggérés
-- Widget `Frise` (chronologique) et `SchemaAnnote` (image avec hotspots)
-- Mode hors-ligne (Service Worker)
-- Mode "révision espacée" pour les quiz (façon Anki)
+- Pas de build : éditer, F5. Le code est une IIFE unique dans `app.js`, sections délimitées par des bannières `// ====`.
+- Cycle de vie des vues : `onRerender(fn)` / `onLeaveView(fn)` (nettoyage des timers, observers, écouteurs) ; overlays via `mountOverlay()`.
+- État : `defaultUserState()` → `sanitizeUserState()` (types) → `migrateUserState()` (migrations one-shot).
+- Vérification rapide d'un sujet en Node : `node -e "global.window={CarnetDeSavoirs:{register(){console.log('ok')}}}; require('./sujets/slug.js')"`.
+- Compat : `color-mix()` et `backdrop-filter` (navigateurs 2023+) ; pas de lookbehind regex (Safari < 16.4 OK).
 
 ---
 
-*v1.0 — Conçu et construit avec ✦ et Claude*
+*v1.1 — août 2026. Conçu et construit avec ✦ et Claude.*

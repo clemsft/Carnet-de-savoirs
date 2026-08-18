@@ -148,6 +148,7 @@
     out.favorites = out.favorites.filter(x => typeof x === 'string');
     out.achievements = out.achievements.filter(x => typeof x === 'string');
     out.dailyQuizDates = out.dailyQuizDates.filter(x => typeof x === 'string');
+    out.vocabReviewed = out.vocabReviewed.filter(x => typeof x === 'string');
     out.quizLog = out.quizLog.filter(x => x && typeof x === 'object');
     // Scores de quiz : entrées cohérentes uniquement (total > 0, best numérique)
     Object.keys(out.quizScores).forEach(k => {
@@ -254,6 +255,7 @@
       readingMode: false,// vrai = sidebar masquée + colonne élargie sur l'onglet Cours
       dailyActivity: {}, // 'YYYY-MM-DD' -> { visits, blocs, quiz } pour la heatmap
       activeParcours: null, // { slug, etape } | null — parcours thématique en cours
+      vocabReviewed: [],  // termes de vocabulaire retournés au moins une fois en flashcards (succès Cartographe)
       lastView: '/'
     };
   }
@@ -1509,6 +1511,7 @@
     const toProcess = [];
     let n;
     while ((n = walker.nextNode())) toProcess.push(n);
+    let found = false;
     toProcess.forEach(textNode => {
       const txt = textNode.nodeValue;
       // Recherche tolérante : on normalise les whitespaces dans le textNode
@@ -1541,6 +1544,56 @@
       mark.dataset.phText = needle;
       mark.textContent = middle;
       const parent = textNode.parentNode;
+      if (before) parent.insertBefore(document.createTextNode(before), textNode);
+      parent.insertBefore(mark, textNode);
+      if (after) parent.insertBefore(document.createTextNode(after), textNode);
+      parent.removeChild(textNode);
+      found = true;
+    });
+    if (found) return;
+    // ---- Repli multi-nœuds ----
+    // Le passage traverse un élément inline (**gras**, `code`, [terme]{accent},
+    // lien) : il n'existe dans aucun textNode isolé. On concatène les
+    // textNodes (normalisés), on cherche le passage dans la chaîne globale et
+    // on entoure chaque portion concernée d'un <mark> distinct.
+    // (Avant, ces surlignages étaient enregistrés mais jamais affichés.)
+    const map = [];   // index normalisé global → { node, offset } (offset réel dans le node)
+    let joined = '';
+    let prevWasSpace = true;   // évite les doubles espaces à la jonction de nœuds
+    toProcess.forEach(textNode => {
+      const txt = textNode.nodeValue;
+      for (let i = 0; i < txt.length; i++) {
+        const ch = txt[i];
+        if (/\s/.test(ch)) {
+          if (prevWasSpace) continue;
+          joined += ' '; map.push({ node: textNode, offset: i }); prevWasSpace = true;
+        } else {
+          joined += ch; map.push({ node: textNode, offset: i }); prevWasSpace = false;
+        }
+      }
+    });
+    const gIdx = joined.indexOf(needle);
+    if (gIdx === -1) return;
+    // Regroupe les positions par nœud → [start, end] réels
+    const perNode = new Map();
+    for (let k = gIdx; k < gIdx + needle.length; k++) {
+      const m = map[k];
+      if (!m) break;
+      const r = perNode.get(m.node) || { start: m.offset, end: m.offset + 1 };
+      r.start = Math.min(r.start, m.offset); r.end = Math.max(r.end, m.offset + 1);
+      perNode.set(m.node, r);
+    }
+    perNode.forEach((r, textNode) => {
+      const txt = textNode.nodeValue;
+      const before = txt.slice(0, r.start), middle = txt.slice(r.start, r.end), after = txt.slice(r.end);
+      if (!middle) return;
+      const mark = document.createElement('mark');
+      mark.className = 'passage-mark';
+      mark.title = 'Cliquer pour retirer ce surlignage';
+      mark.dataset.phText = needle;
+      mark.textContent = middle;
+      const parent = textNode.parentNode;
+      if (!parent) return;
       if (before) parent.insertBefore(document.createTextNode(before), textNode);
       parent.insertBefore(mark, textNode);
       if (after) parent.insertBefore(document.createTextNode(after), textNode);
@@ -1974,8 +2027,10 @@
         });
         return domains.size >= 5;
       } },
-    { id: 'cartographe',   label: 'Cartographe',        desc: '30 termes ou plus indexés dans le vocabulaire.',
-      check: () => buildVocabIndex().length >= 30 },
+    { id: 'cartographe',   label: 'Cartographe',        desc: '30 termes de vocabulaire révisés en flashcards.',
+      // Lié à une ACTION (cartes retournées), pas au simple contenu du carnet
+      // (avant : décerné au premier démarrage dès 30 termes indexés).
+      check: () => (state.user.vocabReviewed || []).length >= 30 },
     // ----- Quiz dédiés -----
     // Les compteurs cumulatifs (state.user.quizCounters) sont la source de
     // vérité pour les achievements de volume — le quizLog est capé à 500
@@ -8002,7 +8057,20 @@
       prevBtn.disabled = idx === 0;
       nextBtn.disabled = idx === deck.length - 1;
     }
-    function flip() { revealed = !revealed; update(); }
+    function flip() {
+      revealed = !revealed;
+      if (revealed && deck[idx]) {
+        // Trace la révision pour le succès « Cartographe »
+        if (!Array.isArray(state.user.vocabReviewed)) state.user.vocabReviewed = [];
+        const key = String(deck[idx].term || '').toLowerCase();
+        if (key && state.user.vocabReviewed.indexOf(key) < 0) {
+          state.user.vocabReviewed.push(key);
+          saveUserState();
+          checkAchievements();
+        }
+      }
+      update();
+    }
     function next() { if (idx < deck.length - 1) { idx++; revealed = false; update(); } }
     function prev() { if (idx > 0) { idx--; revealed = false; update(); } }
     function close() { unmountOverlay(overlay); }

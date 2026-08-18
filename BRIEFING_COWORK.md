@@ -1,175 +1,84 @@
-# Briefing — Déploiement & maintenance du Carnet de Savoirs
+# Briefing — Intégration & maintenance du Carnet de Savoirs (côté Cowork)
 
-> Document à fournir au Claude côté Cowork pour qu'il prenne en charge le déploiement local de l'app et sa maintenance dans le temps.
+> À fournir au Claude qui travaille sur le dossier local (Cowork). Version d'août 2026, alignée sur `app.js` v1.9+.
 
 ---
 
 ## 1. Contexte
 
-**Le projet :** *Carnet de Savoirs* — une application web locale single-folder, autonome, qui sert d'**atelier d'apprentissage personnel** à son utilisateur. Chaque sujet exploré dans une discussion avec Claude devient une fiche multi-vues (résumé, cours interactif, quiz, carte mentale) consultable durablement.
+**Le projet :** *Carnet de Savoirs*, atelier d'apprentissage personnel : chaque sujet exploré avec Claude devient une fiche multi-vues (Résumé, Cours interactif, Quiz, Carte mentale) consultable durablement, reliée aux autres (liens, backlinks, parcours, vocabulaire, timeline).
 
-**Conception :** vanilla JS, pas de build step, pas de serveur, pas d'API externe. L'app fonctionne en ouvrant `index.html` directement dans un navigateur (`file://`). Toutes les données utilisateur sont en `localStorage`.
+**Conception :** vanilla JS, aucun build, aucun serveur, aucune API. Fonctionne en `file://` (double-clic sur `index.html`) et en ligne sur GitHub Pages (PWA installable, hors-ligne). Données utilisateur en `localStorage`.
 
-**État actuel :** v1 livrée, fonctionnelle, avec un premier sujet (*Trous noirs*) déjà intégré.
+**Emplacement :** `C:\Users\Utilisateur\Documents\Claude\Apprentissage\CarnetDeSavoirs\` (dépôt git, branche `main`).
 
----
-
-## 2. Architecture
-
-```
-CarnetDeSavoirs/
-├── index.html           ← Point d'entrée (à ouvrir)
-├── styles.css           ← Design system (1 100 lignes)
-├── app.js               ← Cœur (state, routing, widgets, persistance — 1 200 lignes)
-├── README.md
-└── sujets/
-    └── trous-noirs.js   ← Un fichier .js par sujet
-```
-
-**Mécanique d'enregistrement des sujets :** chaque fichier dans `sujets/` est un script qui s'auto-enregistre dans l'app via `window.CarnetDeSavoirs.register({...})`. L'app les charge via des balises `<script>` listées dans `index.html`.
+**État actuel :** ~68 sujets, 10 parcours. Audit complet réalisé le 18/08/2026 (`AUDIT_2026-08-18.md`), lots 1 à 5 appliqués.
 
 ---
 
-## 3. Tâches initiales attendues côté Cowork
+## 2. Architecture (voir README.md pour le détail)
 
-### a. Déploiement local
-
-1. **Décompresser** `CarnetDeSavoirs.zip` (joint à cette conversation) à un emplacement choisi par l'utilisateur sur son poste Windows. Suggestion :
-   - `C:\Users\<utilisateur>\Documents\CarnetDeSavoirs\`
-   - ou un dossier de synchronisation cloud si l'utilisateur le souhaite.
-2. **Créer un raccourci** vers `index.html` sur le bureau ou dans le menu Démarrer pour ouverture en un clic.
-3. **Vérifier** que l'app s'ouvre correctement dans son navigateur par défaut et que le sujet *Trous noirs* est bien chargé (4 onglets fonctionnels : Résumé, Cours, Quiz, Carte mentale).
-
-### b. Validation rapide
-
-Demander à l'utilisateur de tester :
-- L'ouverture du sujet *Trous noirs*
-- Le widget interactif "Curseur de masse stellaire" dans l'onglet Cours
-- Une session complète du quiz (vérifie que le score est bien sauvegardé)
-- L'export des données depuis le profil (génération d'un fichier JSON)
+- `index.html` liste explicitement chaque `sujets/*.js` et `parcours/*.js` dans une balise `<script>` (avec `?v=…`).
+- `app.js` : IIFE unique ; `window.CarnetDeSavoirs.register()` / `.registerParcours()` / `.start()`.
+- `sw.js` + `manifest.json` : PWA. `LOCAL_URLS` du SW est **régénérée automatiquement** par `Update-Cache-Version.ps1` — ne pas l'éditer à la main.
+- Documentation de génération : `TEMPLATE_SUJET.md` (v1.1) — c'est ce fichier que le Claude « chat » utilise pour écrire une fiche.
 
 ---
 
-## 4. Workflow récurrent (le cœur du job de Cowork)
+## 3. Workflow récurrent : intégrer un nouveau sujet
 
-À chaque nouvelle discussion d'apprentissage entre l'utilisateur et Claude (côté chat.claude.ai), un nouveau sujet doit être ajouté à l'app. Voici la procédure :
+1. **Réception** : un fichier `{slug}.js` généré à partir de `TEMPLATE_SUJET.md`.
+2. **Vérification rapide** avant de le déposer :
+   - `node -e "global.window={CarnetDeSavoirs:{register(){}}}; require('./{slug}.js')"` ne doit produire aucune erreur (apostrophes non échappées et backticks dans les template literals sont les erreurs classiques).
+   - `meta.id` = nom du fichier ; `lie_a` / `prerequis` / `[[slug]]` ne pointent que vers des fichiers existants de `sujets/`.
+   - Pas de markdown (`**`, `` ` ``) dans les champs texte brut (quiz, titres de seuils, légendes) — liste exacte dans TEMPLATE §6.
+3. **Dépôt** dans `sujets/`.
+4. **Enregistrement** dans `index.html`, section `SUJETS`, ordre alphabétique :
+   `<script src="sujets/{slug}.js?v=000000000000" charset="UTF-8"></script>`
+5. **Validation** : ouvrir/rafraîchir l'app, ouvrir la fiche, vérifier les 4 onglets et la console (F12) : `validateSujet` y liste les avertissements éventuels (`quiz[i].correcte hors plage`, `parent inconnu`, etc.).
+6. **Snapshot** : l'utilisateur lance `Snapshot.bat` (bump des versions, commit, push). Vérifier dans la console du .bat les lignes `[OK] index.html`, `[OK] sw.js -> VERSION = …, LOCAL_URLS = N entrees`, `[OK] app.js -> APP_VERSION`.
 
-### Étape 1 — Réception du fichier sujet
-
-Claude (côté chat) génère un fichier `{nom-slug}.js` (ex. `relativite-restreinte.js`). L'utilisateur le récupère et le partage avec toi (Cowork).
-
-### Étape 2 — Placement du fichier
-
-Le placer dans le dossier `sujets/` du projet :
-```
-CarnetDeSavoirs/sujets/{nom-slug}.js
-```
-
-### Étape 3 — Enregistrement dans index.html
-
-Ajouter une balise script juste avant le commentaire `<!-- ============ DÉMARRAGE ============ -->` dans `index.html` :
-
-```html
-<script src="sujets/{nom-slug}.js"></script>
-```
-
-L'ordre des balises n'a pas d'importance (chaque sujet est indépendant). Mais tu peux maintenir un ordre alphabétique ou chronologique pour la lisibilité.
-
-### Étape 4 — Validation
-
-Ouvrir `index.html` (rafraîchir si déjà ouvert) et vérifier :
-- Le nouveau sujet apparaît dans la bibliothèque
-- Son badge de domaine s'affiche avec la bonne couleur
-- Il est cliquable et ses 4 onglets se chargent sans erreur console
-
-Si erreur : ouvrir la console navigateur (F12), copier le message, et le partager pour correction.
+Même procédure pour un parcours (`parcours/{slug}.js`, section `PARCOURS`).
 
 ---
 
-## 5. Modèle de données d'un sujet (référence)
+## 4. Modifier `app.js` / `styles.css`
 
-Voir `sujets/trous-noirs.js` pour un exemple complet et commenté. Structure générale :
-
-```js
-window.CarnetDeSavoirs.register({
-  meta: {
-    id: 'mon-sujet',                // identifiant unique (slug)
-    titre: 'Mon <em>sujet</em>',    // <em> autorisé pour mise en italique
-    domaines: ['Astrophysique'],
-    tags: ['relativité'],
-    difficulte: 2,                  // 1, 2 ou 3
-    duree_estimee_min: 25,
-    prerequis: [],
-    lie_a: [],
-    date_creation: '2026-05-09',
-    date_maj: '2026-05-09'
-  },
-  resume: '...',
-  points_cles: ['...', '...'],
-  carte_mentale: { central, noeuds, liens },
-  cours: [ /* blocs de cours */ ],
-  quiz: [ /* questions QCM */ ]
-});
-```
-
-**Types de blocs de cours** : `texte`, `encadre`, `widget`, `html_libre`.
-
-**Widgets disponibles** : `SelecteurValeurs`, `CurseurParametrique`, `GrilleCartes`, `ListeMethodes`.
-
-Documentation complète : voir `README.md` joint et commentaires dans `app.js`.
+- Toujours partir de la **version actuelle du dossier** (le snapshot bump `APP_VERSION` dans `app.js` : ne pas écraser avec une copie plus ancienne).
+- Conserver l'encodage UTF-8 ; le script de version écrit désormais **sans BOM**.
+- Vérifier la syntaxe (`node --check app.js`) et, si possible, un rendu des routes principales dans un DOM simulé (jsdom) avant de livrer.
+- Conventions internes : nettoyage de vue via `onRerender()` / `onLeaveView()`, overlays via `mountOverlay()`, formats numériques via `formatNumberFr()`, dates `YYYY-MM-DD` via `dateKey()` / `parseDateKey()`, état via `sanitizeUserState()` + `migrateUserState()`.
+- Les enregistrements « une fois par session » (tentative de quiz, activité, records Champion) utilisent des drapeaux `sess._finalized` / `sess._recorded` : ne pas les retirer.
 
 ---
 
-## 6. Domaines & couleurs
+## 5. Domaines & couleurs
 
-Couleurs prédéfinies dans `styles.css` (variables CSS `--d-{slug}`). Palette **consolidée à 14 domaines** :
-
-| Domaine | Slug | Couleur |
-|---|---|---|
-| Astrophysique | `astrophysique` | `#ff6b35` (orange feu) |
-| Physique | `physique` | `#5b8def` (bleu cobalt) |
-| Mathématiques | `mathematiques` | `#d946ef` (magenta) |
-| Biologie | `biologie` | `#4ade80` (vert) |
-| Médecine | `medecine` | `#ef4444` (rouge clinique) |
-| Sciences cognitives | `sciencescognitives` | `#c084fc` (violet doux) |
-| Sciences de la Terre | `sciencesdelaterre` | `#92400e` (brun terre) |
-| Environnement | `environnement` | `#16a34a` (vert profond) |
-| Histoire | `histoire` | `#f5b342` (ambre) |
-| Géopolitique | `geopolitique` | `#dc2626` (rouge brique) |
-| Informatique | `informatique` | `#06b6d4` (cyan) |
-| Économie | `economie` | `#eab308` (jaune-or) |
-| Philosophie | `philosophie` | `#a78bfa` (violet) |
-| Arts | `arts` | `#be185d` (magenta profond) |
-
-**Pour ajouter un nouveau domaine** : préférer rester dans cette palette (élargir l'interprétation d'un domaine existant). Si vraiment nécessaire, ajouter une variable CSS dans `styles.css` (section `:root`), puis utiliser ce nom de domaine dans le tableau `meta.domaines` du sujet. Le slug est obtenu en minusculisant et retirant accents/caractères non-alphabétiques. Si aucune variable CSS ne correspond, l'app génère automatiquement une couleur stable par hash.
+14 domaines (`styles.css`, variables `--d-{slug}`) : Astrophysique `#ff6b35`, Physique `#5b8def`, Mathématiques `#d946ef`, Biologie `#4ade80`, Médecine `#ef4444`, Sciences cognitives `#c084fc`, Sciences de la Terre `#92400e`, Environnement `#16a34a`, Histoire `#f5b342`, Géopolitique `#dc2626`, Informatique `#06b6d4`, Économie `#eab308`, Philosophie `#a78bfa`, Arts `#be185d`. Préférer élargir un domaine existant plutôt qu'en créer un ; un domaine inconnu reçoit une couleur par hash.
 
 ---
 
-## 7. Sauvegarde
+## 6. Sauvegarde des données utilisateur
 
-Les données utilisateur (progression, scores, favoris, notes) sont en `localStorage` du navigateur uniquement. **Il est recommandé de proposer à l'utilisateur un export régulier** (depuis l'app : *Mon profil → Exporter mes données*) sauvegardé dans un dossier de backup.
-
-Suggestion à mettre en place : tâche planifiée Cowork qui rappelle à l'utilisateur tous les mois de faire un export manuel.
+`localStorage` uniquement → recommander un export régulier (**Mon profil → Exporter mes données**), conservé hors du dépôt (`.gitignore` exclut `carnet-de-savoirs-*.json`). L'import valide le fichier (enveloppe `{ app: 'carnet-de-savoirs', version, user }` ou ancien format brut), assainit les types et demande confirmation en affichant un récapitulatif.
 
 ---
 
-## 8. Points d'attention
+## 7. Points d'attention
 
-- **Pas d'API ni de fetch externe** dans l'app. Toute interactivité est locale. Si une fonctionnalité nécessite du réseau (ex. chargement d'une police Google Fonts), elle doit pouvoir échouer sans casser l'app.
-- **Compatibilité navigateur** : le CSS utilise `color-mix()` (Chrome 111+, Firefox 113+, Safari 16.2+). À jour, ça passe partout.
-- **Caractères spéciaux dans les fichiers JS** : les sujets utilisent abondamment l'apostrophe française (`l'app`, `c'est`...). Les chaînes JS sont délimitées par des backticks (template literals) ou des single quotes échappées. Vérifier qu'aucun encodage UTF-8 BOM n'est ajouté en sauvegardant.
-
----
-
-## 9. Suite envisagée (roadmap libre, non urgente)
-
-- Carte globale en graphe force-directed (au lieu des clusters actuels) quand la bibliothèque dépassera ~10 sujets
-- Système de prérequis avec parcours suggérés
-- Nouveaux widgets : `Frise` (chronologique), `SchemaAnnote` (image + hotspots), `Equation` (rendu LaTeX si besoin pour les sujets de physique/maths)
-- Mode hors-ligne complet (Service Worker pour cacher les Google Fonts)
-
-À discuter au cas par cas selon les besoins qui émergeront avec les nouveaux sujets.
+- **Pas de fetch externe dans l'app.** Seules dépendances réseau : Google Fonts et KaTeX (CDN, `crossorigin`), toutes deux facultatives et mises en cache par le SW pour le hors-ligne.
+- **Service worker** : actif seulement en HTTP(S). En `file://`, rien à attendre du cache.
+- **Compatibilité** : `color-mix()`, `backdrop-filter` (navigateurs 2023+). Éviter les lookbehind regex (Safari < 16.4).
+- **Contenu** : le markdown lite est interprété dans une liste précise de champs (TEMPLATE §6) ; le quiz est en texte brut.
+- **Cartes mentales** : ≤ 7 enfants par nœud, labels ≤ 25 caractères, 2-3 niveaux — au-delà, chevauchements.
+- **Frises** : formats de dates reconnus par la Timeline listés dans TEMPLATE §10 ; les dates libres restent dans la fiche mais sont ignorées par la Timeline (compteur affiché sous son titre).
 
 ---
 
-*v1.0 — Conçu avec Claude, mai 2026*
+## 8. Reste à faire (suggestions de l'audit, hors bugs)
+
+Mélange des options QCM à l'affichage · réponses multiples en texte-à-trou · persistance de la session de quiz au F5 · précalcul de l'index de recherche · densité de la carte mentale (allocation angulaire) · accessibilité (`role=tab`, focus trap, `aria-live`) · mini-suite de tests Node pour `md()`, `parseHistoricalDate()`, `normalizeAnswer()`, `sanitizeUserState()` · auto-hébergement de KaTeX et des polices · CSP.
+
+---
+
+*v1.1 — août 2026*

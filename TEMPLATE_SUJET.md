@@ -149,7 +149,15 @@ carte_mentale: {
 
 ## 6. Markdown lite supporté
 
-Dans **toutes les chaînes contenant du contenu rédactionnel** (`points_cles[]`, `cours[].contenu_md`, `cours[].cartes[].description` du widget GrilleCartes, `cours[].methodes[].description` du widget ListeMethodes, `carte_mentale.noeuds[].description`, `cours[].seuils[].description` du widget CurseurParametrique), tu peux utiliser :
+Le markdown lite est interprété dans les champs suivants (liste **exacte**, vérifiée dans `app.js`) :
+
+- `resume`, `points_cles[]`, `vocabulaire[].definition`, `carte_mentale.noeuds[].description`
+- `cours[].contenu_md` (blocs `texte` et `encadre`), `cours[].q` / `indice` / `reponse` (bloc `mini-quiz`)
+- les **`description`** de : `SelecteurValeurs.options[]`, `CurseurParametrique.seuils[]`, `GrilleCartes.cartes[]`, `ListeMethodes.methodes[]`, `Frise.evenements[]`, `SchemaAnnote.hotspots[]`
+
+Il n'est **PAS** interprété (texte brut, les `**` s'afficheraient tels quels) dans : `meta.titre` et les `titre` de blocs/widgets (seul `<em>` y est autorisé), `label` d'encadré, `titre` des seuils, `label` des presets, `tag`/`titre` des cartes, `titre` des méthodes, `date`/`titre` de frise, `legende` d'Equation et de SchemaAnnote, `label` des hotspots, `unite`, colonnes/cellules de TableauComparatif, et **tout le quiz** (`q`, `options`, `explication`, `affirmation`, `items`, `texte`, `paires`).
+
+Syntaxes disponibles :
 
 | Syntaxe              | Rendu                                       |
 |----------------------|---------------------------------------------|
@@ -158,6 +166,9 @@ Dans **toutes les chaînes contenant du contenu rédactionnel** (`points_cles[]`
 | `` `code` ``         | `monospace` (terme technique)               |
 | `[terme]{accent}`    | terme **dans la couleur d'accent du sujet** |
 | `[[slug-du-sujet]]`  | **lien navigable** vers la fiche dont `meta.id == slug-du-sujet`. Si ce sujet n'existe pas (encore) dans le carnet, le lien s'affiche en gris atténué pour signaler le sujet manquant. |
+| `[[slug\|alias]]`    | même lien, mais le texte affiché est `alias` (« voir [[epopee\|les épopées]] »). |
+| `# Titre` / `## Sous-titre` | en début de ligne dans `contenu_md` : titres internes (h2 / h3) |
+| `- item`             | en début de ligne : puce ; les puces consécutives forment une liste (à utiliser avec parcimonie) |
 | Lignes vides         | nouveau paragraphe                          |
 | Retour à la ligne    | `<br>` (saut de ligne sans nouveau paragraphe) |
 
@@ -211,18 +222,31 @@ Une mise en valeur visuelle pour insister sur un point.
 
 ### 7.3. `type: 'widget'`
 
-Un composant interactif. Voir §8 pour les 7 composants disponibles.
+Un composant interactif. Voir §8 pour les 8 composants disponibles.
 
 ```js
 {
   type: 'widget',
   titre: 'Sélectionnez un astre pour visualiser sa vitesse de libération',  // [optionnel]
-  composant: 'SelecteurValeurs',        // un des 7 noms de §8
+  composant: 'SelecteurValeurs',        // un des 8 noms de §8
   params: { /* params spécifiques au composant */ }
 }
 ```
 
-### 7.4. `type: 'html_libre'`
+### 7.4. `type: 'mini-quiz'`
+
+Une question de vérification insérée **dans le fil du cours** (différente du quiz de l'onglet Quiz), avec réponse masquée à révéler. Idéal en fin de section.
+
+```js
+{
+  type: 'mini-quiz',
+  q: 'Pourquoi un objet massif ne peut-il pas atteindre `c` ?',   // markdown lite OK
+  indice: 'Pense à ce que devient l\'énergie quand v → c.',        // [optionnel]
+  reponse: 'Parce que l\'énergie nécessaire tend vers **l\'infini** (facteur de Lorentz).'
+}
+```
+
+### 7.5. `type: 'html_libre'`
 
 Échappatoire pour insérer du HTML brut. **À éviter sauf nécessité**. Si tu y recours, vérifie que le HTML est self-contained et ne dépend de rien d'externe.
 
@@ -235,7 +259,7 @@ Un composant interactif. Voir §8 pour les 7 composants disponibles.
 
 ---
 
-## 8. Les 7 widgets disponibles
+## 8. Les 8 widgets disponibles
 
 ### 8.1. `SelecteurValeurs`
 
@@ -258,13 +282,14 @@ Une rangée de boutons. Cliquer un bouton affiche une valeur + une description. 
 }
 ```
 
-- `valeur` peut être un nombre (formaté automatiquement avec espaces en milliers en français) ou une chaîne.
-- `description` est en texte simple (pas de markdown lite ici).
+- `valeur` peut être un nombre (formaté en français : espace des milliers, virgule décimale) ou une chaîne (« ≈ 1,3 s »).
+- `description` supporte le markdown lite.
+- Si toutes les valeurs sont numériques, l'app propose automatiquement un **mode comparateur** (Maj + clic sur une seconde option : écart et ratio).
 - 3 à 8 options idéalement.
 
 ### 8.2. `CurseurParametrique`
 
-Un curseur (slider) qui révèle un résultat différent selon des seuils.
+Un curseur (slider) qui révèle un résultat différent selon des seuils. Des **presets** (boutons « Repères ») peuvent repositionner le curseur sur des valeurs nommées.
 
 ```js
 {
@@ -278,6 +303,10 @@ Un curseur (slider) qui révèle un résultat différent selon des seuils.
     step: 0.1,                          // pas
     valeurInitiale: 8,                  // [optionnel] valeur de départ (default = min)
     unite: 'M☉',                        // [optionnel] suffixe affiché à côté de la valeur
+    presets: [                          // [optionnel] boutons « Repères » qui positionnent le curseur
+      { label: 'Soleil', valeur: 1 },
+      { label: 'Géante bleue', valeur: 30 }
+    ],
     degradePiste: '#5b8def 0%, #5b8def 16%, #ffb86c 16%, #ffb86c 50%, #ff6b35 50%, #ff6b35 100%',  // [optionnel] gradient CSS pour la barre
     seuils: [
       {
@@ -303,8 +332,10 @@ Un curseur (slider) qui révèle un résultat différent selon des seuils.
 }
 ```
 
-- L'ordre des seuils compte : on prend le premier dont `jusqua > valeur courante`. Termine toujours par un seuil avec `jusqua: Infinity`.
-- 2 à 4 seuils idéalement.
+- L'ordre des seuils compte : on prend le premier dont `jusqua > valeur courante` ; à défaut, le **dernier** seuil sert de repli. Termine quand même par un seuil `jusqua: Infinity` par lisibilité.
+- 2 à 5 seuils idéalement. Le `titre` de chaque seuil est affiché comme repère sur la piste : garde-le court.
+- `description` supporte le markdown lite ; `titre` et `presets[].label` non.
+- La valeur affichée suit le nombre de décimales de `step` (`step: 0.5` → « 2,5 »), séparateur décimal virgule.
 
 ### 8.3. `GrilleCartes`
 
@@ -391,6 +422,17 @@ Rendu d'une formule mathématique en LaTeX, via KaTeX (chargé en CDN). Indispen
 - Caractères grecs : `\alpha`, `\beta`, `\Gamma`, `\Delta`...
 - Si KaTeX n'est pas chargé (offline complet), le widget retombe sur le texte brut + un message discret.
 - À utiliser pour les formules NOTABLES (3 ou 4 max par sujet). Pour des notations inline dans une phrase, utilise plutôt le markdown lite avec `` `code inline` `` qui suffira souvent.
+- **Mode manipulable** [optionnel] : ajoute `variables` (sliders) et une fonction `compute` qui renvoie le nouveau `tex` (et éventuellement une `note`) :
+
+```js
+params: {
+  tex: 'E = mc^2',
+  variables: [ { nom: 'm', label: 'Masse', min: 1, max: 1000, step: 1, init: 1, unite: 'kg' } ],
+  compute: (v) => ({ tex: 'E = ' + v.m + ' \\cdot c^2 \\approx ' + (v.m * 9e16).toExponential(2) + '\\ \\text{J}', note: 'Énergie de masse au repos.' })
+}
+```
+
+- Le rendu attend le chargement de KaTeX (CDN) et se met à jour tout seul dès qu'il arrive.
 
 ### 8.7. `SchemaAnnote`
 
@@ -418,6 +460,33 @@ Une image avec des points cliquables (« hotspots ») qui révèlent une annotat
 - 3 à 8 hotspots idéalement. Au-delà, l'image devient trop chargée.
 - **Taille image recommandée** : ≤ 300 KB en base64 (= ~225 KB binaire). Au-delà, le `.js` du sujet devient lourd à charger.
 
+### 8.8. `TableauComparatif`
+
+Un tableau n × m triable au clic sur les en-têtes, avec surlignage automatique du max et du min des colonnes numériques. Idéal pour comparer des entités sur plusieurs critères chiffrés (empires, planètes, matériaux…).
+
+```js
+{
+  type: 'widget',
+  composant: 'TableauComparatif',
+  titre: 'Les grands empires comparés',
+  params: {
+    colonnes: [
+      { id: 'nom',     label: 'Empire',   type: 'text' },
+      { id: 'surface', label: 'Surface',  unite: 'M km²', type: 'number' },
+      { id: 'duree',   label: 'Durée',    unite: 'ans',   type: 'number' }
+    ],
+    lignes: [
+      { nom: 'Empire mongol', surface: 24, duree: 162 },
+      { nom: 'Empire romain', surface: 5,  duree: 503 }
+    ],
+    surlignageExtremes: true              // [optionnel] défaut true
+  }
+}
+```
+
+- Cellules et en-têtes en texte brut (pas de markdown). Les nombres sont formatés en français.
+- 2 à 8 lignes, 2 à 6 colonnes idéalement.
+
 ---
 
 ## 9. Le bloc `quiz`
@@ -443,6 +512,36 @@ quiz: [
 - `correcte` est strictement entre 0 et `options.length - 1`. Une erreur ici fait planter la question.
 - Pas de markdown dans `q`, `options[]` ni `explication` — ce sont des chaînes texte simple.
 - Couvre les principales idées du cours, pas les détails anecdotiques.
+- **Varie la position de la bonne réponse** (index 0, 1, 2, 3…) : les options ne sont pas mélangées à l'affichage.
+
+### 9.1. Autres types de questions
+
+Le champ `type` (défaut `'qcm'`) permet quatre autres formats, mélangeables dans le même tableau `quiz`. Ils sont utilisables tels quels dans le quiz de la fiche, le quiz mixte, la révision et le mode Champion.
+
+```js
+// Vrai / Faux
+{ type: 'vrai-faux', affirmation: 'Un photon a une masse très faible mais non nulle.', reponse: false,
+  explication: 'Le photon n\'a aucune masse : c\'est précisément pour cela qu\'il se déplace à c.' },
+
+// Remettre dans l'ordre chronologique — `items` est l'ORDRE CORRECT, l'app mélange à l'affichage
+{ type: 'ordre-chrono', q: 'Remets ces jalons dans l\'ordre.',
+  items: ['Équations de Maxwell (1865)', 'Relativité restreinte (1905)', 'Métrique d\'Alcubierre (1994)'],
+  explication: 'Maxwell → Einstein → Alcubierre.' },
+
+// Texte à trou — chaque {motif} devient un champ ; comparaison insensible à la casse et aux accents
+{ type: 'texte-a-trou', texte: 'La vitesse de la lumière vaut environ {300000} km/s.',
+  explication: '299 792 km/s exactement.' },
+
+// Associer — les « droites » sont mélangées dans des listes déroulantes
+{ type: 'associer', q: 'Associe chaque notion à son auteur.',
+  paires: [ { gauche: 'Métrique de distorsion', droite: 'Alcubierre' },
+            { gauche: 'Protection chronologique', droite: 'Hawking' },
+            { gauche: 'Trous de ver traversables', droite: 'Thorne' } ],
+  explication: '…' }
+```
+
+- Un texte-à-trou n'accepte qu'une réponse par trou : choisis un mot sans variante orthographique probable.
+- 2 à 5 items pour `ordre-chrono`, 3 à 5 paires pour `associer`.
 
 ---
 
@@ -484,7 +583,8 @@ L'app a une voix : **élégante, dense, posée, à la fois rigoureuse et émerve
 - **Pas de listes à puces dans `contenu_md`** sauf si vraiment nécessaire (le rendu n'est pas géré). Préfère du texte structuré en paragraphes.
 - **Pas d'emoji** dans le contenu (réservé à l'interface).
 - **Citations et chiffres précis** quand pertinents (dates, ordres de grandeur, noms de lois) — c'est ce qui donne du poids.
-- **Dimensionnement** : un sujet typique fait 5 à 10 blocs `cours` (mélange texte / encadre / widget), 5 à 8 questions de quiz, 6 à 10 nœuds de carte mentale.
+- **Dimensionnement** : un sujet typique fait 8 à 15 blocs `cours` (mélange texte / encadre / widget, au moins 2-3 widgets), 8 à 10 questions de quiz (dont 1 ou 2 d'un autre type que QCM), 12 à 20 nœuds de carte mentale sur 2-3 niveaux (max 7 enfants par nœud, labels ≤ 25 caractères), 6 à 10 termes de vocabulaire.
+- **Dates de Frise** : formats reconnus par la Timeline globale : `1789`, `-450`, `~2500 av. J.-C.`, `117 ap. J.-C.`, `XVᵉ siècle`, `IXᵉ-Xᵉ s.`, `IVe millénaire av. J.-C.`, `1914-1918`, `1954-55`, `26 avril 1986`, `Années 1990-2000`, `il y a 300 000 ans`, `3,5 Ga`, `470 Ma`, `9 thermidor an II`. Une date libre (« Waterloo », « Jour 1 ») reste affichée dans la fiche mais est ignorée par la Timeline.
 
 ---
 
@@ -493,9 +593,12 @@ L'app a une voix : **élégante, dense, posée, à la fois rigoureuse et émerve
 1. ❌ `<strong>` ou `<em>` dans `contenu_md` → ❌ apparaît en littéral. Utilise `**gras**` et `*italique*`.
 2. ❌ Apostrophe non échappée en chaîne single-quote : `'l'app'` → erreur de syntaxe. Utilise des template literals (backticks) ou échappe : `'l\'app'`.
 3. ❌ `correcte` qui dépasse `options.length - 1` → la question plante.
-4. ❌ Oublier `jusqua: Infinity` sur le dernier seuil de `CurseurParametrique` → les valeurs hautes ne matchent rien.
-5. ❌ `meta.id` qui ne correspond pas au nom de fichier → confusion.
-6. ❌ Référence dans `liens` (`de`, `vers`) à un `id` de nœud qui n'existe pas → le lien est silencieusement ignoré.
+4. ❌ Backticks non échappés dans un `contenu_md` écrit en template literal (`` `…` ``) : le `` `code` `` inline doit s'écrire `` \`code\` `` → sinon erreur de syntaxe.
+5. ❌ Markdown (`**`, `` ` ``) dans un champ texte brut (quiz, titres de seuils, légendes…) → affiché littéralement.
+6. ❌ `meta.id` qui ne correspond pas au nom de fichier → confusion.
+7. ❌ Référence dans `liens` (`de`, `vers`) à un `id` de nœud qui n'existe pas → le lien est silencieusement ignoré.
+8. ❌ `lie_a` / `prerequis` pointant vers un id qui n'existe pas dans `sujets/` → lien mort. Vérifie la liste des fichiers existants.
+9. ❌ Toutes les bonnes réponses du quiz au même index → quiz devinable.
 
 ---
 
@@ -514,9 +617,11 @@ L'app a une voix : **élégante, dense, posée, à la fois rigoureuse et émerve
 - [ ] 5-10 questions de `quiz` avec `correcte` valide.
 - [ ] 5-10 entrées de `vocabulaire` avec définitions autoporteuses.
 - [ ] Aucun `<script>`, aucun `fetch()`, aucune dépendance externe.
+- [ ] Le fichier a été chargé une fois dans un moteur JS (`node -e "global.window={CarnetDeSavoirs:{register(){}}}; require('./slug.js')"`) sans erreur.
+- [ ] `lie_a` ne référence que des ids existants ; les `[[slug]]` aussi.
 
 Une fois ces points cochés, tu peux livrer le fichier à l'utilisateur qui l'ajoutera à son atelier via Cowork.
 
 ---
 
-*v1.0 — réf pour génération de sujets, mai 2026*
+*v1.1 — réf pour génération de sujets, août 2026 (mise en conformité avec app.js v1.9 : champs markdown, mini-quiz, presets, TableauComparatif, 5 types de quiz, Equation manipulable, formats de dates)*
