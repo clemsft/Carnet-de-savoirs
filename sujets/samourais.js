@@ -296,7 +296,7 @@ Beaucoup de samouraïs s\'adaptent et deviennent officiers, bureaucrates, entrep
       explication: 'Sengoku Jidai signifie l\'« âge des provinces en guerre ». Pendant un siècle et demi (1467-1615), le pouvoir central s\'effondre et le Japon se fragmente en domaines rivaux dirigés par des **daimyos**. C\'est l\'apogée militaire du samouraï — et la période où les armes à feu européennes bouleversent la tactique.'
     },
     {
-      q: 'Quand le code du **bushido** a-t-il été codifié principalement ?',
+      q: 'Quand le code du bushido a-t-il été codifié principalement ?',
       options: [
         'Pendant la guerre de Genpei, au XIIᵉ siècle',
         'À l\'époque Edo (XVIIᵉ-XVIIIᵉ siècle), en pleine paix',

@@ -79,7 +79,7 @@ Le jeune homme tient la contradiction. Dix ans plus tard, employé à l'office d
       composant: 'Equation',
       params: {
         tex: 'E = mc^2',
-        legende: `Une masse au repos possède une énergie *E* égale à *m* fois la vitesse de la lumière au carré. Avec c ≈ 3·10⁸ m/s, un seul gramme représente environ 9·10¹³ joules — l'équivalent de 25 millions de kWh.`,
+        legende: `Une masse au repos possède une énergie E égale à m fois la vitesse de la lumière au carré. Avec c ≈ 3·10⁸ m/s, un seul gramme représente environ 9·10¹³ joules — l'équivalent de 25 millions de kWh.`,
         affichage: 'block'
       }
     },
@@ -122,7 +122,7 @@ Einstein met **huit ans** à formaliser cette intuition. Il apprend la géométr
       composant: 'Equation',
       params: {
         tex: 'R_{\\mu\\nu} - \\tfrac{1}{2}\\, g_{\\mu\\nu}\\, R = \\frac{8\\pi G}{c^4}\\, T_{\\mu\\nu}',
-        legende: `À gauche, la **géométrie** : R_μν et R décrivent la courbure de l'espace-temps, g_μν sa métrique. À droite, le **contenu** : T_μν est le tenseur énergie-impulsion (matière, rayonnement, pression). John Wheeler résumait : *« La matière dit à l'espace-temps comment se courber ; l'espace-temps dit à la matière comment bouger »*.`,
+        legende: `À gauche, la géométrie : R_μν et R décrivent la courbure de l'espace-temps, g_μν sa métrique. À droite, le contenu : T_μν est le tenseur énergie-impulsion (matière, rayonnement, pression). John Wheeler résumait : « La matière dit à l'espace-temps comment se courber ; l'espace-temps dit à la matière comment bouger ».`,
         affichage: 'block'
       }
     },
@@ -276,7 +276,7 @@ Aujourd'hui, les satellites embarquent une horloge dont la fréquence est **dél
       explication: `Quand des masses très compactes accélèrent (deux trous noirs qui fusionnent, par exemple), elles déforment l'espace-temps autour d'elles et émettent des ondes. LIGO a détecté ces ondes pour la première fois le 14 septembre 2015. Prix Nobel 2017.`
     },
     {
-      q: `Pourquoi parle-t-on de relativité *restreinte* et de relativité *générale* ?`,
+      q: `Pourquoi parle-t-on de relativité « restreinte » et de relativité « générale » ?`,
       options: [
         `La restreinte est plus difficile, la générale plus accessible`,
         `La restreinte se limite aux référentiels inertiels sans gravité ; la générale étend le principe aux référentiels accélérés et à la gravitation`,

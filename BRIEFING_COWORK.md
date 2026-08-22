@@ -21,7 +21,7 @@
 - `index.html` liste explicitement chaque `sujets/*.js` et `parcours/*.js` dans une balise `<script>` (avec `?v=…`).
 - `app.js` : IIFE unique ; `window.CarnetDeSavoirs.register()` / `.registerParcours()` / `.start()`.
 - `sw.js` + `manifest.json` : PWA. `LOCAL_URLS` du SW est **régénérée automatiquement** par `Update-Cache-Version.ps1` — ne pas l'éditer à la main.
-- Documentation de génération : `TEMPLATE_SUJET.md` (v1.1) — c'est ce fichier que le Claude « chat » utilise pour écrire une fiche.
+- Documentation de génération : `TEMPLATE_SUJET.md` (v1.3 — §8ter : schémas générés et ≥ 3 photos par sujet) — c'est ce fichier que le Claude « chat » utilise pour écrire une fiche.
 
 ---
 
@@ -39,6 +39,18 @@
 6. **Snapshot** : l'utilisateur lance `Snapshot.bat` (bump des versions, commit, push). Vérifier dans la console du .bat les lignes `[OK] index.html`, `[OK] sw.js -> VERSION = …, LOCAL_URLS = N entrees`, `[OK] app.js -> APP_VERSION`.
 
 Même procédure pour un parcours (`parcours/{slug}.js`, section `PARCOURS`).
+
+### Photos accompagnant une fiche
+
+Chaque fiche référence **au moins 3 photos** via `SchemaAnnote` avec `image: 'images/{slug}--nom.jpg'` (voir TEMPLATE §8ter). À l'intégration :
+
+1. L'utilisateur fournit les photos (téléchargées depuis les sources libres de droits indiquées par la fiche — Wikimedia Commons, NASA/ESA…).
+2. Redimensionner : bord long ≤ 1200 px, JPEG qualité ~80, cible ≤ 200 Ko par photo.
+3. Nommer selon la convention `{slug}--{nom}.jpg` et déposer dans `images/`.
+4. Vérifier l'affichage dans la fiche (une image manquante s'affiche cassée, sans casser le reste).
+5. Snapshot : le script ajoute automatiquement `images/*` au cache hors-ligne (`LOCAL_URLS`).
+
+Les schémas générés, eux, sont en base64 dans le `.js` : rien à faire.
 
 ---
 
@@ -81,4 +93,4 @@ Mélange des options QCM à l'affichage · réponses multiples en texte-à-trou 
 
 ---
 
-*v1.1 — août 2026*
+*v1.2 — août 2026*

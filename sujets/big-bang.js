@@ -215,7 +215,7 @@ Le troisième, c'est l'**unification avec la mécanique quantique**. À l'instan
       q: `Qu'est-ce que le Big Bang, au sens du modèle cosmologique standard ?`,
       options: [
         `Une explosion qui a eu lieu en un point précis de l'espace`,
-        `La phase initiale chaude et dense de l'univers, marquée par l'**expansion de l'espace lui-même**, depuis ~13,8 milliards d'années`,
+        `La phase initiale chaude et dense de l'univers, marquée par l'expansion de l'espace lui-même, depuis ~13,8 milliards d'années`,
         `La naissance des premières étoiles`,
         `Une éruption solaire géante`
       ],
@@ -259,7 +259,7 @@ Le troisième, c'est l'**unification avec la mécanique quantique**. À l'instan
       q: `Qu'est-ce que l'inflation cosmique ?`,
       options: [
         `Une hausse continue de la taille de l'univers depuis toujours`,
-        `Une phase d'expansion **exponentielle** dans les 10⁻³² premières secondes, postulée par Alan Guth en 1980 pour expliquer la régularité du fond diffus et la platitude de l'univers`,
+        `Une phase d'expansion exponentielle dans les 10⁻³² premières secondes, postulée par Alan Guth en 1980 pour expliquer la régularité du fond diffus et la platitude de l'univers`,
         `Une accélération économique`,
         `Le ralentissement actuel de l'expansion`
       ],
@@ -281,7 +281,7 @@ Le troisième, c'est l'**unification avec la mécanique quantique**. À l'instan
       q: `Qu'ont découvert les équipes de Perlmutter, Riess et Schmidt en 1998 ?`,
       options: [
         `Une nouvelle planète`,
-        `Que l'expansion de l'univers **s'accélère** au lieu de ralentir, en analysant les supernovas de type Ia — découverte attribuée à l'énergie noire`,
+        `Que l'expansion de l'univers s'accélère au lieu de ralentir, en analysant les supernovas de type Ia — découverte attribuée à l'énergie noire`,
         `Que l'univers va s'effondrer`,
         `Que la gravité varie dans le temps`
       ],

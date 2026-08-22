@@ -454,7 +454,10 @@ Une image avec des points cliquables (« hotspots ») qui révèlent une annotat
 }
 ```
 
-- `image` est une **data URL base64** : `data:image/png;base64,…` ou `data:image/jpeg;base64,…`. Encode l'image en base64 (outils en ligne abondants) et colle le résultat. Reste self-contained dans le `.js`.
+- `image` accepte **deux formes** :
+  - une **data URL base64** (`data:image/png;base64,…`) — à utiliser pour les **schémas générés** (voir §8ter) : le `.js` reste self-contained ;
+  - un **chemin relatif** vers le dossier `images/` du carnet (`'images/{slug}--nom.jpg'`) — à utiliser pour les **photos** (voir §8ter) : les photos sont trop lourdes pour du base64.
+- `hotspots: []` est valide : le widget devient alors une **simple image légendée** (photo d'illustration, reproduction d'œuvre…).
 - `x` et `y` sont des **pourcentages** (0-100) de la dimension de l'image (x depuis la gauche, y depuis le haut).
 - Chaque hotspot apparaît comme un cercle numéroté orange. Clic = la carte de description s'affiche en bas de l'image.
 - 3 à 8 hotspots idéalement. Au-delà, l'image devient trop chargée.
@@ -486,6 +489,82 @@ Un tableau n × m triable au clic sur les en-têtes, avec surlignage automatique
 
 - Cellules et en-têtes en texte brut (pas de markdown). Les nombres sont formatés en français.
 - 2 à 8 lignes, 2 à 6 colonnes idéalement.
+
+---
+
+## 8ter. Visuels : schémas générés et photos
+
+Chaque sujet comporte obligatoirement : **au moins 3 photos** et **1 à 2 schémas générés** quand le propos s'y prête. Le schéma explique là où le texte ne suffit pas (mécanisme, échelle, cycle, anatomie, carte) ; la photo montre le réel (œuvre d'art, monument, personnage, organisme, événement historique, image d'observatoire, objet de musée). Chaque image doit enseigner quelque chose que le texte seul ne montre pas — mais avec 3 photos minimum par sujet, on assume aussi leur rôle d'ancrage : donner un visage, un lieu, une matière au sujet.
+
+**Trouver 3 photos, même pour un sujet abstrait** — quelques pistes qui marchent toujours : les *acteurs* (portrait d'époque, buste, photo officielle), les *lieux* (bâtiment, site, ville, laboratoire), les *objets et documents* (manuscrit, tablette, instrument, première édition, une du journal), les *œuvres* (tableau, mosaïque, affiche d'époque), les *moments* (photo d'événement, congrès, signature). Un sujet de mathématiques peut montrer un portrait, un manuscrit et un instrument de calcul ; un sujet d'économie, un lieu de pouvoir, une une de presse et un acteur clé.
+
+### A. Schémas et graphiques générés (par Claude, au moment de la génération du sujet)
+
+Le schéma est produit en Python (matplotlib) ou en SVG rendu en PNG, puis intégré en **base64** dans un widget `SchemaAnnote` — avec des hotspots calculés programmatiquement à partir des coordonnées des données, jamais estimés à l'œil.
+
+**Charte graphique (obligatoire — le schéma doit sembler natif de l'app) :**
+
+| Élément | Valeur |
+|---|---|
+| Fond | `#12121e` (ou `#0a0a14`) |
+| Texte principal / secondaire / atténué | `#ece4d3` / `#c8c0b0` / `#8a8298` |
+| Lignes, axes, grilles | `rgba(236, 228, 211, 0.16)` |
+| Accents (dans l'ordre de préférence) | orange `#ff6b35`, bleu `#5b8def`, ambre `#f5b342`, vert `#4ade80`, magenta `#d946ef`, violet `#a78bfa`, cyan `#06b6d4`, rouge `#fb7185` |
+| Police | une sérif (DejaVu Serif sous matplotlib — proche du Spectral de l'app) |
+
+**Recette matplotlib éprouvée :** `figsize` ≈ (11, 5) à (11, 7), `dpi=110`, titre dans l'image (`fig.text`, ~14 pt), sous-légende italique en pied (~9,5 pt, couleur atténuée), puis **quantisation à 128 couleurs** avant sauvegarde (`PIL : im.quantize(colors=128)`) → un schéma pèse **15 à 30 Ko** au lieu de 150+.
+
+```python
+import matplotlib; matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+plt.rcParams.update({'font.family': 'DejaVu Serif', 'text.color': '#ece4d3',
+  'axes.labelcolor': '#c8c0b0', 'xtick.color': '#c8c0b0', 'ytick.color': '#c8c0b0',
+  'axes.edgecolor': (0.93, 0.89, 0.83, 0.16), 'figure.facecolor': '#12121e',
+  'axes.facecolor': '#12121e', 'savefig.facecolor': '#12121e'})
+```
+
+**Hotspots calculés, pas devinés** — convertir les coordonnées de données en pourcentages de la figure :
+
+```python
+def pct(fig, ax, x, y):
+    X, Y = fig.transFigure.inverted().transform(ax.transData.transform((x, y)))
+    return round(X * 100, 1), round((1 - Y) * 100, 1)   # y inversé (0 = haut)
+```
+
+**Sujets qui s'y prêtent bien** : échelles et ordres de grandeur (axe log annoté), spectres et gradients, courbes de fonctions avec points remarquables, diagrammes espace-temps, cycles (eau, carbone, Krebs), coupes (Terre, cellule, volcan), cartes stylisées, chronologies visuelles. **Vérifier le rendu** (relire l'image générée) avant d'intégrer : chevauchements de labels et texte coupé sont les défauts classiques.
+
+### B. Photos (workflow en deux temps, avec l'utilisateur)
+
+Claude ne peut pas télécharger d'images depuis le web pendant la génération. Le workflow est donc :
+
+1. **Côté génération (chat)** : Claude identifie **au minimum 3 photos** pertinentes (davantage si le sujet est visuel) et fournit à l'utilisateur des **sources libres de droits précises** (Wikimedia Commons, NASA/ESA — domaine public ou CC), sous forme de **liste numérotée de liens** en fin de livraison, avec pour chaque lien l'image exacte à prendre. L'utilisateur télécharge et glisse les fichiers dans la conversation ; Claude (ou Cowork) identifie chaque image à son contenu, la redimensionne et la dépose. Dans la fiche, chaque widget référence le chemin **prévu** :
+
+```js
+{
+  type: 'widget',
+  composant: 'SchemaAnnote',
+  titre: 'La nébuleuse du Crabe',
+  params: {
+    image: 'images/nebuleuses--crabe-hubble.jpg',   // convention : {slug-du-sujet}--{nom}.jpg
+    legende: 'Rémanent de la supernova de 1054, vu par Hubble. (NASA/ESA, domaine public)',
+    hotspots: []    // [] = simple image légendée ; ou des hotspots si des détails méritent annotation
+  }
+}
+```
+
+2. **Côté intégration (Cowork)** : l'utilisateur dépose les photos téléchargées ; Cowork les **redimensionne** (bord long ≤ 1200 px, JPEG qualité ~80, cible ≤ 200 Ko), les nomme selon la convention `{slug}--{nom}.jpg`, les place dans `images/`, et vérifie l'affichage. Le script de snapshot ajoute automatiquement le dossier `images/` au cache hors-ligne.
+
+**Règles :**
+- Uniquement des images **libres de droits** (domaine public, CC0, CC-BY avec crédit). Le crédit va dans la `legende`.
+- Pas de photo « décorative » générique ; pas de photo de personne vivante identifiable hors contexte encyclopédique.
+- Si la photo n'est pas encore déposée, l'app affiche une image cassée : c'est attendu, elle apparaîtra dès le dépôt. Le mentionner à l'utilisateur en livrant la fiche.
+
+### C. Choisir entre schéma, photo… et rien
+
+- Le **schéma** montre un *mécanisme*, une *relation*, une *échelle* → générable, précis, dans la charte.
+- La **photo** montre une *réalité singulière* (cette œuvre, ce monument, cette galaxie) qu'un dessin trahirait.
+- Un `GrilleCartes`, une `Frise` ou un `TableauComparatif` remplacent avantageusement un visuel quand l'information est déjà structurée.
+- En cas de doute : pas d'image.
 
 ---
 
@@ -619,9 +698,10 @@ L'app a une voix : **élégante, dense, posée, à la fois rigoureuse et émerve
 - [ ] Aucun `<script>`, aucun `fetch()`, aucune dépendance externe.
 - [ ] Le fichier a été chargé une fois dans un moteur JS (`node -e "global.window={CarnetDeSavoirs:{register(){}}}; require('./slug.js')"`) sans erreur.
 - [ ] `lie_a` ne référence que des ids existants ; les `[[slug]]` aussi.
+- [ ] **Au moins 3 photos** (chemins `images/{slug}--nom.jpg`, crédit en légende, liste de liens de téléchargement fournie avec la livraison) + 1 à 2 schémas générés si le propos s'y prête (charte graphique, hotspots calculés, images relues).
 
 Une fois ces points cochés, tu peux livrer le fichier à l'utilisateur qui l'ajoutera à son atelier via Cowork.
 
 ---
 
-*v1.1 — réf pour génération de sujets, août 2026 (mise en conformité avec app.js v1.9 : champs markdown, mini-quiz, presets, TableauComparatif, 5 types de quiz, Equation manipulable, formats de dates)*
+*v1.3 — réf pour génération de sujets, août 2026 (v1.2 + minimum de 3 photos par sujet, pistes pour les sujets abstraits, livraison des liens en liste numérotée)*

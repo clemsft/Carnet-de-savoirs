@@ -44,6 +44,13 @@ if (Test-Path 'index.html') {
   foreach ($m in [regex]::Matches($new, 'src="((?!https?:|//)[^"?]+\.js)'))   { $localAssets += $m.Groups[1].Value }
 }
 
+# Photos et illustrations du dossier images/ : disponibles hors-ligne elles aussi
+if (Test-Path 'images') {
+  Get-ChildItem 'images' -File | Where-Object { $_.Extension -match '\.(jpe?g|png|webp|svg|gif)$' } | ForEach-Object {
+    $localAssets += ('images/' + $_.Name)
+  }
+}
+
 # ---- 2. sw.js : VERSION + LOCAL_URLS régénérée ----
 if (Test-Path 'sw.js') {
   $sw = Read-Utf8 'sw.js'

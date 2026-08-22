@@ -79,7 +79,7 @@ Toute la suite de l'histoire — civile, militaire, philosophique — découle d
       composant: 'Equation',
       params: {
         tex: 'E = \\Delta m \\cdot c^2',
-        legende: `Forme appliquée aux réactions nucléaires : l'énergie libérée *E* est la différence de masse *Δm* entre l'état initial et final, multipliée par le carré de la vitesse de la lumière. Pour une fission d'U-235, Δm représente environ 0,09 % de la masse initiale.`,
+        legende: `Forme appliquée aux réactions nucléaires : l'énergie libérée E est la différence de masse Δm entre l'état initial et final, multipliée par le carré de la vitesse de la lumière. Pour une fission d'U-235, Δm représente environ 0,09 % de la masse initiale.`,
         affichage: 'block'
       }
     },

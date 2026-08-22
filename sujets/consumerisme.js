@@ -284,7 +284,7 @@ Une question philosophique reste cependant ouverte : ces alternatives **sortent-
     {
       type: 'texte-a-trou',
       q: 'Complète :',
-      texte: 'Dans son livre *La Distinction* (1979), {Bourdieu} démontre que les goûts en matière de consommation sont des marqueurs de {classe} sociale, et non de simples préférences individuelles.',
+      texte: 'Dans son livre « La Distinction » (1979), {Bourdieu} démontre que les goûts en matière de consommation sont des marqueurs de {classe} sociale, et non de simples préférences individuelles.',
       explication: 'Bourdieu a montré, par une enquête statistique massive, que les choix culturels et alimentaires reproduisent les hiérarchies sociales. Le goût pour l\'opéra, le pot-au-feu ou tel mobilier n\'est pas neutre : il signale et reproduit la position dans l\'espace social.'
     },
     {

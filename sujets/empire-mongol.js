@@ -210,7 +210,7 @@ L\'empire unifié n\'aura duré que **cent cinquante ans environ**. Mais ses des
       options: [
         'Oui, dans l\'absolu',
         'Non, c\'est l\'Empire romain qui détient ce record',
-        'C\'est le plus grand empire **contigu** ; l\'Empire britannique est plus vaste mais éclaté sur les océans',
+        'C\'est le plus grand empire contigu ; l\'Empire britannique est plus vaste mais éclaté sur les océans',
         'Non, c\'est l\'Empire chinois sous les Han'
       ],
       correcte: 2,

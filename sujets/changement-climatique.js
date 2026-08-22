@@ -78,7 +78,7 @@ L'effet de serre est donc bien connu depuis le XIXᵉ siècle. Ce qui a changé,
       composant: 'Equation',
       params: {
         tex: '\\Delta F = 5{,}35 \\, \\ln\\!\\left(\\frac{C}{C_0}\\right)',
-        legende: `Forçage radiatif additionnel (en W/m²) dû à une concentration de CO₂ *C* par rapport à une concentration de référence *C₀*. Pour C = 425 ppm et C₀ = 280 ppm (préindustriel), on obtient ΔF ≈ 2,2 W/m² — l'énergie supplémentaire que la Terre retient en permanence.`,
+        legende: `Forçage radiatif additionnel (en W/m²) dû à une concentration de CO₂ C par rapport à une concentration de référence C₀. Pour C = 425 ppm et C₀ = 280 ppm (préindustriel), on obtient ΔF ≈ 2,2 W/m² — l'énergie supplémentaire que la Terre retient en permanence.`,
         affichage: 'block'
       }
     },
@@ -227,7 +227,7 @@ La justice climatique est l'angle moral et géopolitique du problème. Les pays 
       q: `Quelle serait la température moyenne terrestre sans effet de serre ?`,
       options: [
         `Identique à aujourd'hui`,
-        `Environ -18 °C — l'effet de serre naturel est indispensable à l'habitabilité, c'est son **renforcement** récent qui pose problème`,
+        `Environ -18 °C — l'effet de serre naturel est indispensable à l'habitabilité, c'est son renforcement récent qui pose problème`,
         `0 °C`,
         `Environ +5 °C`
       ],
@@ -238,7 +238,7 @@ La justice climatique est l'angle moral et géopolitique du problème. Les pays 
       q: `Que mesure la courbe de Keeling depuis 1958 ?`,
       options: [
         `La température moyenne globale`,
-        `La concentration atmosphérique de **CO₂**, mesurée en continu au sommet du Mauna Loa à Hawaï`,
+        `La concentration atmosphérique de CO₂, mesurée en continu au sommet du Mauna Loa à Hawaï`,
         `Le niveau des mers`,
         `L'épaisseur de la couche d'ozone`
       ],
@@ -293,7 +293,7 @@ La justice climatique est l'angle moral et géopolitique du problème. Les pays 
       q: `Que désigne le mot "mitigation" en politique climatique ?`,
       options: [
         `Adoucir le discours public`,
-        `Réduire les émissions de gaz à effet de serre — par opposition à l'**adaptation**, qui consiste à se préparer aux changements déjà inévitables`,
+        `Réduire les émissions de gaz à effet de serre — par opposition à l'adaptation, qui consiste à se préparer aux changements déjà inévitables`,
         `Compenser financièrement les pays touchés`,
         `Refroidir artificiellement l'atmosphère`
       ],

@@ -218,7 +218,7 @@ C\'est cette transformation **qualitative** que désigne le mot mégafeu : moins
       q: 'À l\'échelle globale, la surface totale brûlée par an évolue-t-elle à la hausse ?',
       options: [
         'Oui, elle augmente fortement chaque année',
-        'Non, elle diminue légèrement, mais cette baisse cache une augmentation des feux **extrêmes** dans les forêts tempérées et boréales',
+        'Non, elle diminue légèrement, mais cette baisse cache une augmentation des feux extrêmes dans les forêts tempérées et boréales',
         'Elle est strictement stable',
         'On ne peut pas la mesurer'
       ],

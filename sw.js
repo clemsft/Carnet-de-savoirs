@@ -24,7 +24,7 @@
  * file://. L'enregistrement est conditionnel côté app.js.
  */
 
-const VERSION = '202608182323';
+const VERSION = '202608221901';
 const CACHE_LOCAL = 'carnet-local-' + VERSION;
 const CACHE_EXTERNAL = 'carnet-external-' + VERSION;
 
@@ -117,7 +117,22 @@ const LOCAL_URLS = [
   './parcours/le-vivant.js',
   './parcours/pensee-du-monde.js',
   './parcours/sciences-de-l-ecriture.js',
-  './parcours/sciences-de-l-esprit.js'
+  './parcours/sciences-de-l-esprit.js',
+  './images/baudouin-iv--couronnement.jpg',
+  './images/empire-byzantin--justinien-mosaique.jpg',
+  './images/empire-byzantin--sainte-sophie.jpg',
+  './images/epopee--tablette-gilgamesh.jpg',
+  './images/jerome-kerviel--tours-socgen.jpg',
+  './images/le-rap--grandmaster-flash.jpg',
+  './images/les-animes--akihabara.jpg',
+  './images/les-templiers--bucher-molay.jpg',
+  './images/les-templiers--sceau.jpg',
+  './images/marc-aurele--statue-equestre.jpg',
+  './images/mecanique-quantique--solvay-1927.jpg',
+  './images/napoleon--sacre-david.jpg',
+  './images/saddam-hussein--firdos-2003.jpg',
+  './images/vitesse-de-la-lumiere-limite--aldrin-apollo11.jpg',
+  './images/vitesse-de-la-lumiere-limite--webb-deep-field.jpg'
 ];
 // __LOCAL_URLS_END__
 
