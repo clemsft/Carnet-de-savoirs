@@ -137,6 +137,22 @@ Or si tu places un détecteur à l\'une des fentes pour vérifier par laquelle l
     },
 
     {
+      type: 'widget',
+      composant: 'Prediction',
+      titre: 'L\'échelle du monde quantique',
+      params: {
+        question: 'La constante de Planck vaut 6,6 × 10 puissance -x, en joules-secondes. Que vaut x ?',
+        min: 1,
+        max: 60,
+        step: 1,
+        valeurInitiale: 10,
+        reponse: 34,
+        unite: '',
+        explication: 'x = **34**. Un nombre si petit (33 zéros après la virgule) que les effets quantiques sont invisibles à notre échelle — et incontournables à celle des atomes.'
+      }
+    },
+
+    {
       type: 'texte',
       titre: 'Le principe d\'<em>incertitude</em>',
       contenu_md:
@@ -166,6 +182,12 @@ Une conséquence vertigineuse : un atome au repos est **mathématiquement imposs
 `Cette équation joue pour la quantique le rôle que joue *F = ma* en mécanique classique. Elle dit comment évolue la **fonction d\'onde** Ψ — un objet mathématique abstrait dont le **carré du module** donne la probabilité de trouver la particule à tel endroit, dans tel état.
 
 C\'est le tournant philosophique de la théorie : la quantique ne décrit plus la **réalité** des objets, mais des **probabilités**. Une particule n\'a pas une position avant qu\'on la mesure. Elle a une distribution de positions probables, qui se concrétise au moment de l\'observation.`
+    },
+
+    {
+      type: 'mini-quiz',
+      q: 'Dans l\'expérience des fentes, que se passe-t-il si l\'on installe un détecteur pour savoir par quelle fente passe la particule ?',
+      reponse: 'Les **franges disparaissent**. Dès que l\'information « quel chemin » existe, la superposition est détruite et la particule se comporte comme une bille classique. Ce n\'est pas l\'appareil qui « perturbe » : c\'est l\'information elle-même qui compte.'
     },
 
     {

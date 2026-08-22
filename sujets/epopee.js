@@ -190,6 +190,22 @@ Au **Moyen Âge**, les **chansons de geste** appliquent le moule épique aux exp
 
     {
       type: 'widget',
+      composant: 'Prediction',
+      titre: 'Avant le comparateur, ton estimation',
+      params: {
+        question: 'Combien de vers compte le Mahabharata indien ?',
+        min: 0,
+        max: 250000,
+        step: 5000,
+        valeurInitiale: 30000,
+        reponse: 200000,
+        unite: 'vers',
+        explication: 'Environ **200 000 vers** — huit fois l\'Iliade et l\'Odyssée réunies. La plus longue œuvre littéraire jamais composée.'
+      }
+    },
+
+    {
+      type: 'widget',
       composant: 'SelecteurValeurs',
       titre: 'Longueurs comparées de quelques grandes épopées',
       params: {
@@ -204,6 +220,13 @@ Au **Moyen Âge**, les **chansons de geste** appliquent le moule épique aux exp
           { label: 'Beowulf (Angleterre)', valeur: '~3 200', description: 'Vieil anglais, vers 700. Conservé dans un seul manuscrit du Xᵉ siècle. Beowulf combat Grendel puis un dragon.' }
         ]
       }
+    },
+
+    {
+      type: 'mini-quiz',
+      q: 'De mémoire : cite trois des six moments du cycle du héros.',
+      indice: 'Revois le schéma circulaire plus haut… après avoir essayé.',
+      reponse: 'L\'**appel**, le **départ** (franchir le seuil), les **épreuves**, l\'**abîme** (mort symbolique), la **révélation**, le **retour**. De Gilgamesh à Frodon, le squelette est le même.'
     },
 
     {

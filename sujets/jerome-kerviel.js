@@ -132,6 +132,22 @@ Le débat sur son procès portera sur un point crucial : sa hiérarchie *savait-
 
     {
       type: 'widget',
+      composant: 'Prediction',
+      titre: 'Engage-toi avant le graphique',
+      params: {
+        question: 'Combien la fraude a-t-elle finalement coûté à la Société Générale, en milliards d\'euros ?',
+        min: 0,
+        max: 60,
+        step: 0.5,
+        valeurInitiale: 10,
+        reponse: 4.9,
+        unite: 'Md€',
+        explication: '**4,9 milliards d\'euros** de perte au débouclage — mais la vraie surprise est ailleurs : l\'exposition atteignait 49,9 Md€, davantage que la valeur boursière de la banque.'
+      }
+    },
+
+    {
+      type: 'widget',
       composant: 'SchemaAnnote',
       titre: 'Les ordres de grandeur de l\'affaire',
       params: {
@@ -150,6 +166,12 @@ Le débat sur son procès portera sur un point crucial : sa hiérarchie *savait-
 Or ces trois jours coïncident avec le début d'une chute mondiale des marchés — les premiers effets visibles de la crise des subprimes. Chaque milliard vendu pèse sur les cours, ce qui aggrave la perte sur ce qu'il reste à vendre. C'est un cercle vicieux classique en trading. La banque perd ainsi environ **6,4 Mds €** sur le débouclage, à comparer à un gain latent de 1,5 Mds € en fin d'année précédente. Solde net : **-4,9 Mds €**.
 
 Une question a longtemps hanté les analystes : et si la banque avait attendu ? Certains estiment que, dans un marché qui rebondit deux mois plus tard, la perte réelle aurait pu être bien moindre. Mais ce raisonnement ignore le risque systémique — la SocGen ne pouvait juridiquement pas conserver ces positions sans les faire valider par ses instances de risque, ce qui était impossible sans révéler la fraude.`
+    },
+
+    {
+      type: 'mini-quiz',
+      q: 'Pourquoi déboucler 50 milliards en trois jours aggrave-t-il mécaniquement la perte ?',
+      reponse: 'Vendre massivement et vite **fait chuter les cours contre soi** : chaque vague de vente déprécie ce qui reste à vendre. Et janvier 2008 était déjà un marché baissier — la banque a vendu au pire moment, dans un marché qui plongeait.'
     },
 
     {

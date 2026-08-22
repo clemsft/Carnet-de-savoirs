@@ -169,6 +169,28 @@ Militairement, Montgisard offre au royaume un répit de plusieurs années. Symbo
     },
 
     {
+      type: 'widget',
+      composant: 'Prediction',
+      titre: 'Avant de lire la suite, engage-toi',
+      params: {
+        question: 'À quel âge Baudouin IV meurt-il ?',
+        min: 15,
+        max: 70,
+        step: 1,
+        reponse: 23,
+        unite: 'ans',
+        explication: 'Rongé par la lèpre, aveugle et paralysé à la fin, il meurt en mars 1185 à **23 ans** — après avoir tenu son royaume onze ans et battu Saladin en rase campagne.'
+      }
+    },
+
+    {
+      type: 'mini-quiz',
+      q: 'Sans remonter dans la page : qui Baudouin IV désigne-t-il pour lui succéder, et pourquoi pas simplement sa sœur Sibylle ?',
+      indice: 'Regarde qui il veut ÉVITER de mettre sur le trône.',
+      reponse: 'Son **neveu**, le petit Baudouin V — précisément pour court-circuiter le mari de Sibylle, **Guy de Lusignan**, dont il se méfie. Le pari échoue : l\'enfant meurt à 9 ans, Guy devient roi, et Hattin suit un an plus tard.'
+    },
+
+    {
       type: 'texte',
       titre: `<em>La lente descente</em> et l'après`,
       contenu_md:

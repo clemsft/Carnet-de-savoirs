@@ -57,8 +57,8 @@ puis une balise `<script>` dans la section `PARCOURS` de `index.html`.
 
 ## Blocs de cours et widgets (résumé — détail dans TEMPLATE_SUJET.md)
 
-Blocs : `texte`, `encadre`, `widget`, `mini-quiz`, `html_libre`.
-Widgets : `SelecteurValeurs` (+ comparateur), `CurseurParametrique` (+ presets), `GrilleCartes` (cartes retournables), `ListeMethodes` (accordéon), `Frise` (timeline, agrégée dans la Timeline globale), `Equation` (KaTeX, mode manipulable), `SchemaAnnote` (image base64 + hotspots), `TableauComparatif` (tri + extrêmes).
+Blocs : `texte`, `encadre`, `widget`, `mini-quiz` (question à réponse masquée dans le fil du cours), `html_libre`.
+Widgets : `Prediction` (s'engager sur une valeur avant de connaître la réponse), `SelecteurValeurs` (+ comparateur), `CurseurParametrique` (+ presets), `GrilleCartes` (cartes retournables + auto-test « su / à revoir » persistant), `ListeMethodes` (accordéon), `Frise` (timeline + mode « masquer les dates », agrégée dans la Timeline globale), `Equation` (KaTeX, mode manipulable), `SchemaAnnote` (image base64 ou photo `images/` + hotspots), `TableauComparatif` (tri + extrêmes).
 Quiz : `qcm`, `vrai-faux`, `ordre-chrono`, `texte-a-trou`, `associer`.
 
 ## Domaines & couleurs

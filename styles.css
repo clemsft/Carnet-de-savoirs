@@ -6268,3 +6268,48 @@ body.dark mark.passage-mark:hover {
 /* Toast « nouvelle version » (service worker) */
 .update-toast .btn-row { display: flex; gap: 0.5rem; }
 .update-toast .btn { padding: 0.35rem 0.8rem; font-size: 0.85rem; }
+
+/* ============ Widget Prediction ============ */
+.w-predict { display: flex; flex-direction: column; gap: 0.6rem; }
+.w-predict-question { font-size: 1.02rem; font-weight: 600; color: var(--text); }
+.w-predict-labelrow { display: flex; justify-content: space-between; align-items: baseline; }
+.w-predict-prompt { font-size: 0.85rem; color: var(--text-dim); font-style: italic; }
+.w-predict-value { font-family: var(--f-display); font-size: 1.25rem; color: var(--accent); }
+.w-predict-bounds { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-faint); margin-top: -0.35rem; }
+.w-predict-go { align-self: flex-start; }
+.w-predict-result { border: 1px solid var(--line-strong); border-left: 3px solid var(--accent); border-radius: var(--r); padding: 0.9rem 1.1rem; display: flex; flex-direction: column; gap: 0.6rem; background: var(--bg-elev); }
+.w-predict-result.is-great { border-left-color: var(--ok); }
+.w-predict-result.is-close { border-left-color: var(--warn); }
+.w-predict-result.is-far, .w-predict-result.is-off { border-left-color: var(--err); }
+.w-predict-numbers { display: flex; gap: 1.4rem; flex-wrap: wrap; font-size: 0.95rem; }
+.w-predict-num-guess { color: var(--text-soft); }
+.w-predict-num-answer { color: var(--text); font-weight: 700; }
+.w-predict-scale { position: relative; height: 10px; border-radius: 5px; background: color-mix(in oklab, var(--text) 10%, transparent); }
+.w-predict-mark { position: absolute; top: -3px; width: 4px; height: 16px; border-radius: 2px; transform: translateX(-50%); }
+.w-predict-mark-guess { background: var(--text-dim); }
+.w-predict-mark-answer { background: var(--accent); }
+.w-predict-verdict { font-size: 0.92rem; color: var(--text-soft); font-style: italic; }
+.w-predict-explication { font-size: 0.92rem; color: var(--text-soft); border-top: 1px dashed var(--line); padding-top: 0.6rem; }
+.w-predict-explication p { margin: 0 0 0.4rem; }
+
+/* ============ GrilleCartes : auto-test ============ */
+.w-grid-selftest-summary { display: none; font-size: 0.82rem; color: var(--text-dim); margin-bottom: 0.5rem; }
+.w-grid-selftest-summary .st-ok { color: var(--ok); }
+.w-grid-selftest-summary .st-ko { color: var(--err); }
+.w-grid-selftest-reset { background: none; border: none; color: var(--text-faint); font: inherit; font-size: 0.78rem; text-decoration: underline dotted; cursor: pointer; margin-left: 0.6rem; }
+.w-grid-selftest-btns { display: flex; gap: 0.45rem; margin-top: 0.55rem; }
+.w-grid-st-btn { font: inherit; font-size: 0.78rem; padding: 0.22rem 0.6rem; border-radius: var(--r-sm); border: 1px solid var(--line-strong); background: transparent; color: var(--text-soft); cursor: pointer; }
+.w-grid-st-btn.st-btn-ok:hover { border-color: var(--ok); color: var(--ok); }
+.w-grid-st-btn.st-btn-ko:hover { border-color: var(--err); color: var(--err); }
+.w-grid-card-flip.st-ok { box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--ok) 55%, transparent); }
+.w-grid-card-flip.st-ko { box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--err) 55%, transparent); }
+.w-grid-card-flip.st-ok .w-grid-card-front::after,
+.w-grid-card-flip.st-ko .w-grid-card-front::after { content: '●'; position: absolute; top: 0.5rem; right: 0.6rem; font-size: 0.7rem; }
+.w-grid-card-flip.st-ok .w-grid-card-front::after { color: var(--ok); }
+.w-grid-card-flip.st-ko .w-grid-card-front::after { color: var(--err); }
+
+/* ============ Frise : auto-test des dates ============ */
+.w-frise-test-toggle { font: inherit; font-size: 0.8rem; padding: 0.3rem 0.75rem; margin-bottom: 0.7rem; border-radius: var(--r-sm); border: 1px solid var(--line-strong); background: transparent; color: var(--text-soft); cursor: pointer; }
+.w-frise-test-toggle.is-active { border-color: var(--accent); color: var(--accent); }
+.w-frise-date.is-veiled { color: transparent; background: color-mix(in oklab, var(--text) 12%, transparent); border-radius: 4px; cursor: pointer; user-select: none; position: relative; }
+.w-frise-date.is-veiled::after { content: 'révéler'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--text-faint); font-size: 0.68rem; font-style: normal; letter-spacing: 0.05em; }

@@ -121,6 +121,22 @@ Constantinople devient à la fois la plus grande ville d\'Europe (jusqu\'à **50
     },
 
     {
+      type: 'widget',
+      composant: 'Prediction',
+      titre: 'Un empire « décadent » ?',
+      params: {
+        question: 'Combien d\'années séparent la fondation de Constantinople (330) de sa chute (1453) ?',
+        min: 100,
+        max: 2000,
+        step: 1,
+        valeurInitiale: 500,
+        reponse: 1123,
+        unite: 'ans',
+        explication: '**1 123 ans.** L\'empire « décadent » des manuels a duré plus longtemps que Rome avant lui — et plus longtemps que la monarchie française n\'a existé.'
+      }
+    },
+
+    {
       type: 'texte',
       titre: 'Le <em>siècle d\'or</em> de Justinien',
       contenu_md:
@@ -209,6 +225,12 @@ Mais le coup le plus traumatisant viendra des **chrétiens occidentaux** eux-mê
 Sous le prétexte d\'une querelle de succession au trône byzantin, l\'armée croisée prend et **pille** la plus grande cité chrétienne du monde. Pendant trois jours, les chevaliers chrétiens massacrent, violent, brûlent. Sainte-Sophie est saccagée — une prostituée est même installée sur le trône du patriarche pendant les fêtes. Les **trésors** byzantins (reliques, mosaïques, sculptures antiques) sont expédiés vers l\'Occident — beaucoup ornent encore aujourd\'hui Saint-Marc de Venise.
 
 L\'empire est démantelé en plusieurs fragments dirigés par des seigneurs latins. Il sera **restauré en 1261**, mais ne retrouvera jamais sa puissance d\'avant. C\'est à partir de cette **fracture** que le déclin devient irréversible.`
+    },
+
+    {
+      type: 'mini-quiz',
+      q: 'Pourquoi peut-on dire que Byzance ne s\'est jamais remise de 1204 — plutôt que de 1453 ?',
+      reponse: 'Le sac de 1204 est l\'œuvre des **croisés chrétiens**, pas des Ottomans : Constantinople est pillée, l\'empire démembré en États latins. Restauré en 1261, il n\'est plus qu\'une cité-État exsangue. 1453 ne fait qu\'achever un mourant.'
     },
 
     {

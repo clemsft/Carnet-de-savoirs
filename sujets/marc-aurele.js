@@ -125,6 +125,21 @@ Ensuite, les **guerres marcomanes**. En 166, une coalition de peuples germanique
     },
 
     {
+      type: 'widget',
+      composant: 'Prediction',
+      titre: 'Un règne sous pression',
+      params: {
+        question: 'Combien d\'années dure le règne de Marc Aurèle ?',
+        min: 1,
+        max: 45,
+        step: 1,
+        reponse: 19,
+        unite: 'ans',
+        explication: '**19 ans** (161-180), presque tous passés en guerre sur le Danube — c\'est là, sous la tente, qu\'il écrit les Pensées.'
+      }
+    },
+
+    {
       type: 'texte',
       titre: `Les <em>Pensées pour moi-même</em>`,
       contenu_md:
@@ -166,6 +181,12 @@ Faut-il en faire grief à Marc Aurèle ? Il n'avait pas le choix politique — r
         legende: 'La statue équestre de Marc Aurèle (bronze doré, vers 175), Capitole. Au Moyen Âge, on croyait qu\'elle représentait Constantin — ce qui la sauva de la fonte. (Photo Wikimedia Commons, licence Creative Commons — crédit selon le fichier)',
         hotspots: []
       }
+    },
+
+    {
+      type: 'mini-quiz',
+      q: 'En quoi le choix de son successeur contredit-il toute la philosophie de Marc Aurèle ?',
+      reponse: 'Quatre empereurs avant lui avaient **adopté le meilleur** plutôt que transmis au fils. Marc Aurèle, le philosophe du devoir et de la raison, choisit le **sang** : son fils Commode, 18 ans, inapte. Le stoïcien a cédé là où des empereurs sans philosophie avaient su renoncer.'
     },
 
     {

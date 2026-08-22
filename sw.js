@@ -24,7 +24,7 @@
  * file://. L'enregistrement est conditionnel côté app.js.
  */
 
-const VERSION = '202608221901';
+const VERSION = '202608222248';
 const CACHE_LOCAL = 'carnet-local-' + VERSION;
 const CACHE_EXTERNAL = 'carnet-external-' + VERSION;
 

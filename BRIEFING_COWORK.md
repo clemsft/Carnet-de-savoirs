@@ -21,7 +21,7 @@
 - `index.html` liste explicitement chaque `sujets/*.js` et `parcours/*.js` dans une balise `<script>` (avec `?v=…`).
 - `app.js` : IIFE unique ; `window.CarnetDeSavoirs.register()` / `.registerParcours()` / `.start()`.
 - `sw.js` + `manifest.json` : PWA. `LOCAL_URLS` du SW est **régénérée automatiquement** par `Update-Cache-Version.ps1` — ne pas l'éditer à la main.
-- Documentation de génération : `TEMPLATE_SUJET.md` (v1.3 — §8ter : schémas générés et ≥ 3 photos par sujet) — c'est ce fichier que le Claude « chat » utilise pour écrire une fiche.
+- Documentation de génération : `TEMPLATE_SUJET.md` (v1.4 — §8ter visuels ; §7-8 widgets pédagogiques : `Prediction` + `mini-quiz` obligatoires, auto-test GrilleCartes/Frise) — c'est ce fichier que le Claude « chat » utilise pour écrire une fiche.
 
 ---
 
@@ -93,4 +93,4 @@ Mélange des options QCM à l'affichage · réponses multiples en texte-à-trou 
 
 ---
 
-*v1.2 — août 2026*
+*v1.3 — août 2026*

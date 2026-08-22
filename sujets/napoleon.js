@@ -235,6 +235,22 @@ La coalition se reforme. À **Leipzig** (octobre 1813), la *bataille des Nations
 
     {
       type: 'widget',
+      composant: 'Prediction',
+      titre: 'Avant le graphique, ton estimation',
+      params: {
+        question: 'Sur les 422 000 hommes du corps principal entrés en Russie en juin 1812, combien repassent le Niémen en décembre ?',
+        min: 0,
+        max: 422000,
+        step: 1000,
+        valeurInitiale: 200000,
+        reponse: 10000,
+        unite: 'hommes',
+        explication: '**10 000** hommes en état de combattre — soit 2 %. Froid, typhus, faim et cosaques ont fait le reste. Le graphique ci-dessous suit l\'hémorragie étape par étape.'
+      }
+    },
+
+    {
+      type: 'widget',
       composant: 'SchemaAnnote',
       titre: 'Cliquez sur les jalons de la campagne de Russie',
       params: {
@@ -253,6 +269,12 @@ La coalition se reforme. À **Leipzig** (octobre 1813), la *bataille des Nations
       type: 'encadre',
       label: 'Cent-Jours et Sainte-Hélène',
       contenu_md: `Pendant qu\'à Vienne le congrès des vainqueurs redécoupe l\'Europe, Napoléon, sur Elbe, prépare son retour. Le **1ᵉʳ mars 1815**, il débarque à **Golfe-Juan** avec mille hommes. La marche vers Paris est un prodige : à chaque détachement royal envoyé pour l\'arrêter, il s\'avance seul et déclare : *si quelqu\'un d\'entre vous veut tuer son empereur, me voici*. Les soldats se rangent à sa suite. Louis XVIII fuit. **Vingt jours plus tard**, il est aux Tuileries — sans avoir tiré un coup de feu. Mais la coalition se reforme aussitôt. À **Waterloo**, le **18 juin 1815**, Wellington tient et Blücher arrive à temps. La Garde recule pour la première fois. Cette fois, les vainqueurs ne laissent rien au hasard : Napoléon est déporté à **Sainte-Hélène**, rocher anglais perdu dans l\'Atlantique sud, à 1 900 km de la côte africaine. **Six ans** de captivité humiliante, à dicter ses mémoires à **Las Cases** — qui en feront le *Mémorial*, bréviaire du futur mythe napoléonien. Il meurt le **5 mai 1821**, probablement d\'un cancer de l\'estomac, à 51 ans.`
+    },
+
+    {
+      type: 'mini-quiz',
+      q: 'Pourquoi le blocus continental s\'est-il retourné contre l\'Empire ?',
+      reponse: 'Pour être efficace, il fallait fermer **toutes** les côtes européennes au commerce anglais — donc contrôler l\'Europe entière. C\'est lui qui pousse Napoléon dans le piège espagnol (1808) puis vers la Russie (1812), qui rouvrait son commerce avec Londres. L\'arme économique a dicté une stratégie militaire intenable.'
     },
 
     {

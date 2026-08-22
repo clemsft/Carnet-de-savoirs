@@ -193,6 +193,21 @@ Tezuka pose aussi les bases du **système** qui régira l'industrie pendant soix
     },
 
     {
+      type: 'widget',
+      composant: 'Prediction',
+      titre: 'Le coût du dessin',
+      params: {
+        question: 'Combien de dessins faut-il environ pour un épisode d\'animé de 20 minutes ?',
+        min: 0,
+        max: 10000,
+        step: 100,
+        reponse: 3000,
+        unite: 'dessins',
+        explication: 'Environ **3 000 dessins** par épisode — et c\'est déjà le résultat des économies du « limited animation ». Un long-métrage Ghibli en demande dix fois plus.'
+      }
+    },
+
+    {
       type: 'texte',
       titre: `Les <em>genres</em> et leurs publics`,
       contenu_md:
@@ -218,6 +233,12 @@ Le **shonen** vise les jeunes garçons (8-18 ans) : combats, amitié, dépasseme
           { label: 'Slice of life', valeur: 'K-On!, Barakamon, Yuru Camp', description: 'Renoncement à l\'intrigue spectaculaire pour le détail du quotidien : une école de musique, un camping, une école d\'art. Genre méditatif et contemplatif.' }
         ]
       }
+    },
+
+    {
+      type: 'mini-quiz',
+      q: 'Qu\'est-ce que la « limited animation » héritée de Tezuka — et pourquoi est-elle un génie autant qu\'une contrainte ?',
+      reponse: 'Animer **moins d\'images** (8 par seconde au lieu de 24, plans fixes, bouches seules animées, cycles réutilisés) pour tenir des budgets TV minuscules. La contrainte a forgé une **esthétique** : cadrages audacieux, arrêts sur image dramatiques, économie du mouvement devenue signature du médium.'
     },
 
     {

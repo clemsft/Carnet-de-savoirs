@@ -180,6 +180,15 @@ Syntaxes disponibles :
 
 ## 7. Le bloc `cours` — types de blocs
 
+**Règle d'or : un widget = une intention pédagogique.** Avant d'insérer un widget, nomme ce qu'il fait faire au lecteur :
+
+- **S'engager / prédire** → `Prediction` (s'engager sur une valeur avant de savoir), `mini-quiz` (répondre de tête avant de révéler). **Obligatoires : au moins 1 `Prediction` et 1 à 2 `mini-quiz` par sujet.** Toujours placer la `Prediction` AVANT le passage qui donne la réponse.
+- **Se tester** → `GrilleCartes` (l'app ajoute automatiquement des boutons « su / à revoir » persistants : rédige les faces avant comme des questions implicites), `Frise` (l'app propose automatiquement « Masquer les dates »).
+- **Explorer / manipuler** → `CurseurParametrique`, `SelecteurValeurs` (+ comparateur), `Equation` en mode manipulable.
+- **Structurer** → `TableauComparatif`, `ListeMethodes`, `SchemaAnnote`.
+
+Un widget qui ne fait que reformater du texte lisible en paragraphe (une « grille » de définitions qu'on aurait pu écrire en prose, une frise de 2 événements) est un widget-décoration : ne l'insère pas.
+
 ```js
 cours: [
   // ... succession de blocs de différents types ...
@@ -222,20 +231,20 @@ Une mise en valeur visuelle pour insister sur un point.
 
 ### 7.3. `type: 'widget'`
 
-Un composant interactif. Voir §8 pour les 8 composants disponibles.
+Un composant interactif. Voir §8 pour les 9 composants disponibles.
 
 ```js
 {
   type: 'widget',
   titre: 'Sélectionnez un astre pour visualiser sa vitesse de libération',  // [optionnel]
-  composant: 'SelecteurValeurs',        // un des 8 noms de §8
+  composant: 'SelecteurValeurs',        // un des 9 noms de §8
   params: { /* params spécifiques au composant */ }
 }
 ```
 
 ### 7.4. `type: 'mini-quiz'`
 
-Une question de vérification insérée **dans le fil du cours** (différente du quiz de l'onglet Quiz), avec réponse masquée à révéler. Idéal en fin de section.
+Une question de vérification insérée **dans le fil du cours** (différente du quiz de l'onglet Quiz), avec réponse masquée à révéler. **1 à 2 par sujet, obligatoire** — idéalement après un passage dense, en formulant la question de façon à obliger un rappel de mémoire (« Sans remonter dans la page… », « De mémoire… »).
 
 ```js
 {
@@ -259,7 +268,7 @@ Une question de vérification insérée **dans le fil du cours** (différente du
 
 ---
 
-## 8. Les 8 widgets disponibles
+## 8. Les 9 widgets disponibles
 
 ### 8.1. `SelecteurValeurs`
 
@@ -357,6 +366,7 @@ Une grille de cartes uniformes — idéale pour des classifications, des compara
 
 - `tag` : optionnel, court, affiché en italique au-dessus du titre.
 - 2 à 6 cartes idéalement.
+- **Auto-test automatique** : après retournement, l'app propose « ✓ su / ✗ à revoir » et persiste les réponses (pastilles + bilan). Tire parti de ce mécanisme : rédige la **face avant comme une invite à deviner** (le nom seul, la date seule, le concept nu) et la face arrière comme la réponse complète.
 
 ### 8.4. `ListeMethodes`
 
@@ -399,6 +409,7 @@ Une timeline chronologique verticale. Idéale pour les sujets historiques, l'év
 ```
 
 - Chaque événement a `date` (chaîne libre — date, période, ordre de grandeur), `titre` (court), `description` (markdown lite supporté).
+- **Auto-test automatique** : dès 3 événements datés, l'app affiche un bouton « Masquer les dates » qui transforme la frise en exercice de datation (clic sur une date voilée pour la révéler). Rien à configurer.
 - 3 à 8 événements idéalement.
 - Les dates s'affichent en italique colorées, le marqueur sur la ligne verticale, la description en dessous.
 
@@ -489,6 +500,34 @@ Un tableau n × m triable au clic sur les en-têtes, avec surlignage automatique
 
 - Cellules et en-têtes en texte brut (pas de markdown). Les nombres sont formatés en français.
 - 2 à 8 lignes, 2 à 6 colonnes idéalement.
+
+### 8.9. `Prediction`
+
+**Le widget d'engagement actif — au moins un par sujet.** L'utilisateur s'engage sur une valeur chiffrée au curseur AVANT de connaître la réponse, clique « Je me prononce », et l'app révèle la vraie valeur, l'écart, un verdict et l'explication. C'est le mécanisme de calibration qui rend les ordres de grandeur mémorables.
+
+```js
+{
+  type: 'widget',
+  composant: 'Prediction',
+  titre: 'Avant le graphique, ton estimation',      // [optionnel]
+  params: {
+    question: 'Sur les 422 000 hommes entrés en Russie, combien repassent le Niémen ?',  // [requis]
+    min: 0,
+    max: 422000,
+    step: 1000,
+    valeurInitiale: 200000,       // [optionnel] position de départ du curseur (défaut : milieu)
+    reponse: 10000,               // [requis] la vraie valeur
+    unite: 'hommes',              // [optionnel]
+    explication: '**10 000** hommes en état de combattre — soit 2 %. Froid, typhus, faim…'  // markdown lite
+  }
+}
+```
+
+**Règles d'usage :**
+- Place TOUJOURS la `Prediction` **avant** le bloc qui donne la réponse (texte, schéma, sélecteur) — jamais après.
+- Choisis une valeur **surprenante** : si tout le monde tombe juste, le widget n'apprend rien. Les meilleurs candidats : ordres de grandeur contre-intuitifs, pourcentages extrêmes, durées mal calibrées.
+- `question` et `titre` en texte brut ; `explication` en markdown lite.
+- Cale `min`/`max` pour que la réponse ne soit ni au bord ni au centre exact, et `valeurInitiale` loin de la réponse.
 
 ---
 
@@ -662,7 +701,7 @@ L'app a une voix : **élégante, dense, posée, à la fois rigoureuse et émerve
 - **Pas de listes à puces dans `contenu_md`** sauf si vraiment nécessaire (le rendu n'est pas géré). Préfère du texte structuré en paragraphes.
 - **Pas d'emoji** dans le contenu (réservé à l'interface).
 - **Citations et chiffres précis** quand pertinents (dates, ordres de grandeur, noms de lois) — c'est ce qui donne du poids.
-- **Dimensionnement** : un sujet typique fait 8 à 15 blocs `cours` (mélange texte / encadre / widget, au moins 2-3 widgets), 8 à 10 questions de quiz (dont 1 ou 2 d'un autre type que QCM), 12 à 20 nœuds de carte mentale sur 2-3 niveaux (max 7 enfants par nœud, labels ≤ 25 caractères), 6 à 10 termes de vocabulaire.
+- **Dimensionnement** : un sujet typique fait 10 à 16 blocs `cours` (mélange texte / encadre / widget, au moins 2-3 widgets **dont 1 `Prediction` et 1-2 `mini-quiz`**), 8 à 10 questions de quiz (dont 1 ou 2 d'un autre type que QCM), 12 à 20 nœuds de carte mentale sur 2-3 niveaux (max 7 enfants par nœud, labels ≤ 25 caractères), 6 à 10 termes de vocabulaire.
 - **Dates de Frise** : formats reconnus par la Timeline globale : `1789`, `-450`, `~2500 av. J.-C.`, `117 ap. J.-C.`, `XVᵉ siècle`, `IXᵉ-Xᵉ s.`, `IVe millénaire av. J.-C.`, `1914-1918`, `1954-55`, `26 avril 1986`, `Années 1990-2000`, `il y a 300 000 ans`, `3,5 Ga`, `470 Ma`, `9 thermidor an II`. Une date libre (« Waterloo », « Jour 1 ») reste affichée dans la fiche mais est ignorée par la Timeline.
 
 ---
@@ -692,7 +731,7 @@ L'app a une voix : **élégante, dense, posée, à la fois rigoureuse et émerve
 - [ ] 4-8 `points_cles` courts.
 - [ ] `carte_mentale` a un `central` qui pointe vers un nœud existant.
 - [ ] Tous les `liens` réfèrent à des nœuds existants.
-- [ ] 5-10 blocs de `cours` mélangeant texte, encadré et au moins un widget.
+- [ ] 10-16 blocs de `cours` mélangeant texte, encadré et widgets — **dont au moins 1 `Prediction` (placée avant la réponse) et 1-2 `mini-quiz`** ; aucun widget-décoration.
 - [ ] 5-10 questions de `quiz` avec `correcte` valide.
 - [ ] 5-10 entrées de `vocabulaire` avec définitions autoporteuses.
 - [ ] Aucun `<script>`, aucun `fetch()`, aucune dépendance externe.
@@ -704,4 +743,4 @@ Une fois ces points cochés, tu peux livrer le fichier à l'utilisateur qui l'aj
 
 ---
 
-*v1.3 — réf pour génération de sujets, août 2026 (v1.2 + minimum de 3 photos par sujet, pistes pour les sujets abstraits, livraison des liens en liste numérotée)*
+*v1.4 — réf pour génération de sujets, août 2026 (v1.3 + widgets pédagogiques : règle « un widget = une intention », widget `Prediction` obligatoire, mini-quiz obligatoires, auto-test GrilleCartes et Frise)*

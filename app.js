@@ -14,7 +14,7 @@
   // Version de l'application, bumpée automatiquement par Snapshot.bat
   // (cf. Update-Cache-Version.ps1, section APP_VERSION). Affichée en bas
   // de la sidebar pour signaler chaque mise à jour à l'utilisateur.
-  const APP_VERSION = 'v1.11';
+  const APP_VERSION = 'v1.12';
 
   // =================================================================
   // STATE
@@ -149,6 +149,7 @@
     out.achievements = out.achievements.filter(x => typeof x === 'string');
     out.dailyQuizDates = out.dailyQuizDates.filter(x => typeof x === 'string');
     out.vocabReviewed = out.vocabReviewed.filter(x => typeof x === 'string');
+    if (!out.cardSelfTest || typeof out.cardSelfTest !== 'object' || Array.isArray(out.cardSelfTest)) out.cardSelfTest = {};
     out.quizLog = out.quizLog.filter(x => x && typeof x === 'object');
     // Scores de quiz : entrées cohérentes uniquement (total > 0, best numérique)
     Object.keys(out.quizScores).forEach(k => {
@@ -256,6 +257,7 @@
       dailyActivity: {}, // 'YYYY-MM-DD' -> { visits, blocs, quiz } pour la heatmap
       activeParcours: null, // { slug, etape } | null — parcours thématique en cours
       vocabReviewed: [],  // termes de vocabulaire retournés au moins une fois en flashcards (succès Cartographe)
+      cardSelfTest: {},   // sujetId -> 'b{blockIdx}' -> cardIdx -> 'ok'|'ko' (auto-test des GrilleCartes)
       lastView: '/'
     };
   }
@@ -2567,7 +2569,7 @@
       counter.textContent = (idx + 1) + ' / ' + total;
       clear(slideContent);
       try {
-        const node = renderBlock(block, sujet);
+        const node = renderBlock(block, sujet, idx);
         if (node) slideContent.appendChild(node);
         else slideContent.appendChild(el('p', null, '(bloc vide)'));
       } catch (e) {
@@ -2847,7 +2849,7 @@
     sujet.cours.forEach((block, i) => {
       let node = null;
       try {
-        node = renderBlock(block, sujet);
+        node = renderBlock(block, sujet, i);
       } catch (e) {
         console.error(`[CarnetDeSavoirs] Erreur de rendu cours[${i}]`, e, block);
         node = el('div', { class: 'block-error course-block' },
@@ -3101,7 +3103,7 @@
   // BLOCK / WIDGET RENDERING
   // =================================================================
 
-  function renderBlock(block, sujet) {
+  function renderBlock(block, sujet, blockIdx) {
     if (!block || !block.type) return null;
     switch (block.type) {
       case 'texte':
@@ -3109,7 +3111,7 @@
       case 'encadre':
         return renderEncadreBlock(block);
       case 'widget':
-        return renderWidget(block);
+        return renderWidget(block, { sujetId: sujet && sujet.meta ? sujet.meta.id : null, blockIdx: blockIdx });
       case 'html_libre':
         return renderHtmlLibre(block);
       case 'mini-quiz':
@@ -3191,7 +3193,7 @@
     return wrap;
   }
 
-  function renderWidget(block) {
+  function renderWidget(block, ctx) {
     const wrap = el('section', { class: 'widget course-block' });
     if (block.titre) wrap.appendChild(el('div', { class: 'widget-title', html: '— ' + htmlEscapeButKeepEm(block.titre) }));
     const renderer = WIDGETS[block.composant];
@@ -3201,7 +3203,7 @@
       return wrap;
     }
     try {
-      const inner = renderer(block.params || {});
+      const inner = renderer(block.params || {}, ctx || {});
       if (inner) wrap.appendChild(inner);
     } catch (e) {
       console.error(`[CarnetDeSavoirs] Erreur dans le widget "${block.composant}"`, e, block.params);
@@ -3454,10 +3456,52 @@
        description. Clic pour retourner. Sans description la carte reste
        statique (compatibilité ascendante).
     */
-    GrilleCartes(params) {
+    GrilleCartes(params, ctx) {
       const cartes = params.cartes || [];
+      const wrap = el('div');
       const grid = el('div', { class: 'w-grid' });
-      cartes.forEach(c => {
+      // ---- Auto-test persistant ----
+      // Le retournement d'une carte est déjà un « devine d'abord » implicite ;
+      // on le rend explicite : après révélation, l'utilisateur marque la carte
+      // « su » ou « à revoir ». Persisté par sujet+bloc dans cardSelfTest.
+      const canTrack = !!(ctx && ctx.sujetId != null && ctx.blockIdx != null);
+      const key = canTrack ? 'b' + ctx.blockIdx : null;
+      function getMarks() {
+        if (!canTrack) return {};
+        const bySujet = state.user.cardSelfTest[ctx.sujetId] || {};
+        return bySujet[key] || {};
+      }
+      function setMark(idx, val) {
+        if (!canTrack) return;
+        if (!state.user.cardSelfTest[ctx.sujetId]) state.user.cardSelfTest[ctx.sujetId] = {};
+        if (!state.user.cardSelfTest[ctx.sujetId][key]) state.user.cardSelfTest[ctx.sujetId][key] = {};
+        if (val === null) delete state.user.cardSelfTest[ctx.sujetId][key][idx];
+        else state.user.cardSelfTest[ctx.sujetId][key][idx] = val;
+        saveUserState();
+        syncSummary();
+      }
+      const summary = el('div', { class: 'w-grid-selftest-summary' });
+      function syncSummary() {
+        const marks = getMarks();
+        const vals = Object.values(marks);
+        const ok = vals.filter(v => v === 'ok').length, ko = vals.filter(v => v === 'ko').length;
+        clear(summary);
+        if (!vals.length) { summary.style.display = 'none'; return; }
+        summary.style.display = '';
+        summary.appendChild(el('span', null, 'Auto-test : '));
+        summary.appendChild(el('span', { class: 'st-ok' }, ok + ' sue' + (ok > 1 ? 's' : '')));
+        summary.appendChild(el('span', null, ' · '));
+        summary.appendChild(el('span', { class: 'st-ko' }, ko + ' à revoir'));
+        const reset = el('button', { class: 'w-grid-selftest-reset', type: 'button' }, 'réinitialiser');
+        reset.addEventListener('click', () => {
+          if (state.user.cardSelfTest[ctx.sujetId]) delete state.user.cardSelfTest[ctx.sujetId][key];
+          saveUserState();
+          grid.querySelectorAll('.w-grid-card-flip').forEach(cd => { cd.classList.remove('is-flipped', 'st-ok', 'st-ko'); });
+          syncSummary();
+        });
+        summary.appendChild(reset);
+      }
+      cartes.forEach((c, ci) => {
         const hasBack = c.description && String(c.description).trim() !== '';
         if (!hasBack) {
           grid.appendChild(el('div', { class: 'w-grid-card w-grid-card-static' },
@@ -3466,7 +3510,8 @@
           ));
           return;
         }
-        const card = el('button', { class: 'w-grid-card w-grid-card-flip', type: 'button' });
+        const mark = getMarks()[ci];
+        const card = el('button', { class: 'w-grid-card w-grid-card-flip' + (mark === 'ok' ? ' st-ok' : mark === 'ko' ? ' st-ko' : ''), type: 'button' });
         const inner = el('div', { class: 'w-grid-card-inner' });
         const front = el('div', { class: 'w-grid-card-face w-grid-card-front' },
           c.tag ? el('span', { class: 'tag' }, c.tag) : null,
@@ -3478,16 +3523,29 @@
           el('div', {
             class: 'w-grid-card-desc',
             html: md(c.description).replace(/^<p>|<\/p>$/g, '')
-          }),
-          el('span', { class: 'w-grid-card-hint' }, 'Retourner')
+          })
         );
+        if (canTrack) {
+          const btns = el('div', { class: 'w-grid-selftest-btns' });
+          const okB = el('button', { class: 'w-grid-st-btn st-btn-ok', type: 'button', title: 'Je le savais' }, '✓ su');
+          const koB = el('button', { class: 'w-grid-st-btn st-btn-ko', type: 'button', title: 'À revoir' }, '✗ à revoir');
+          okB.addEventListener('click', (e) => { e.stopPropagation(); setMark(ci, 'ok'); card.classList.add('st-ok'); card.classList.remove('st-ko'); });
+          koB.addEventListener('click', (e) => { e.stopPropagation(); setMark(ci, 'ko'); card.classList.add('st-ko'); card.classList.remove('st-ok'); });
+          btns.appendChild(okB); btns.appendChild(koB);
+          back.appendChild(btns);
+        } else {
+          back.appendChild(el('span', { class: 'w-grid-card-hint' }, 'Retourner'));
+        }
         inner.appendChild(front);
         inner.appendChild(back);
         card.appendChild(inner);
         card.addEventListener('click', () => card.classList.toggle('is-flipped'));
         grid.appendChild(card);
       });
-      return grid;
+      wrap.appendChild(summary);
+      wrap.appendChild(grid);
+      syncSummary();
+      return wrap;
     },
 
     /* ----- ListeMethodes -----
@@ -3545,7 +3603,25 @@
     */
     Frise(params) {
       const events = params.evenements || [];
+      const outer = el('div');
       const wrap = el('div', { class: 'w-frise w-frise-interactive' });
+      // ---- Auto-test : masquer les dates ----
+      // Transforme la frise en exercice de datation : les dates sont voilées,
+      // un clic sur chacune la révèle. Proposé dès que 3 événements sont datés.
+      const datedCount = events.filter(ev => ev && ev.date).length;
+      let testMode = false;
+      if (datedCount >= 3) {
+        const toggle = el('button', { class: 'w-frise-test-toggle', type: 'button' }, 'Masquer les dates (auto-test)');
+        toggle.addEventListener('click', () => {
+          testMode = !testMode;
+          toggle.textContent = testMode ? 'Réafficher les dates' : 'Masquer les dates (auto-test)';
+          toggle.classList.toggle('is-active', testMode);
+          wrap.querySelectorAll('.w-frise-date').forEach(d => {
+            d.classList.toggle('is-veiled', testMode);
+          });
+        });
+        outer.appendChild(toggle);
+      }
       const items = events.map((ev, i) => {
         const hasDesc = ev.description && String(ev.description).trim() !== '';
         const item = el(hasDesc ? 'button' : 'div', {
@@ -3554,7 +3630,18 @@
         });
         item.appendChild(el('div', { class: 'w-frise-marker' }));
         const content = el('div', { class: 'w-frise-content' });
-        if (ev.date) content.appendChild(el('div', { class: 'w-frise-date' }, ev.date));
+        if (ev.date) {
+          const dateEl = el('div', { class: 'w-frise-date' }, ev.date);
+          // En mode auto-test, cliquer sur la date voilée la révèle (sans
+          // déplier/replier l'événement).
+          dateEl.addEventListener('click', (e) => {
+            if (dateEl.classList.contains('is-veiled')) {
+              e.stopPropagation();
+              dateEl.classList.remove('is-veiled');
+            }
+          });
+          content.appendChild(dateEl);
+        }
         if (ev.titre) content.appendChild(el('div', { class: 'w-frise-titre' }, ev.titre));
         if (hasDesc) {
           const descWrap = el('div', { class: 'w-frise-desc-wrap' });
@@ -3593,7 +3680,8 @@
         }
       });
 
-      return wrap;
+      outer.appendChild(wrap);
+      return outer;
     },
 
     /* ----- Equation (rendu LaTeX via KaTeX, chargée via CDN) -----
@@ -3856,6 +3944,85 @@
       wrapTable.appendChild(table);
       renderBody();
       return wrapTable;
+    },
+
+    /* ----- Prediction -----
+       Le widget d'engagement actif : l'utilisateur s'engage sur une valeur
+       AVANT de connaître la réponse, puis compare. C'est le mécanisme de
+       calibration qui rend les ordres de grandeur mémorables — se tromper
+       de peu ou de beaucoup, mais s'être prononcé.
+       params = {
+         question: 'Combien de… ?',      // [requis] la question chiffrée
+         min, max, step,                  // bornes du curseur
+         reponse: 4.9,                    // [requis] la vraie valeur
+         unite: 'Md€',                    // [optionnel]
+         valeurInitiale,                  // [optionnel] défaut = milieu de plage
+         explication: '…'                 // [optionnel] markdown-lite, affiché après révélation
+       }
+       Aucune persistance : l'intérêt est dans le moment de l'engagement,
+       pas dans l'historique.
+    */
+    Prediction(params) {
+      const min = params.min ?? 0;
+      const max = params.max ?? 100;
+      const step = params.step ?? 1;
+      const answer = params.reponse;
+      const span = (max - min) || 1;
+      const init = params.valeurInitiale ?? (min + span / 2);
+      const wrap = el('div', { class: 'w-predict' });
+      if (params.question) wrap.appendChild(el('div', { class: 'w-predict-question' }, params.question));
+
+      const valueLabel = el('span', { class: 'w-predict-value' });
+      const labelRow = el('div', { class: 'w-predict-labelrow' },
+        el('span', { class: 'w-predict-prompt' }, 'Ta prédiction :'), valueLabel);
+      const slider = el('input', {
+        type: 'range', class: 'w-range w-predict-range',
+        min, max, step, value: init,
+        'aria-label': params.question || 'Prédiction'
+      });
+      const fmt = (v) => formatNumberFr(v, decimalsOfStep(step)) + (params.unite ? ' ' + params.unite : '');
+      const sync = () => { valueLabel.textContent = fmt(parseFloat(slider.value)); };
+      slider.addEventListener('input', sync);
+
+      const goBtn = el('button', { class: 'btn w-predict-go', type: 'button' }, 'Je me prononce');
+      const result = el('div', { class: 'w-predict-result', style: { display: 'none' } });
+
+      goBtn.addEventListener('click', () => {
+        const guess = parseFloat(slider.value);
+        slider.disabled = true;
+        goBtn.style.display = 'none';
+        const err = Math.abs(guess - answer) / span;   // écart relatif à la plage
+        let verdict, cls;
+        if (err <= 0.05)      { verdict = 'Excellent — quasi dans le mille.'; cls = 'is-great'; }
+        else if (err <= 0.15) { verdict = 'Bien vu — tu étais proche.';        cls = 'is-close'; }
+        else if (err <= 0.35) { verdict = 'L\'ordre de grandeur y est, mais l\'écart est réel.'; cls = 'is-far'; }
+        else                  { verdict = 'Surprenant, non ? C\'est justement ce qui le rend mémorable.'; cls = 'is-off'; }
+        result.classList.add(cls);
+        result.style.display = '';
+        // Mini-échelle : position de la prédiction et de la réponse
+        const scale = el('div', { class: 'w-predict-scale' });
+        const pctOf = (v) => Math.max(0, Math.min(100, ((v - min) / span) * 100));
+        scale.appendChild(el('div', { class: 'w-predict-mark w-predict-mark-guess', style: { left: pctOf(guess) + '%' }, title: 'Ta prédiction' }));
+        scale.appendChild(el('div', { class: 'w-predict-mark w-predict-mark-answer', style: { left: pctOf(answer) + '%' }, title: 'La réponse' }));
+        result.appendChild(el('div', { class: 'w-predict-numbers' },
+          el('span', { class: 'w-predict-num-guess' }, 'Toi : ' + fmt(guess)),
+          el('span', { class: 'w-predict-num-answer' }, 'Réponse : ' + fmt(answer))
+        ));
+        result.appendChild(scale);
+        result.appendChild(el('div', { class: 'w-predict-verdict' }, verdict));
+        if (params.explication) {
+          result.appendChild(el('div', { class: 'w-predict-explication', html: md(params.explication) }));
+        }
+      });
+
+      sync();
+      wrap.appendChild(labelRow);
+      wrap.appendChild(slider);
+      wrap.appendChild(el('div', { class: 'w-predict-bounds' },
+        el('span', null, fmt(min)), el('span', null, fmt(max))));
+      wrap.appendChild(goBtn);
+      wrap.appendChild(result);
+      return wrap;
     },
 
     /* ----- SchemaAnnote (image avec hotspots cliquables) -----

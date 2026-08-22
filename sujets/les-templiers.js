@@ -149,6 +149,22 @@ Rapidement, les rois eux-mêmes utilisent leurs services. Le **trésor royal de 
     },
 
     {
+      type: 'widget',
+      composant: 'Prediction',
+      titre: 'L\'Ordre en chiffres',
+      params: {
+        question: 'Combien d\'années sépare la reconnaissance de l\'Ordre (concile de Troyes, 1129) de sa dissolution (1312) ?',
+        min: 20,
+        max: 500,
+        step: 1,
+        valeurInitiale: 350,
+        reponse: 183,
+        unite: 'ans',
+        explication: '**183 ans** — moins de deux siècles pour passer de neuf chevaliers pauvres à la première puissance financière d\'Europe, puis au bûcher.'
+      }
+    },
+
+    {
       type: 'texte',
       titre: `Le vendredi 13 octobre 1307`,
       contenu_md:
@@ -168,6 +184,12 @@ Les accusations sont graves : *reniement du Christ*, *idolâtrie* (l'énigmatiqu
         legende: 'L\'exécution du dernier maître de l\'Ordre, le 18 mars 1314, miniature des Chroniques de France (XIVᵉ-XVᵉ siècle, BnF). (Domaine public)',
         hotspots: []
       }
+    },
+
+    {
+      type: 'mini-quiz',
+      q: 'Quel mécanisme financier les Templiers ont-ils inventé, et quel problème résolvait-il ?',
+      reponse: 'La **lettre de change** : déposer son or à Paris, voyager avec un simple document chiffré, retirer à Jérusalem. Elle résolvait le problème du **transport de valeur** sur 3 000 km de routes dangereuses — l\'ancêtre du chèque de voyage.'
     },
 
     {

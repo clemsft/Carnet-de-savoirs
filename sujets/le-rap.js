@@ -213,6 +213,21 @@ La troisième technique est la **production** — le travail sur le **beat**. Au
     },
 
     {
+      type: 'widget',
+      composant: 'Prediction',
+      titre: 'Retour aux origines',
+      params: {
+        question: 'En quelle année a lieu la block party fondatrice de DJ Kool Herc dans le Bronx ?',
+        min: 1950,
+        max: 2000,
+        step: 1,
+        reponse: 1973,
+        unite: '',
+        explication: '**1973**, au 1520 Sedgwick Avenue. Cinquante ans plus tard, le genre né dans cette fête d\'anniversaire est la musique la plus écoutée du monde.'
+      }
+    },
+
+    {
       type: 'texte',
       titre: `La <em>guerre des côtes</em> et l'âge d'or des années 1990`,
       contenu_md:
@@ -268,6 +283,13 @@ Dans les années 2000, **Booba** (Boulogne-Billancourt, ancien de **Lunatic**) i
 En parallèle naît à **Chicago** la [drill]{accent}, sous-genre plus dur et plus rapide, avec **Chief Keef** en figure de proue (*I Don't Like*, 2012). La drill se mondialise : Londres (Headie One, Digga D), Brooklyn (Pop Smoke, tué à 20 ans en 2020), Paris (Gazo, Freeze Corleone). Le rap n'a plus de centre — il est devenu **simultanément partout**.
 
 Au sommet de cette décennie 2010, une figure se détache : **Kendrick Lamar**, de **Compton** (Californie). Trois albums vertigineux : *good kid, m.A.A.d city* (2012, récit autobiographique d'une enfance dans la violence), *To Pimp a Butterfly* (2015, fresque jazz-funk-spoken-word sur la condition noire américaine), *DAMN.* (2017, méditation morale resserrée). Ce dernier reçoit en **2018** le **Prix Pulitzer de musique** — première récompense de ce prestige attribuée à un album rap, geste de reconnaissance institutionnelle longtemps inimaginable. Kendrick devient, sans concurrent sérieux, la voix la plus écoutée de sa génération. Le rap, cinquante ans après Kool Herc, a accompli son passage : de musique de fête de quartier à art majeur, étudié, primé, mondialisé — sans pourtant rien perdre de sa puissance de témoignage initial.`
+    },
+
+    {
+      type: 'mini-quiz',
+      q: 'Boom-bap et trap : quelle est la différence rythmique fondamentale ?',
+      indice: 'Réécoute mentalement la grille de flow vue plus haut.',
+      reponse: 'Le **boom-bap** (années 1990, ~90 BPM) : caisse claire carrée sur les temps 2 et 4, échantillons de soul-funk. La **trap** (Atlanta, années 2010) : basses 808, tempo lent mais hi-hats en **triolets** ultra-rapides — c\'est ce débit ternaire qui change tout le flow.'
     },
 
     {

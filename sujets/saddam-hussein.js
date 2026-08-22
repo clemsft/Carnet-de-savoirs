@@ -112,6 +112,12 @@ L'année 1979 est décisive à un autre titre : de l'autre côté de la frontiè
     },
 
     {
+      type: 'mini-quiz',
+      q: 'Pourquoi qualifier l\'État baasiste de « coup-proof » — et quel est le revers de cette conception ?',
+      reponse: 'Des **services de sécurité rivaux** qui se surveillent mutuellement, le clan de Tikrit aux postes clés, une armée doublée d\'une Garde républicaine loyaliste : impossible d\'organiser un complot. Mais un État bâti sur la **loyauté plutôt que la compétence** est désarmé face à une vraie guerre — 1991 et 2003 le montreront.'
+    },
+
+    {
       type: 'texte',
       titre: `La répression intérieure`,
       contenu_md:
@@ -148,6 +154,22 @@ Après la défaite de 1991, les chiites du Sud se soulèvent, croyant à un sout
         image: 'images/saddam-hussein--firdos-2003.jpg',
         legende: 'La statue de Saddam Hussein abattue place Firdos, à Bagdad — l\'image, en partie mise en scène, qui symbolisa la chute du régime. (Photo U.S. military — domaine public)',
         hotspots: []
+      }
+    },
+
+    {
+      type: 'widget',
+      composant: 'Prediction',
+      titre: 'La mécanique du plébiscite',
+      params: {
+        question: 'Quel score officiel Saddam Hussein obtient-il au référendum présidentiel de 2002 ?',
+        min: 50,
+        max: 100,
+        step: 0.1,
+        valeurInitiale: 75,
+        reponse: 100,
+        unite: '%',
+        explication: '**100,00 %** — 11 445 638 « oui », zéro « non », participation 100 %, selon le régime. Le chiffre ne mesure pas l\'adhésion : il mesure la peur.'
       }
     },
 
